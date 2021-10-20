@@ -127,34 +127,44 @@ class AddStoryViewController: UIViewController {
         ])
     }
     
+    // MARK: - Keyboard notifications
+    
     private func subscribeToKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: AddStoryViewController.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: AddStoryViewController.keyboardWillHideNotification, object: nil)
-        
-        // TODO: Uncomment if needed for testing.
-        
-       // NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChangeFrame(notification:)), name: AddStoryViewController.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow(notification:)),
+            name: AddStoryViewController.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide(notification:)),
+            name: AddStoryViewController.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     private func unsubscribeFromKeyboardNotifications() {
-        NotificationCenter.default.removeObserver(self, name: AddStoryViewController.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: AddStoryViewController.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.removeObserver(
+            self,
+            name: AddStoryViewController.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.removeObserver(
+            self,
+            name: AddStoryViewController.keyboardWillHideNotification,
+            object: nil
+        )
     }
     
     @objc private func keyboardWillShow(notification: NSNotification) {
         if let userInfo = notification.userInfo,
            let keyboardSize = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
            let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double {
-            // TODO: Fix animation jumping.
-            shouldAnimate = animationDuration > 0
-            if shouldAnimate {
-                confirmButtonBottomConstraint?.constant = -keyboardSize.height
-                
-                print("will show")
-                print(animationDuration)
-                UIView.animate(withDuration: animationDuration) { [weak self] in
-                    self?.view.layoutIfNeeded()
-                }
+            confirmButtonBottomConstraint?.constant = -keyboardSize.height
+            
+            UIView.animate(withDuration: animationDuration) { [weak self] in
+                self?.view.layoutIfNeeded()
             }
         }
     }
@@ -162,30 +172,7 @@ class AddStoryViewController: UIViewController {
     @objc private func keyboardWillHide(notification: NSNotification) {
         if let userInfo = notification.userInfo,
            let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double {
-            print("will hide")
-            print(animationDuration)
-            if shouldAnimate {
-                confirmButtonBottomConstraint?.constant = -padding
-                
-                UIView.animate(withDuration: animationDuration) { [weak self] in
-                    self?.view.layoutIfNeeded()
-                }
-            }
-        }
-    }
-    
-    @objc private func keyboardWillChangeFrame(notification: NSNotification) {
-        if let userInfo = notification.userInfo,
-           let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-           let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double {
-            print(keyboardFrame.minY)
-            print(animationDuration)
-            
-            guard animationDuration > 0 else {
-                return
-            }
-
-            confirmButtonBottomConstraint?.constant = -keyboardFrame.height
+            confirmButtonBottomConstraint?.constant = -padding
             
             UIView.animate(withDuration: animationDuration) { [weak self] in
                 self?.view.layoutIfNeeded()
@@ -199,8 +186,8 @@ class AddStoryViewController: UIViewController {
 extension AddStoryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == titleTextField {
-            titleTextField.resignFirstResponder()
             locationTextField.becomeFirstResponder()
+            titleTextField.resignFirstResponder()
         } else if textField == locationTextField {
             locationTextField.resignFirstResponder()
         }
