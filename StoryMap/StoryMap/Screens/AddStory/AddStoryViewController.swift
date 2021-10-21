@@ -25,10 +25,6 @@ class AddStoryViewController: UIViewController {
     
     private var confirmButtonBottomConstraint: NSLayoutConstraint?
     
-    private let padding: CGFloat = 20
-    private let topOffset: CGFloat = 50
-    private let confirmButtonHeight: CGFloat = 44
-    
     init(viewModel: AddStoryViewModelType) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -87,29 +83,28 @@ class AddStoryViewController: UIViewController {
     private func setupTitleTextField() {
         titleStackView.axis = .vertical
         titleStackView.distribution = .equalSpacing
-        titleStackView.spacing = 5
+        titleStackView.spacing = StyleKit.metrics.padding.verySmall
         
         titleStackView.addArrangedSubview(titleTextField)
         titleStackView.addArrangedSubview(titleTextFieldErrorLabel)
         
         titleTextFieldErrorLabel.textColor = .red
         titleTextFieldErrorLabel.textAlignment = .left
-        titleTextFieldErrorLabel.font = UIFont.systemFont(ofSize: 12)
+        titleTextFieldErrorLabel.font = StyleKit.font.caption2
         
         titleTextField.borderStyle = .roundedRect
-        titleTextField.translatesAutoresizingMaskIntoConstraints = false
         titleTextField.returnKeyType = .next
         titleTextField.delegate = self
         titleTextField.snp.makeConstraints { make in
-            make.height.equalTo(confirmButtonHeight)
+            make.height.equalTo(StyleKit.metrics.textFieldHeight)
         }
         titleTextField.becomeFirstResponder()
         
         view.addSubview(titleStackView)
         
         titleStackView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(topOffset)
-            make.leading.trailing.equalToSuperview().inset(padding)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(StyleKit.metrics.padding.large)
+            make.leading.trailing.equalToSuperview().inset(StyleKit.metrics.padding.common)
         }
     }
     
@@ -120,9 +115,9 @@ class AddStoryViewController: UIViewController {
         view.addSubview(locationTextField)
         
         locationTextField.snp.makeConstraints { make in
-            make.top.equalTo(titleStackView.snp.bottom).offset(10)
-            make.leading.trailing.equalToSuperview().inset(padding)
-            make.height.equalTo(confirmButtonHeight)
+            make.top.equalTo(titleStackView.snp.bottom).offset(StyleKit.metrics.padding.small)
+            make.leading.trailing.equalToSuperview().inset(StyleKit.metrics.padding.common)
+            make.height.equalTo(StyleKit.metrics.textFieldHeight)
         }
     }
     
@@ -130,7 +125,7 @@ class AddStoryViewController: UIViewController {
         view.addSubview(recordButton)
         
         recordButton.snp.makeConstraints { make in
-            make.top.equalTo(locationTextField.snp.bottom).offset(topOffset)
+            make.top.equalTo(locationTextField.snp.bottom).offset(StyleKit.metrics.padding.large)
             make.centerX.equalToSuperview()
         }
     }
@@ -141,7 +136,7 @@ class AddStoryViewController: UIViewController {
         addPhotoButton.addTarget(self, action: #selector(addPhotoTapped), for: .touchUpInside)
         
         addPhotoButton.snp.makeConstraints { make in
-            make.top.equalTo(recordButton.snp.bottom).offset(padding)
+            make.top.equalTo(recordButton.snp.bottom).offset(StyleKit.metrics.padding.common)
             make.centerX.equalToSuperview()
         }
     }
@@ -153,13 +148,13 @@ class AddStoryViewController: UIViewController {
         confirmButton.layer.borderColor = UIColor.lightGray.cgColor
         confirmButton.layer.cornerRadius = 8
         
-        confirmButtonBottomConstraint = confirmButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -padding)
+        confirmButtonBottomConstraint = confirmButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -StyleKit.metrics.padding.common)
         confirmButtonBottomConstraint?.isActive = true
         
         confirmButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.width.equalTo(locationTextField)
-            make.height.equalTo(confirmButtonHeight)
+            make.height.equalTo(StyleKit.metrics.buttonHeight)
         }
     }
     
@@ -182,7 +177,7 @@ class AddStoryViewController: UIViewController {
         
         actionSheet.addAction(
             UIAlertAction(
-                title: "Take Photo",
+                title: viewModel.addPhotoCaptureAction,
                 style: .default,
                 handler: { [weak self] _ in
                     self?.showImagePicker(with: .camera)
@@ -191,7 +186,7 @@ class AddStoryViewController: UIViewController {
         )
         actionSheet.addAction(
             UIAlertAction(
-                title: "Choose from library",
+                title: viewModel.addPhotoChooseAction,
                 style: .default,
                 handler: { [weak self] _ in
                     self?.showImagePicker(with: .photoLibrary)
@@ -200,7 +195,7 @@ class AddStoryViewController: UIViewController {
         )
         actionSheet.addAction(
             UIAlertAction(
-                title: "Cancel",
+                title: LocalizationKit.general.cancel,
                 style: .cancel,
                 handler: nil
             )
@@ -254,7 +249,7 @@ class AddStoryViewController: UIViewController {
     @objc private func keyboardWillHide(notification: NSNotification) {
         if let userInfo = notification.userInfo,
            let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double {
-            confirmButtonBottomConstraint?.constant = -padding
+            confirmButtonBottomConstraint?.constant = -StyleKit.metrics.padding.common
             
             UIView.animate(withDuration: animationDuration) { [weak self] in
                 self?.view.layoutIfNeeded()
