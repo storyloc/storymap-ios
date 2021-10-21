@@ -44,7 +44,7 @@ class MapViewController: UIViewController {
     }
     
     @objc private func addButtonTapped() {
-        let addStoryVC = AddStoryViewController()
+        let addStoryVC = AddStoryViewController(viewModel: AddStoryViewModel())
         present(addStoryVC, animated: true, completion: nil)
     }
 }
