@@ -9,7 +9,8 @@ import Foundation
 
 struct LocalizationKit {
     static let general = General()
-    static let addStory = AddStory()}
+    static let addStory = AddStory()
+}
 
 extension LocalizationKit {
     struct General {

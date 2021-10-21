@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 public extension String {
     var localized: String {
         get {
