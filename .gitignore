@@ -88,3 +88,4 @@ iOSInjectionProject/
 .DS_Store
 StoryMap/StoryMap.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 *.xcworkspacedata
+StoryMap/StoryMap.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
