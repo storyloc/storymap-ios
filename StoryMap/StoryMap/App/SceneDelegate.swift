@@ -10,18 +10,18 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    var mapCoordinator: CoordinatorType?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         if let windowScene = scene as? UIWindowScene {
-            let navigationController = UINavigationController()
-            let viewController = MapViewController()
-            navigationController.viewControllers = [viewController]
+            self.mapCoordinator = MapCoordinator()
             
             self.window = UIWindow(windowScene: windowScene)
         
-            self.window?.rootViewController = navigationController
+            self.window?.rootViewController = mapCoordinator?.presenter
             self.window?.backgroundColor = .black
             self.window?.makeKeyAndVisible()
+            mapCoordinator?.start(nil)
         }
     }
 

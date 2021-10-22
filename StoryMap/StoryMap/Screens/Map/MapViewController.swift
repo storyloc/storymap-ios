@@ -12,6 +12,8 @@ class MapViewController: UIViewController {
     
     // MARK: - Constants
     
+    var onAddStory: (() -> Void)?
+    
     private let addButton = UIButton(type: .system)
     
     private let buttonOffset: CGFloat = 44
@@ -44,7 +46,6 @@ class MapViewController: UIViewController {
     }
     
     @objc private func addButtonTapped() {
-        let addStoryVC = AddStoryViewController(viewModel: AddStoryViewModel())
-        present(addStoryVC, animated: true, completion: nil)
+        onAddStory?()
     }
 }

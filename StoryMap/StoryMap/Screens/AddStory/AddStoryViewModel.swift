@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol AddStoryViewModelType: AnyObject {
     var titlePlaceholder: String { get }
@@ -16,6 +17,8 @@ protocol AddStoryViewModelType: AnyObject {
     var addPhotoTitle: String { get }
     var addPhotoDialogueTitle: String { get }
     var confirmTitle: String { get }
+    
+    func showAlert(_ alert: UIAlertController)
 }
 
 class AddStoryViewModel: AddStoryViewModelType {
@@ -32,4 +35,10 @@ class AddStoryViewModel: AddStoryViewModelType {
     let addPhotoTitle: String = "Add Photo"
     var addPhotoDialogueTitle: String = "Do you want to take a new photo or choose from library instead?"
     let confirmTitle: String = "Create Story"
+    
+    var onShowAlert: ((UIAlertController) -> Void)?
+    
+    func showAlert(_ alert: UIAlertController) {
+        onShowAlert?(alert)
+    }
 }

@@ -20,6 +20,8 @@ class AddStoryViewController: UIViewController {
     private let titleTextFieldErrorLabel = UILabel()
     private let locationTextField = UITextField()
     private let recordButton = UIButton(type: .system)
+    private let photoStackView = UIStackView()
+    private let pickedImageView = UIImageView()
     private let addPhotoButton = UIButton(type: .system)
     private let confirmButton = UIButton(type: .system)
     
@@ -136,12 +138,35 @@ class AddStoryViewController: UIViewController {
     }
     
     private func setupAddPhotoButton() {
-        view.addSubview(addPhotoButton)
+        photoStackView.axis = .vertical
+        photoStackView.distribution = .equalSpacing
+        photoStackView.spacing = padding
+        
+        photoStackView.addArrangedSubview(pickedImageView)
+        photoStackView.addArrangedSubview(addPhotoButton)
+        
+        view.addSubview(photoStackView)
         
         addPhotoButton.addTarget(self, action: #selector(addPhotoTapped), for: .touchUpInside)
         
-        addPhotoButton.snp.makeConstraints { make in
+        photoStackView.snp.makeConstraints { make in
             make.top.equalTo(recordButton.snp.bottom).offset(padding)
+            make.width.equalTo(locationTextField)
+            make.centerX.equalToSuperview()
+        }
+    }
+    
+    private func updatePickedImageView(with image: UIImage) {
+        pickedImageView.image = image
+        pickedImageView.contentMode = .scaleAspectFit
+        pickedImageView.snp.makeConstraints { make in
+            make.width.height.equalTo(100)
+        }
+        
+        photoStackView.snp.removeConstraints()
+        photoStackView.snp.makeConstraints { make in
+            make.top.equalTo(recordButton.snp.bottom).offset(padding)
+            make.width.equalTo(locationTextField)
             make.centerX.equalToSuperview()
         }
     }
@@ -206,7 +231,7 @@ class AddStoryViewController: UIViewController {
             )
         )
                               
-        present(actionSheet, animated: true)
+        viewModel.showAlert(actionSheet)
     }
     
     // MARK: - Keyboard notifications
@@ -294,5 +319,13 @@ extension AddStoryViewController: UITextFieldDelegate {
 // MARK: - UIImagePickerControllerDelegate
 
 extension AddStoryViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
-    
+    func imagePickerController (_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[.originalImage] as? UIImage else {
+            return
+        }
+        
+        
+        dismiss(animated: true)
+        updatePickedImageView(with: image)
+    }
 }
