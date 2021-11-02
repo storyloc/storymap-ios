@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol AddStoryViewModelType: AnyObject {
     var titlePlaceholder: String { get }
@@ -21,6 +22,8 @@ protocol AddStoryViewModelType: AnyObject {
     var addPhotoChooseAction: String { get }
     
     var confirmTitle: String { get }
+    
+    func showAlert(_ alert: UIAlertController)
 }
 
 class AddStoryViewModel: AddStoryViewModelType {
@@ -39,4 +42,10 @@ class AddStoryViewModel: AddStoryViewModelType {
     let addPhotoCaptureAction: String = LocalizationKit.addStory.addPhotoCaptureAction
     let addPhotoChooseAction: String = LocalizationKit.addStory.addPhotoChooseAction
     let confirmTitle: String = LocalizationKit.addStory.confirmButtonTitle
+    
+    var onShowAlert: ((UIAlertController) -> Void)?
+    
+    func showAlert(_ alert: UIAlertController) {
+        onShowAlert?(alert)
+    }
 }

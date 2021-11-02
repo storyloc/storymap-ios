@@ -22,6 +22,9 @@
 		8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E4B2721A1B5003D0CE9 /* LocalizationKit.swift */; };
 		8A639E4E2721A390003D0CE9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A639E4D2721A390003D0CE9 /* Localizable.strings */; };
 		8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E502721A6B8003D0CE9 /* String+Localized.swift */; };
+		8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
+		8A639E562721CB14003D0CE9 /* MapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E552721CB14003D0CE9 /* MapCoordinator.swift */; };
+		8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +46,9 @@
 		8A639E4B2721A1B5003D0CE9 /* LocalizationKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationKit.swift; sourceTree = "<group>"; };
 		8A639E4D2721A390003D0CE9 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		8A639E502721A6B8003D0CE9 /* String+Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Localized.swift"; sourceTree = "<group>"; };
+		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorType.swift; sourceTree = "<group>"; };
+		8A639E552721CB14003D0CE9 /* MapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
+		8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryCoordinator.swift; sourceTree = "<group>"; };
 		BD12A9DCCF2D3E26C71DB3E4 /* Pods-StoryMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.release.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -80,6 +86,7 @@
 			children = (
 				8A344DB1271DA48C005A710B /* AddStoryViewController.swift */,
 				8A639E3D27217D66003D0CE9 /* AddStoryViewModel.swift */,
+				8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */,
 			);
 			path = AddStory;
 			sourceTree = "<group>";
@@ -136,6 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				8A4A8702271D8B0200F17B4E /* MapViewController.swift */,
+				8A639E552721CB14003D0CE9 /* MapCoordinator.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -163,6 +171,7 @@
 			children = (
 				8A639E4F2721A6A6003D0CE9 /* Extensions */,
 				8A639E4227219F76003D0CE9 /* Theme */,
+				8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -305,6 +314,9 @@
 				8A639E3E27217D66003D0CE9 /* AddStoryViewModel.swift in Sources */,
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
+				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
+				8A639E562721CB14003D0CE9 /* MapCoordinator.swift in Sources */,
+				8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */,
 				8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */,
 				8A639E4627219FEA003D0CE9 /* Metrics.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
