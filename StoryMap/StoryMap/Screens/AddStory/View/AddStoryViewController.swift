@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import PhotosUI
 
 class AddStoryViewController: UIViewController {
     
@@ -183,50 +184,14 @@ class AddStoryViewController: UIViewController {
         }
     }
     
-    func showImagePicker(with sourceType: UIImagePickerController.SourceType) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.sourceType = sourceType
-        imagePicker.delegate = self
-        
-        present(imagePicker, animated: true)
-    }
-    
     // MARK: - Actions
     
     @objc func addPhotoTapped() {
-        let actionSheet = UIAlertController(
-            title: viewModel.addPhotoDialogueTitle,
-            message: nil,
-            preferredStyle: .actionSheet
-        )
-        
-        actionSheet.addAction(
-            UIAlertAction(
-                title: viewModel.addPhotoCaptureAction,
-                style: .default,
-                handler: { [weak self] _ in
-                    self?.showImagePicker(with: .camera)
-                }
-            )
-        )
-        actionSheet.addAction(
-            UIAlertAction(
-                title: viewModel.addPhotoChooseAction,
-                style: .default,
-                handler: { [weak self] _ in
-                    self?.showImagePicker(with: .photoLibrary)
-                }
-            )
-        )
-        actionSheet.addAction(
-            UIAlertAction(
-                title: LocalizationKit.general.cancel,
-                style: .cancel,
-                handler: nil
-            )
-        )
-                              
-        viewModel.showAlert(actionSheet)
+        viewModel.showPhotoAlert()
+    }
+    
+    @objc func confirmTapped() {
+        viewModel.confirm()
     }
     
     // MARK: - Keyboard notifications
@@ -321,6 +286,25 @@ extension AddStoryViewController: UIImagePickerControllerDelegate & UINavigation
         
         
         dismiss(animated: true)
+        viewModel.image = image.jpegData(compressionQuality: 1)
         updatePickedImageView(with: image)
+    }
+}
+
+// MARK: PHPickerViewControllerDelegate
+
+extension AddStoryViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        guard let result = results.first else { return }
+        let provider = result.itemProvider
+        provider.loadObject(ofClass: UIImage.self) { image, error in
+            if let image = image as? UIImage {
+                DispatchQueue.main.async { [weak self] in
+                    self?.dismiss(animated: true)
+                    self?.viewModel.image = image.jpegData(compressionQuality: 1)
+                    self?.updatePickedImageView(with: image)
+                }
+            }
+        }
     }
 }

@@ -25,6 +25,10 @@
 		8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
 		8A639E562721CB14003D0CE9 /* MapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E552721CB14003D0CE9 /* MapCoordinator.swift */; };
 		8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */; };
+		8AFAE47327316C5400BFC249 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47227316C5400BFC249 /* Story.swift */; };
+		8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE475273170C800BFC249 /* RealmDataProvider.swift */; };
+		8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */; };
+		8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,9 +50,13 @@
 		8A639E4B2721A1B5003D0CE9 /* LocalizationKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationKit.swift; sourceTree = "<group>"; };
 		8A639E4D2721A390003D0CE9 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		8A639E502721A6B8003D0CE9 /* String+Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Localized.swift"; sourceTree = "<group>"; };
-		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorType.swift; sourceTree = "<group>"; };
+		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoordinatorType.swift; path = "../New Group/CoordinatorType.swift"; sourceTree = "<group>"; };
 		8A639E552721CB14003D0CE9 /* MapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
 		8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryCoordinator.swift; sourceTree = "<group>"; };
+		8AFAE47227316C5400BFC249 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
+		8AFAE475273170C800BFC249 /* RealmDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmDataProvider.swift; sourceTree = "<group>"; };
+		8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryViewModelType.swift; sourceTree = "<group>"; };
+		8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertConfig.swift; sourceTree = "<group>"; };
 		BD12A9DCCF2D3E26C71DB3E4 /* Pods-StoryMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.release.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,9 +92,9 @@
 		8A344DB0271DA472005A710B /* AddStory */ = {
 			isa = PBXGroup;
 			children = (
-				8A344DB1271DA48C005A710B /* AddStoryViewController.swift */,
-				8A639E3D27217D66003D0CE9 /* AddStoryViewModel.swift */,
-				8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */,
+				8AFAE47927317DB500BFC249 /* Coordinator */,
+				8AFAE47827317D9D00BFC249 /* ViewModel */,
+				8AFAE47727317D9600BFC249 /* View */,
 			);
 			path = AddStory;
 			sourceTree = "<group>";
@@ -169,9 +177,11 @@
 		8A639E4127219F69003D0CE9 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				8AFAE474273170A300BFC249 /* DataProviders */,
+				8AFAE47127316C2E00BFC249 /* Model */,
+				8AFAE470273167F800BFC249 /* Coordinators */,
 				8A639E4F2721A6A6003D0CE9 /* Extensions */,
 				8A639E4227219F76003D0CE9 /* Theme */,
-				8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -194,6 +204,64 @@
 				8A639E502721A6B8003D0CE9 /* String+Localized.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		8AFAE470273167F800BFC249 /* Coordinators */ = {
+			isa = PBXGroup;
+			children = (
+				8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */,
+			);
+			path = Coordinators;
+			sourceTree = "<group>";
+		};
+		8AFAE47127316C2E00BFC249 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE47E27317E9300BFC249 /* Alerts */,
+				8AFAE47227316C5400BFC249 /* Story.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		8AFAE474273170A300BFC249 /* DataProviders */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE475273170C800BFC249 /* RealmDataProvider.swift */,
+			);
+			path = DataProviders;
+			sourceTree = "<group>";
+		};
+		8AFAE47727317D9600BFC249 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8A344DB1271DA48C005A710B /* AddStoryViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		8AFAE47827317D9D00BFC249 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				8A639E3D27217D66003D0CE9 /* AddStoryViewModel.swift */,
+				8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		8AFAE47927317DB500BFC249 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		8AFAE47E27317E9300BFC249 /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */,
+			);
+			path = Alerts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -316,14 +384,18 @@
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
 				8A639E562721CB14003D0CE9 /* MapCoordinator.swift in Sources */,
+				8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */,
 				8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */,
 				8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */,
+				8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */,
 				8A639E4627219FEA003D0CE9 /* Metrics.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,
+				8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */,
 				8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */,
 				8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */,
+				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,7 +464,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -447,7 +519,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -466,7 +538,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = H44389JMW4;
 				INFOPLIST_FILE = "StoryMap/Supporting files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -487,7 +559,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = H44389JMW4;
 				INFOPLIST_FILE = "StoryMap/Supporting files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
