@@ -23,6 +23,10 @@ class StoryDetailViewController: UIViewController {
     override func viewDidLoad() {
         title = "Story"
         view.backgroundColor = .white
-        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
 }
