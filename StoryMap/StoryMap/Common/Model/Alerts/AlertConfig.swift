@@ -14,6 +14,14 @@ struct AlertConfig {
     let style: AlertStyle
     let actions: [AlertAction]
     
+    
+    init(title: String?, message: String?, style: AlertStyle, actions: [AlertAction]) {
+        self.title = title
+        self.message = message
+        self.style = style
+        self.actions = actions
+    }
+    
     var controller: UIAlertController {
         get {
             let controller = UIAlertController(

@@ -23,9 +23,11 @@ protocol AddStoryViewModelType: AnyObject {
     var addPhotoTitle: String { get }
     
     var confirmTitle: String { get }
+    var confirmButtonEnabled: Bool { get }
     
     var image: Data? { get set }
     
     func showPhotoAlert()
     func confirm()
+    func close()
 }

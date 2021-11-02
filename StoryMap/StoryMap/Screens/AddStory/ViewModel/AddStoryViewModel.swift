@@ -12,13 +12,24 @@ class AddStoryViewModel: AddStoryViewModelType {
     let locationPlaceholder: String = LocalizationKit.addStory.locationPlaceholder
     let recordIcon: String = StyleKit.image.icons.record
     
-    let addPhotoTitle: String = LocalizationKit.addStory.addPhotoButtonTitle
     let confirmTitle: String = LocalizationKit.addStory.confirmButtonTitle
     
     var title: String?
     var titleError: String {
         get {
-            return title?.isEmpty ?? true ? LocalizationKit.addStory.titleError : " "
+            title?.isEmpty ?? true ? LocalizationKit.addStory.titleError : " "
+        }
+    }
+    
+    var addPhotoTitle: String {
+        get {
+            image == nil ? LocalizationKit.addStory.addPhotoButtonTitle : LocalizationKit.addStory.replacePhotoButtonTitle
+        }
+    }
+    
+    var confirmButtonEnabled: Bool {
+        get {
+            !(title?.isEmpty ?? false)  && image != nil
         }
     }
     
@@ -26,6 +37,7 @@ class AddStoryViewModel: AddStoryViewModelType {
     
     var onShowAlert: ((AlertConfig) -> Void)?
     var onShowImagePicker: ((PhotoInputType) -> Void)?
+    var onClose: (() -> Void)?
     
     private let realmDataProvider = RealmDataProvider.shared
     
@@ -60,13 +72,40 @@ class AddStoryViewModel: AddStoryViewModelType {
         onShowAlert?(alert)
     }
     
+    func showAreYouSureAlert() {
+        let alert = AlertConfig(
+            title: LocalizationKit.addStory.closeDialogueTitle,
+            message: LocalizationKit.addStory.closeDialogueMessage,
+            style: .actionSheet,
+            actions: [
+                AlertAction(
+                    title: LocalizationKit.general.close,
+                    style: .destructive,
+                    handler: { [weak self] in
+                        self?.onClose?()
+                    }
+                ),
+                AlertAction(
+                    title: LocalizationKit.general.cancel,
+                    style: .cancel,
+                    handler: nil
+                )
+            ]
+        )
+        
+        onShowAlert?(alert)
+    }
+    
     func confirm() {
         guard let title = title, let image = image else {
-            // TODO: Add error handling.
             return
         }
         
         let story = Story(title: title, image: image)
         realmDataProvider.write(object: story)
+    }
+    
+    func close() {
+        showAreYouSureAlert()
     }
 }
