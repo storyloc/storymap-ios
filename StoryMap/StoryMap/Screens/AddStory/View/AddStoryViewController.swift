@@ -174,6 +174,12 @@ class AddStoryViewController: UIViewController {
         confirmButton.layer.borderColor = UIColor.lightGray.cgColor
         confirmButton.layer.cornerRadius = 8
         
+        confirmButton.addTarget(
+            self,
+            action: #selector(confirmTapped),
+            for: .touchUpInside
+        )
+        
         confirmButtonBottomConstraint = confirmButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -StyleKit.metrics.padding.common)
         confirmButtonBottomConstraint?.isActive = true
         
