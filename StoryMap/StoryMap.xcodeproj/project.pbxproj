@@ -22,7 +22,6 @@
 		8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E4B2721A1B5003D0CE9 /* LocalizationKit.swift */; };
 		8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E502721A6B8003D0CE9 /* String+Localized.swift */; };
 		8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
-		8A639E562721CB14003D0CE9 /* MapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E552721CB14003D0CE9 /* MapCoordinator.swift */; };
 		8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */; };
 		8AFAE47327316C5400BFC249 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47227316C5400BFC249 /* Story.swift */; };
 		8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE475273170C800BFC249 /* RealmDataProvider.swift */; };
@@ -32,6 +31,8 @@
 		8AFAE48527319B2900BFC249 /* StoryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE48427319B2900BFC249 /* StoryDetailViewController.swift */; };
 		8AFAE48727319B3B00BFC249 /* StoryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE48627319B3B00BFC249 /* StoryDetailViewModel.swift */; };
 		8AFAE4952731B10C00BFC249 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8AFAE4942731B10C00BFC249 /* Localizable.strings */; };
+		8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE49C2731E44400BFC249 /* MapViewModel.swift */; };
+		8AFAE4A42731F09700BFC249 /* MapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +64,8 @@
 		8AFAE48427319B2900BFC249 /* StoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryDetailViewController.swift; sourceTree = "<group>"; };
 		8AFAE48627319B3B00BFC249 /* StoryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryDetailViewModel.swift; sourceTree = "<group>"; };
 		8AFAE4942731B10C00BFC249 /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
+		8AFAE49C2731E44400BFC249 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
+		8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
 		BD12A9DCCF2D3E26C71DB3E4 /* Pods-StoryMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.release.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -112,6 +115,7 @@
 				8A4A86E3271D882600F17B4E /* Products */,
 				50176851818C98DA717EBF6A /* Pods */,
 				73A068BD96F0D20F5CDAC9AB /* Frameworks */,
+				8AFAE4A12731EF9100BFC249 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -157,8 +161,9 @@
 		8A4A86FE271D8A8700F17B4E /* Map */ = {
 			isa = PBXGroup;
 			children = (
-				8A4A8702271D8B0200F17B4E /* MapViewController.swift */,
-				8A639E552721CB14003D0CE9 /* MapCoordinator.swift */,
+				8AFAE49B2731E42D00BFC249 /* View */,
+				8AFAE49A2731E42200BFC249 /* ViewModel */,
+				8AFAE4A22731F09700BFC249 /* Coordinator */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -305,6 +310,38 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		8AFAE49A2731E42200BFC249 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE49C2731E44400BFC249 /* MapViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		8AFAE49B2731E42D00BFC249 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8A4A8702271D8B0200F17B4E /* MapViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		8AFAE4A12731EF9100BFC249 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				8A639E552721CB14003D0CE9 /* MapCoordinator.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		8AFAE4A22731F09700BFC249 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -425,7 +462,6 @@
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
-				8A639E562721CB14003D0CE9 /* MapCoordinator.swift in Sources */,
 				8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */,
 				8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */,
 				8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */,
@@ -433,6 +469,7 @@
 				8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */,
 				8A639E4627219FEA003D0CE9 /* Metrics.swift in Sources */,
 				8AFAE48327319B1400BFC249 /* StoryDetailCoordinator.swift in Sources */,
+				8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,
@@ -440,6 +477,7 @@
 				8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */,
 				8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */,
 				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,
+				8AFAE4A42731F09700BFC249 /* MapCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
