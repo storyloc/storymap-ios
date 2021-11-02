@@ -1,0 +1,23 @@
+/* 
+  Localizable.strings
+  StoryMap
+
+  Created by Dory on 21/10/2021.
+  
+*/
+
+// MARK: - General
+
+"general_cancel" = "Cancel";
+"general_close" = "Close";
+
+// MARK: - Add Story
+
+"addStory_titleTextField_placeholder" = "Add Title";
+"addStory_titleTextField_error" = "Title should not be empty.";
+"addStory_locationTextField_placeholder" = "Add Location";
+"addStory_addPhoto_buttonTitle" = "Add Photo";
+"addStory_addPhoto_dialogueTitle" = "Do you want to take a new photo or choose from library instead?";
+"addStory_addPhoto_captureAction" = "Take Photo";
+"addStory_addPhoto_chooseAction" = "Choose From Library";
+"addStory_confirmButton_title" = "Create Story";

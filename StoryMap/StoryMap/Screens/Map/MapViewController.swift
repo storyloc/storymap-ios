@@ -31,7 +31,13 @@ class MapViewController: UIViewController {
     }
     
     private func setupButton() {
-        addButton.setImage(UIImage(named: "plus"), for: .normal)
+        addButton.setImage(
+            StyleKit.image.make(
+                from: StyleKit.image.icons.plus,
+                with: .alwaysTemplate
+            ),
+            for: .normal
+        )
         addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         view.addSubview(addButton)
         
