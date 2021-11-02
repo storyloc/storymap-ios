@@ -98,9 +98,9 @@
 		8A344DB0271DA472005A710B /* AddStory */ = {
 			isa = PBXGroup;
 			children = (
-				8AFAE47927317DB500BFC249 /* Coordinator */,
-				8AFAE47827317D9D00BFC249 /* ViewModel */,
 				8AFAE47727317D9600BFC249 /* View */,
+				8AFAE47827317D9D00BFC249 /* ViewModel */,
+				8AFAE47927317DB500BFC249 /* Coordinator */,
 			);
 			path = AddStory;
 			sourceTree = "<group>";

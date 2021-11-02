@@ -18,11 +18,16 @@ class AddStoryCoordinator: CoordinatorType {
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = AddStoryViewModel()
+        
+        let viewController = AddStoryViewController(viewModel: viewModel)
+        viewController.isModalInPresentation = true
+        
         viewModel.onShowAlert = { [weak self] alert in
             self?.presenter.present(alert.controller, animated: true)
         }
-        
-        let viewController = AddStoryViewController(viewModel: viewModel)
+        viewModel.onClose = { [weak self] in
+            self?.stop()
+        }
         viewModel.onShowImagePicker = { [weak self] type in
             guard let self = self else { return }
             
@@ -32,23 +37,39 @@ class AddStoryCoordinator: CoordinatorType {
                 animated: true,
                 completion: nil
             )
-            case .photoLibrary:
-                self.presenter.visibleViewController?.present(
-                    self.makeChooseImageController(with: viewController),
-                    animated: true,
-                    completion: nil
-                )
+            case .photoLibrary: self.showChooseImageController(with: viewController)
             }
         }
         viewModel.onConfirm = { [weak self] story in
             self?.stop(story: story)
         }
+
         presenter.viewControllers = [viewController]
         presentFrom?.present(presenter, animated: true)
     }
     
     func stop() {
-        
+        presenter.visibleViewController?.dismiss(animated: true, completion: nil)
+    }
+    
+    func showChooseImageController(with delegate: PHPickerViewControllerDelegate) {
+        PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                switch status {
+                case .authorized:
+                    self.presenter.visibleViewController?.present(
+                        self.makeChooseImageController(with: delegate),
+                        animated: true,
+                        completion: nil
+                    )
+                default:
+                    let alert = self.makeMissingPermissionsAlert()
+                    self.presenter.visibleViewController?.present(alert.controller, animated: true)
+                }
+            }
+        }
     }
     
     func stop(story: Story?) {
@@ -73,5 +94,20 @@ class AddStoryCoordinator: CoordinatorType {
         imagePicker.sourceType = .camera
         imagePicker.delegate = delegate
         return imagePicker
+    }
+    
+    private func makeMissingPermissionsAlert() -> AlertConfig {
+        return AlertConfig(
+            title: LocalizationKit.addStory.missingPermissionsTitle,
+            message: LocalizationKit.addStory.missingPermissionsMessage,
+            style: .alert,
+            actions: [
+                AlertAction(
+                    title: LocalizationKit.general.ok,
+                    style: .cancel,
+                    handler: nil
+                )
+            ]
+        )
     }
 }
