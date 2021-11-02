@@ -29,6 +29,7 @@
 		8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE475273170C800BFC249 /* RealmDataProvider.swift */; };
 		8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */; };
 		8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */; };
+		8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE49C2731E44400BFC249 /* MapViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +58,7 @@
 		8AFAE475273170C800BFC249 /* RealmDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmDataProvider.swift; sourceTree = "<group>"; };
 		8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryViewModelType.swift; sourceTree = "<group>"; };
 		8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertConfig.swift; sourceTree = "<group>"; };
+		8AFAE49C2731E44400BFC249 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		BD12A9DCCF2D3E26C71DB3E4 /* Pods-StoryMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.release.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -150,8 +152,9 @@
 		8A4A86FE271D8A8700F17B4E /* Map */ = {
 			isa = PBXGroup;
 			children = (
-				8A4A8702271D8B0200F17B4E /* MapViewController.swift */,
-				8A639E552721CB14003D0CE9 /* MapCoordinator.swift */,
+				8AFAE49B2731E42D00BFC249 /* View */,
+				8AFAE49A2731E42200BFC249 /* ViewModel */,
+				8AFAE4992731E41800BFC249 /* Coordinator */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -262,6 +265,30 @@
 				8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */,
 			);
 			path = Alerts;
+			sourceTree = "<group>";
+		};
+		8AFAE4992731E41800BFC249 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				8A639E552721CB14003D0CE9 /* MapCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		8AFAE49A2731E42200BFC249 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE49C2731E44400BFC249 /* MapViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		8AFAE49B2731E42D00BFC249 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8A4A8702271D8B0200F17B4E /* MapViewController.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -389,6 +416,7 @@
 				8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */,
 				8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */,
 				8A639E4627219FEA003D0CE9 /* Metrics.swift in Sources */,
+				8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,

@@ -16,8 +16,9 @@ class MapCoordinator: CoordinatorType {
     var onDidStop: (() -> Void)?
     
     func start(_ presentFrom: UIViewController?) {
-        let viewController = MapViewController()
-        viewController.onAddStory = { [weak self] in
+        let viewModel = MapViewModel()
+        let viewController = MapViewController(viewModel: viewModel)
+        viewModel.onAddStory = { [weak self] in
             self?.showAddStory()
         }
         presenter.pushViewController(viewController, animated: true)
