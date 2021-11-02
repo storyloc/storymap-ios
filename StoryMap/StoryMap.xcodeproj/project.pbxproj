@@ -20,7 +20,6 @@
 		8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E472721A0BA003D0CE9 /* FontKit.swift */; };
 		8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E492721A0D2003D0CE9 /* ImageKit.swift */; };
 		8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E4B2721A1B5003D0CE9 /* LocalizationKit.swift */; };
-		8A639E4E2721A390003D0CE9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8A639E4D2721A390003D0CE9 /* Localizable.strings */; };
 		8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E502721A6B8003D0CE9 /* String+Localized.swift */; };
 		8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
 		8A639E562721CB14003D0CE9 /* MapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E552721CB14003D0CE9 /* MapCoordinator.swift */; };
@@ -29,6 +28,10 @@
 		8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE475273170C800BFC249 /* RealmDataProvider.swift */; };
 		8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */; };
 		8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */; };
+		8AFAE48327319B1400BFC249 /* StoryDetailCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE48227319B1400BFC249 /* StoryDetailCoordinator.swift */; };
+		8AFAE48527319B2900BFC249 /* StoryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE48427319B2900BFC249 /* StoryDetailViewController.swift */; };
+		8AFAE48727319B3B00BFC249 /* StoryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE48627319B3B00BFC249 /* StoryDetailViewModel.swift */; };
+		8AFAE4952731B10C00BFC249 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8AFAE4942731B10C00BFC249 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,7 +51,6 @@
 		8A639E472721A0BA003D0CE9 /* FontKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontKit.swift; sourceTree = "<group>"; };
 		8A639E492721A0D2003D0CE9 /* ImageKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageKit.swift; sourceTree = "<group>"; };
 		8A639E4B2721A1B5003D0CE9 /* LocalizationKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationKit.swift; sourceTree = "<group>"; };
-		8A639E4D2721A390003D0CE9 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		8A639E502721A6B8003D0CE9 /* String+Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Localized.swift"; sourceTree = "<group>"; };
 		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoordinatorType.swift; path = "../New Group/CoordinatorType.swift"; sourceTree = "<group>"; };
 		8A639E552721CB14003D0CE9 /* MapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
@@ -57,6 +59,10 @@
 		8AFAE475273170C800BFC249 /* RealmDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmDataProvider.swift; sourceTree = "<group>"; };
 		8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryViewModelType.swift; sourceTree = "<group>"; };
 		8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertConfig.swift; sourceTree = "<group>"; };
+		8AFAE48227319B1400BFC249 /* StoryDetailCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryDetailCoordinator.swift; sourceTree = "<group>"; };
+		8AFAE48427319B2900BFC249 /* StoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryDetailViewController.swift; sourceTree = "<group>"; };
+		8AFAE48627319B3B00BFC249 /* StoryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryDetailViewModel.swift; sourceTree = "<group>"; };
+		8AFAE4942731B10C00BFC249 /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		BD12A9DCCF2D3E26C71DB3E4 /* Pods-StoryMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.release.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -141,6 +147,7 @@
 		8A4A86FD271D8A7200F17B4E /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				8AFAE48127319AEF00BFC249 /* StoryDetail */,
 				8A344DB0271DA472005A710B /* AddStory */,
 				8A4A86FE271D8A8700F17B4E /* Map */,
 			);
@@ -160,8 +167,8 @@
 			isa = PBXGroup;
 			children = (
 				8A4A86F0271D883200F17B4E /* LaunchScreen.storyboard */,
+				8AFAE4942731B10C00BFC249 /* Localizable.strings */,
 				8A4A86EE271D883200F17B4E /* Assets.xcassets */,
-				8A639E4D2721A390003D0CE9 /* Localizable.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -242,8 +249,8 @@
 		8AFAE47827317D9D00BFC249 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				8A639E3D27217D66003D0CE9 /* AddStoryViewModel.swift */,
 				8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */,
+				8A639E3D27217D66003D0CE9 /* AddStoryViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -262,6 +269,40 @@
 				8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */,
 			);
 			path = Alerts;
+			sourceTree = "<group>";
+		};
+		8AFAE48127319AEF00BFC249 /* StoryDetail */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE4972731B1F800BFC249 /* View */,
+				8AFAE4982731B1FF00BFC249 /* ViewModel */,
+				8AFAE4962731B1EF00BFC249 /* Coordinator */,
+			);
+			path = StoryDetail;
+			sourceTree = "<group>";
+		};
+		8AFAE4962731B1EF00BFC249 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE48227319B1400BFC249 /* StoryDetailCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		8AFAE4972731B1F800BFC249 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE48427319B2900BFC249 /* StoryDetailViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		8AFAE4982731B1FF00BFC249 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				8AFAE48627319B3B00BFC249 /* StoryDetailViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -324,7 +365,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A4A86F2271D883200F17B4E /* LaunchScreen.storyboard in Resources */,
-				8A639E4E2721A390003D0CE9 /* Localizable.strings in Resources */,
+				8AFAE4952731B10C00BFC249 /* Localizable.strings in Resources */,
 				8A4A86EF271D883200F17B4E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -379,6 +420,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A639E4427219FDD003D0CE9 /* StyleKit.swift in Sources */,
+				8AFAE48527319B2900BFC249 /* StoryDetailViewController.swift in Sources */,
 				8A639E3E27217D66003D0CE9 /* AddStoryViewModel.swift in Sources */,
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
@@ -387,8 +429,10 @@
 				8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */,
 				8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */,
 				8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */,
+				8AFAE48727319B3B00BFC249 /* StoryDetailViewModel.swift in Sources */,
 				8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */,
 				8A639E4627219FEA003D0CE9 /* Metrics.swift in Sources */,
+				8AFAE48327319B1400BFC249 /* StoryDetailCoordinator.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,
@@ -417,6 +461,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -478,6 +523,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

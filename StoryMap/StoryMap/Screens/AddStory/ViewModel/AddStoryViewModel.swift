@@ -26,6 +26,7 @@ class AddStoryViewModel: AddStoryViewModelType {
     
     var onShowAlert: ((AlertConfig) -> Void)?
     var onShowImagePicker: ((PhotoInputType) -> Void)?
+    var onConfirm: ((Story) -> Void)?
     
     private let realmDataProvider = RealmDataProvider.shared
     
@@ -68,5 +69,6 @@ class AddStoryViewModel: AddStoryViewModelType {
         
         let story = Story(title: title, image: image)
         realmDataProvider.write(object: story)
+        onConfirm?(story)
     }
 }
