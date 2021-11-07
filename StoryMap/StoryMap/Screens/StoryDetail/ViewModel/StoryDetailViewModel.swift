@@ -8,7 +8,7 @@
 import Foundation
 
 protocol StoryDetailViewModelType: AnyObject {
-    
+    var story: Story { get }
 }
 
 class StoryDetailViewModel: StoryDetailViewModelType {
