@@ -7,5 +7,14 @@ target 'StoryMap' do
 
   pod 'SnapKit', '~> 5.0.0'
   pod 'RealmSwift', '~> 10'
+  # pod 'EarlGreyApp'
 
+end
+
+target 'StoryMapTests' do
+  
+  use_frameworks!
+  
+  pod 'EarlGreyTest'
+  
 end

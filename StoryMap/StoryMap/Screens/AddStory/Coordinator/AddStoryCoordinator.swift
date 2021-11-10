@@ -12,12 +12,17 @@ import PhotosUI
 class AddStoryCoordinator: CoordinatorType {
     var presenter = UINavigationController()
     
-    var onDidStop: (() -> Void)?
+    var location: Location
     
+    var onDidStop: (() -> Void)?
     var onShowStory: ((Story) -> Void)?
     
+    init(location: Location) {
+        self.location = location
+    }
+    
     func start(_ presentFrom: UIViewController?) {
-        let viewModel = AddStoryViewModel()
+        let viewModel = AddStoryViewModel(location: location)
         
         let viewController = AddStoryViewController(viewModel: viewModel)
         viewController.isModalInPresentation = true
