@@ -23,9 +23,6 @@ class MapCoordinator: CoordinatorType {
             self?.showAddStory()
         }
         presenter.pushViewController(viewController, animated: true)
-
-        // For testing purpose only
-        setupTestStory()
     }
     
     func stop() {
@@ -44,24 +41,5 @@ class MapCoordinator: CoordinatorType {
         storyDetailCoordinator = StoryDetailCoordinator(story: story)
         storyDetailCoordinator?.presenter = presenter
         storyDetailCoordinator?.start(nil)
-    }
-
-    private func setupTestStory() {
-        let store = RealmDataProvider.shared
-        let title: String? = "Lulu Waterfall"
-        let image = StyleKit.image.make(
-            from: StyleKit.image.examples.waterfall,
-            with: .alwaysTemplate
-        )
-
-        let imageData = image?.jpegData(compressionQuality: 1)
-        guard let title = title, let imageData = imageData else {
-            return
-        }
-
-        let story = Story(title: title, image: imageData)
-        store.write(object: story)
-
-        showStoryDetail(with: story)
     }
 }
