@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		84114AC55A8F98054317F9C1 /* Pods_StoryMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23A5CD55F391F9DBFD6338E6 /* Pods_StoryMap.framework */; };
 		8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A344DB1271DA48C005A710B /* AddStoryViewController.swift */; };
+		8A4615BC273BFCEE00D25529 /* StoryMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615BB273BFCEE00D25529 /* StoryMapTests.swift */; };
 		8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4A86E5271D882600F17B4E /* AppDelegate.swift */; };
 		8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4A86E7271D882600F17B4E /* SceneDelegate.swift */; };
 		8A4A86EF271D883200F17B4E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A4A86EE271D883200F17B4E /* Assets.xcassets */; };

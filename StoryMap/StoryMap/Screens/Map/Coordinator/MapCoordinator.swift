@@ -19,21 +19,21 @@ class MapCoordinator: CoordinatorType {
     func start(_ presentFrom: UIViewController?) {
         let viewModel = MapViewModel()
         let viewController = MapViewController(viewModel: viewModel)
-        viewModel.onAddStory = { [weak self] in
-            self?.showAddStory()
+        viewModel.onAddStory = { [weak self] location in
+            self?.showAddStory(with: location)
+        }
+        viewModel.onOpenStory = { [weak self] story in
+            self?.showStoryDetail(with: story)
         }
         presenter.pushViewController(viewController, animated: true)
-
-        // For testing purpose only
-        setupTestStory()
     }
     
     func stop() {
         presenter.popViewController(animated: true)
     }
     
-    private func showAddStory() {
-        addStoryCoordinator = AddStoryCoordinator()
+    private func showAddStory(with location: Location) {
+        addStoryCoordinator = AddStoryCoordinator(location: location)
         addStoryCoordinator?.onShowStory = { [weak self] story in
             self?.showStoryDetail(with: story)
         }
@@ -44,24 +44,5 @@ class MapCoordinator: CoordinatorType {
         storyDetailCoordinator = StoryDetailCoordinator(story: story)
         storyDetailCoordinator?.presenter = presenter
         storyDetailCoordinator?.start(nil)
-    }
-
-    private func setupTestStory() {
-        let store = RealmDataProvider.shared
-        let title: String? = "Lulu Waterfall"
-        let image = StyleKit.image.make(
-            from: StyleKit.image.examples.waterfall,
-            with: .alwaysTemplate
-        )
-
-        let imageData = image?.jpegData(compressionQuality: 1)
-        guard let title = title, let imageData = imageData else {
-            return
-        }
-
-        let story = Story(title: title, image: imageData)
-        store.write(object: story)
-
-        showStoryDetail(with: story)
     }
 }

@@ -10,16 +10,28 @@ import RealmSwift
 
 class RealmDataProvider {
     static var shared = RealmDataProvider()
-    private var realm: Realm?
     
-    private init() {
-        self.realm = try? Realm()
+    private static var config: Realm.Configuration {
+        var config = Realm.Configuration()
+        config.deleteRealmIfMigrationNeeded = true
+        return config
+    }
+    
+    private var realm: Realm
+    
+    private init?() {
+        do {
+            self.realm = try Realm(configuration: RealmDataProvider.config, queue: .main)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+            return nil
+        }
     }
     
     func write(object: Object) {
         do {
-            try realm?.write {
-                realm?.add(object)
+            try realm.write {
+                realm.add(object)
             }
         } catch let error as NSError {
             print(error.localizedDescription)
@@ -28,9 +40,9 @@ class RealmDataProvider {
     
     func write(objects: [Object]) {
         do {
-            try realm?.write {
+            try realm.write {
                 objects.forEach { object in
-                    realm?.add(object)
+                    realm.add(object)
                 }
             }
         } catch let error as NSError {
@@ -38,10 +50,8 @@ class RealmDataProvider {
         }
     }
     
-    func read(type: Object.Type, with filter: String? = nil) -> Results<Object>? {
-        guard var objects = realm?.objects(type) else {
-            return nil
-        }
+    func read<T: Object>(type: T.Type, with filter: String? = nil) -> Results<T>? {
+        var objects = realm.objects(type)
         
         if let filter = filter {
             objects = objects.filter(filter)
@@ -51,7 +61,7 @@ class RealmDataProvider {
     
     func update(with closure: @escaping () -> Void) {
         do {
-            try realm?.write {
+            try realm.write {
                 closure()
             }
         } catch let error as NSError {
@@ -62,8 +72,8 @@ class RealmDataProvider {
     
     func delete(object: Object) {
         do {
-            try realm?.write {
-                realm?.delete(object)
+            try realm.write {
+                realm.delete(object)
             }
         } catch let error as NSError {
             print(error.localizedDescription)
@@ -72,8 +82,8 @@ class RealmDataProvider {
     
     func deleteAll() {
         do {
-            try realm?.write {
-                realm?.deleteAll()
+            try realm.write {
+                realm.deleteAll()
             }
         } catch let error as NSError {
             print(error.localizedDescription)

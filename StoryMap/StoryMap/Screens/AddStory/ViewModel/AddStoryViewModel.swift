@@ -9,12 +9,13 @@ import Foundation
 
 class AddStoryViewModel: AddStoryViewModelType {
     let titlePlaceholder: String = LocalizationKit.addStory.titlePlaceholder
-    let locationPlaceholder: String = LocalizationKit.addStory.locationPlaceholder
-    let recordIcon: String = StyleKit.image.icons.record
     
     let confirmTitle: String = LocalizationKit.addStory.confirmButtonTitle
     
-    var title: String?
+    var location: Location
+    
+    var title: String? 
+    
     var titleError: String {
         get {
             title?.isEmpty ?? true ? LocalizationKit.addStory.titleError : " "
@@ -29,7 +30,7 @@ class AddStoryViewModel: AddStoryViewModelType {
     
     var confirmButtonEnabled: Bool {
         get {
-            !(title?.isEmpty ?? false)  && image != nil
+            !(title?.isEmpty ?? true) && image != nil
         }
     }
     
@@ -41,6 +42,10 @@ class AddStoryViewModel: AddStoryViewModelType {
     var onClose: (() -> Void)?
     
     private let realmDataProvider = RealmDataProvider.shared
+    
+    init(location: Location) {
+        self.location = location
+    }
     
     func showPhotoAlert() {
         let alert = AlertConfig(
@@ -102,8 +107,12 @@ class AddStoryViewModel: AddStoryViewModelType {
             return
         }
         
-        let story = Story(title: title, image: image)
-        realmDataProvider.write(object: story)
+        let story = Story(
+            title: title,
+            image: image,
+            location: location
+        )
+        realmDataProvider?.write(object: story)
         onConfirm?(story)
     }
     

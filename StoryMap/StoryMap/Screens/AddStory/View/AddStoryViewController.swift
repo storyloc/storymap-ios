@@ -18,7 +18,6 @@ class AddStoryViewController: UIViewController {
     
     private let titleStackView = UIStackView()
     private let titleTextFieldErrorLabel = UILabel()
-    private let recordButton = UIButton(type: .system)
     private let photoStackView = UIStackView()
     private let pickedImageView = UIImageView()
     private let addPhotoButton = UIButton(type: .system)
@@ -26,7 +25,6 @@ class AddStoryViewController: UIViewController {
     private let closeButton = UIButton(type: .system)
     
     private var titleTextField = UITextField()
-    private var locationTextField = UITextField()
     private var confirmButtonBottomConstraint: NSLayoutConstraint?
     
     init(viewModel: AddStoryViewModelType) {
@@ -63,8 +61,6 @@ class AddStoryViewController: UIViewController {
         
         setupCloseButton()
         setupTitleTextField()
-        setupLocationTextField()
-        setupRecordButton()
         setupAddPhotoButton()
         setupConfirmButton()
         
@@ -72,11 +68,8 @@ class AddStoryViewController: UIViewController {
     }
     
     private func updateUI() {
-        titleTextField.placeholder = viewModel.titlePlaceholder
         titleTextField.attributedPlaceholder = NSAttributedString(string: viewModel.titlePlaceholder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
         titleTextFieldErrorLabel.text = viewModel.titleError
-        locationTextField.attributedPlaceholder = NSAttributedString(string: viewModel.locationPlaceholder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
-        recordButton.setImage(UIImage(named: viewModel.recordIcon), for: .normal)
         addPhotoButton.setTitle(viewModel.addPhotoTitle, for: .normal)
         confirmButton.setTitle(viewModel.confirmTitle, for: .normal)
         confirmButton.isEnabled = viewModel.confirmButtonEnabled
@@ -115,6 +108,8 @@ class AddStoryViewController: UIViewController {
             make.height.equalTo(StyleKit.metrics.textFieldHeight)
         }
         
+        titleTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        
         styleTextField(&titleTextField)
         titleTextField.delegate = self
         
@@ -125,22 +120,6 @@ class AddStoryViewController: UIViewController {
         titleStackView.snp.makeConstraints { make in
             make.top.equalTo(closeButton.snp.bottom).offset(StyleKit.metrics.padding.large)
             make.leading.trailing.equalToSuperview().inset(StyleKit.metrics.padding.common)
-        }
-    }
-    
-    private func setupLocationTextField() {
-        locationTextField.backgroundColor = .white
-        locationTextField.borderStyle = .roundedRect
-        locationTextField.delegate = self
-        
-        styleTextField(&locationTextField)
-        
-        view.addSubview(locationTextField)
-        
-        locationTextField.snp.makeConstraints { make in
-            make.top.equalTo(titleStackView.snp.bottom).offset(StyleKit.metrics.padding.small)
-            make.leading.trailing.equalToSuperview().inset(StyleKit.metrics.padding.common)
-            make.height.equalTo(StyleKit.metrics.textFieldHeight)
         }
     }
     
@@ -157,15 +136,6 @@ class AddStoryViewController: UIViewController {
         textField.delegate = self
     }
     
-    private func setupRecordButton() {
-        view.addSubview(recordButton)
-        
-        recordButton.snp.makeConstraints { make in
-            make.top.equalTo(locationTextField.snp.bottom).offset(StyleKit.metrics.padding.large)
-            make.centerX.equalToSuperview()
-        }
-    }
-    
     private func setupAddPhotoButton() {
         photoStackView.axis = .vertical
         photoStackView.distribution = .equalSpacing
@@ -179,8 +149,8 @@ class AddStoryViewController: UIViewController {
         addPhotoButton.addTarget(self, action: #selector(addPhotoTapped), for: .touchUpInside)
         
         photoStackView.snp.makeConstraints { make in
-            make.top.equalTo(recordButton.snp.bottom).offset(StyleKit.metrics.padding.common)
-            make.width.equalTo(locationTextField)
+            make.top.equalTo(titleStackView.snp.bottom).offset(StyleKit.metrics.padding.common)
+            make.width.equalTo(titleTextField)
             make.centerX.equalToSuperview()
         }
     }
@@ -190,13 +160,6 @@ class AddStoryViewController: UIViewController {
         pickedImageView.contentMode = .scaleAspectFit
         pickedImageView.snp.makeConstraints { make in
             make.width.height.lessThanOrEqualTo(StyleKit.metrics.imageWidth)
-        }
-        
-        photoStackView.snp.removeConstraints()
-        photoStackView.snp.makeConstraints { make in
-            make.top.equalTo(recordButton.snp.bottom).offset(StyleKit.metrics.padding.common)
-            make.width.equalTo(locationTextField)
-            make.centerX.equalToSuperview()
         }
     }
     
@@ -220,7 +183,7 @@ class AddStoryViewController: UIViewController {
         
         confirmButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.width.equalTo(locationTextField)
+            make.width.equalTo(titleTextField)
             make.height.equalTo(StyleKit.metrics.buttonHeight)
         }
     }
@@ -240,6 +203,12 @@ class AddStoryViewController: UIViewController {
     @objc func closeTapped() {
         hideKeyboard()
         viewModel.close()
+    }
+    
+    @objc private func textFieldDidChange(textField: UITextField) {
+        viewModel.title = textField.text
+        updateTitleTextField()
+        updateUI()
     }
     
     // MARK: - Keyboard notifications
@@ -296,7 +265,6 @@ class AddStoryViewController: UIViewController {
     }
     
     private func hideKeyboard() {
-        locationTextField.resignFirstResponder()
         titleTextField.resignFirstResponder()
     }
 }
@@ -305,27 +273,12 @@ class AddStoryViewController: UIViewController {
 
 extension AddStoryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField == titleTextField {
-            locationTextField.becomeFirstResponder()
-            titleTextField.resignFirstResponder()
-        } else if textField == locationTextField {
-            locationTextField.resignFirstResponder()
-        }
-        
+        titleTextField.resignFirstResponder()
         return true
     }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        if textField == titleTextField {
-            titleTextFieldErrorLabel.alpha = 0
-        }
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        if textField == titleTextField {
-            viewModel.title = textField.text
-            updateTitleTextField()
-        }
+        titleTextFieldErrorLabel.alpha = 0
     }
 }
 
@@ -336,7 +289,6 @@ extension AddStoryViewController: UIImagePickerControllerDelegate & UINavigation
         guard let image = info[.originalImage] as? UIImage else {
             return
         }
-        
         
         dismiss(animated: true)
         viewModel.image = image.jpegData(compressionQuality: 1)

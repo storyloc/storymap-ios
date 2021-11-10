@@ -17,9 +17,6 @@ protocol AddStoryViewModelType: AnyObject {
     var title: String? { get set }
     var titleError: String { get }
     
-    var locationPlaceholder: String { get }
-    var recordIcon: String { get }
-    
     var addPhotoTitle: String { get }
     
     var confirmTitle: String { get }

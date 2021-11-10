@@ -12,11 +12,13 @@ class Story: Object {
     @Persisted var title: String
     @Persisted var timestamp: Date
     @Persisted var image: Data
+    @Persisted var location: Location?
     
-    convenience init(title: String, image: Data) {
+    convenience init(title: String, image: Data, location: Location?) {
         self.init()
         self.title = title
         self.timestamp = Date()
         self.image = image
+        self.location = location
     }
 }
