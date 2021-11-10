@@ -12,9 +12,10 @@ protocol StoryDetailViewModelType: AnyObject {
 }
 
 class StoryDetailViewModel: StoryDetailViewModelType {
-    var story: Story
+    internal var story: Story
     
     init(story: Story) {
         self.story = story
     }
+    
 }
