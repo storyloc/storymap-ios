@@ -28,9 +28,8 @@ class StoryDetailViewController: UIViewController {
         view.backgroundColor = .white
         setupImageView()
 //        setupMapView()
-
 //        if owner = "me" { setupTagLabel() } else
-        setupTagTextField()
+//        setupTagTextField()
 //        setupPrivateToggle()
 //        setupAddStoryBook()
 //        How to change title if title is in NavigationBar?
