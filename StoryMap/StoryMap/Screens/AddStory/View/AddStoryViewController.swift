@@ -116,6 +116,7 @@ class AddStoryViewController: UIViewController {
         }
         
         styleTextField(&titleTextField)
+        titleTextField.delegate = self
         
         titleTextField.becomeFirstResponder()
         

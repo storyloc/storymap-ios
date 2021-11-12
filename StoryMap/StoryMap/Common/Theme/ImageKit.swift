@@ -10,12 +10,17 @@ import UIKit
 
 struct ImageKit {
     let icons = Icons()
+    let examples = Examples()
 }
 
 extension ImageKit {
     struct Icons {
         let plus = "ic-plus"
         let record = "ic-record"
+    }
+    struct Examples {
+        let waterfall = "ex-waterfall"
+        let mountain = "ex-mountain"
     }
 }
 

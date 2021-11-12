@@ -11,7 +11,8 @@ import UIKit
 class MapCoordinator: CoordinatorType {
     var presenter = UINavigationController()
     
-    var addStoryCoordinator: CoordinatorType?
+    var addStoryCoordinator: AddStoryCoordinator?
+    var storyDetailCoordinator: StoryDetailCoordinator?
     
     var onDidStop: (() -> Void)?
     
@@ -30,6 +31,15 @@ class MapCoordinator: CoordinatorType {
     
     private func showAddStory() {
         addStoryCoordinator = AddStoryCoordinator()
+        addStoryCoordinator?.onShowStory = { [weak self] story in
+            self?.showStoryDetail(with: story)
+        }
         addStoryCoordinator?.start(presenter.topViewController)
+    }
+    
+    private func showStoryDetail(with story: Story) {
+        storyDetailCoordinator = StoryDetailCoordinator(story: story)
+        storyDetailCoordinator?.presenter = presenter
+        storyDetailCoordinator?.start(nil)
     }
 }

@@ -10,10 +10,11 @@ import UIKit
 import PhotosUI
 
 class AddStoryCoordinator: CoordinatorType {
-
     var presenter = UINavigationController()
     
     var onDidStop: (() -> Void)?
+    
+    var onShowStory: ((Story) -> Void)?
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = AddStoryViewModel()
@@ -39,7 +40,10 @@ class AddStoryCoordinator: CoordinatorType {
             case .photoLibrary: self.showChooseImageController(with: viewController)
             }
         }
-        
+        viewModel.onConfirm = { [weak self] story in
+            self?.stop(story: story)
+        }
+
         presenter.viewControllers = [viewController]
         presentFrom?.present(presenter, animated: true)
     }
@@ -66,6 +70,14 @@ class AddStoryCoordinator: CoordinatorType {
                 }
             }
         }
+    }
+    
+    func stop(story: Story?) {
+        presenter.visibleViewController?.dismiss(animated: true, completion: { [weak self] in
+            if let story = story {
+                self?.onShowStory?(story)
+            }
+        })
     }
     
     private func makeChooseImageController(with delegate: PHPickerViewControllerDelegate) -> UIViewController {
