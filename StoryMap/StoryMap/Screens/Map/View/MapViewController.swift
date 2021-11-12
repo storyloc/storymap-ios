@@ -92,26 +92,33 @@ class MapViewController: UIViewController {
         setupMap()
         
         setupObservers()
+        
+        updateAddButton()
+        updateCenterButton()
     }
     
     private func setupObservers() {
         vmCancellable = viewModel.objectWillChange.sink { [weak self] _ in
             guard let self = self else { return }
+            
             self.collectionViewHeightConstraint?.isActive = !self.viewModel.collectionData.isEmpty
             self.collectionView.reloadData()
             self.addStoriesToMap()
         }
         
         locCancellable = locationManager.objectWillChange.sink { [weak self] _ in
-            self?.updateCenterButton()
-            self?.updateAddButton()
-            self?.viewModel.location = self?.locationManager.userLocation
-            self?.collectionView.reloadData()
+            guard let self = self else { return }
             
-            guard !(self?.viewModel.collectionData.isEmpty ?? true) else { return }
+            self.updateCenterButton()
+            self.updateAddButton()
             
-            self?.collectionView.scrollToItem(
-                at: IndexPath(row: self?.locationManager.selectedPinIndex ?? 0, section: 0),
+            self.viewModel.location = self.locationManager.userLocation
+            
+            guard !self.viewModel.collectionData.isEmpty else { return }
+            
+            self.collectionView.reloadData()
+            self.collectionView.scrollToItem(
+                at: IndexPath(row: self.locationManager.selectedPinIndex, section: 0),
                 at: .centeredHorizontally,
                 animated: true
             )
@@ -136,7 +143,7 @@ class MapViewController: UIViewController {
         collectionViewHeightConstraint?.isActive = !viewModel.collectionData.isEmpty
         
         collectionView.snp.makeConstraints { make in
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(StyleKit.metrics.padding.verySmall)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(StyleKit.metrics.padding.medium)
             make.leading.trailing.equalToSuperview()
         }
     }
@@ -158,8 +165,6 @@ class MapViewController: UIViewController {
             make.trailing.equalToSuperview().inset(StyleKit.metrics.padding.medium)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
-        
-        updateAddButton()
     }
     
     private func setupCenterButton() {
@@ -170,6 +175,7 @@ class MapViewController: UIViewController {
             make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
+        
         updateCenterButton()
     }
     
@@ -183,7 +189,10 @@ class MapViewController: UIViewController {
     }
 
     func addStoriesToMap() {
-        let locations: [IndexLocation] = viewModel.collectionData.map({ (index: $0.id.stringValue, location: $0.loc) })
+        let locations: [IndexLocation] = viewModel.collectionData.map { item in
+            (index: item.id.stringValue, location: item.loc)
+        }
+        
         locationManager.addMarkers(to: locations)
     }
     
@@ -219,6 +228,7 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: indexPath) as? ThumbnailCell ?? ThumbnailCell()
         let cellData = viewModel.collectionData[indexPath.row]
         
+        cell.update(with: UIImage(data: cellData.image))
         cell.select(indexPath.row == locationManager.selectedPinIndex)
 
         return cell

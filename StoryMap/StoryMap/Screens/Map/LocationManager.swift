@@ -17,7 +17,6 @@ protocol LocationManagerType: CLLocationManagerDelegate, MKMapViewDelegate {
     var isMapCentered: Bool { get }
     var userLocationAvailable: Bool { get }
     var userLocation: Location? { get }
-    var mapCenterLocation: Location? { get }
     var selectedPinIndex: Int { get }
     
     func centerMap()
@@ -28,7 +27,6 @@ protocol LocationManagerType: CLLocationManagerDelegate, MKMapViewDelegate {
 class LocationManager: NSObject, ObservableObject, LocationManagerType {
     let mapView = MKMapView()
     var userLocation: Location?
-    var mapCenterLocation: Location?
     
     @Published var isMapCentered: Bool = true
     @Published var userLocationAvailable: Bool = false
@@ -36,6 +34,8 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     
     private let locationManager = CLLocationManager()
     private var pinLocations: [IndexLocation] = []
+    
+    private var mapCenterLocation: Location?
     
     override init() {
         super.init()
@@ -66,10 +66,16 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     
     func addMarkers(to locations: [IndexLocation]) {
         pinLocations = locations
+        
         locations.forEach { loc in
             let marker = MKPointAnnotation()
-            marker.coordinate = CLLocationCoordinate2D(latitude: loc.location.latitude, longitude: loc.location.longitude)
+            
             marker.title = loc.index
+            marker.coordinate = CLLocationCoordinate2D(
+                latitude: loc.location.latitude,
+                longitude: loc.location.longitude
+            )
+            
             mapView.addAnnotation(marker)
         }
     }
@@ -78,14 +84,6 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
 // MARK: MKMapViewDelegate
 
 extension LocationManager: MKMapViewDelegate {
-    func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
-        mapCenterLocation = Location(
-            latitude: mapView.centerCoordinate.latitude,
-            longitude: mapView.centerCoordinate.longitude
-        )
-        isMapCentered = mapCenterLocation == userLocation
-    }
-    
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         mapCenterLocation = Location(
             latitude: mapView.centerCoordinate.latitude,
@@ -93,9 +91,8 @@ extension LocationManager: MKMapViewDelegate {
         )
         
         if let userLocation = userLocation,
-           let mapCenterLocation = mapCenterLocation,
-           mapCenterLocation.distance(from: userLocation).rounded() > 0 {
-            print(mapCenterLocation.distance(from: userLocation))
+        let mapCenterLocation = mapCenterLocation,
+        mapCenterLocation.distance(from: userLocation).rounded() > 0 {
             isMapCentered = false
         }
     }
@@ -104,17 +101,9 @@ extension LocationManager: MKMapViewDelegate {
         guard let annotation = view.annotation else {
             return
         }
-    
-        let location = Location(
-            latitude: annotation.coordinate.latitude,
-            longitude: annotation.coordinate.longitude
-        )
-        if let index = pinLocations.firstIndex(where: { $0.index == annotation.title
-        }) {
+        
+        if let index = pinLocations.firstIndex(where: { $0.index == annotation.title }) {
             selectedPinIndex = index
-        } else {
-            print(location)
-            print(pinLocations)
         }
     }
 }
@@ -123,6 +112,7 @@ extension LocationManager: MKMapViewDelegate {
 
 extension LocationManager: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        // TODO: React to user not giving location permissions.
         switch manager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse: break
         default: break

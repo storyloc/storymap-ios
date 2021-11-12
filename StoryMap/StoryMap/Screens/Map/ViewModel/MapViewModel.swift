@@ -26,6 +26,7 @@ class MapViewModel: ObservableObject, MapViewModelType {
     
     var location: Location? {
         didSet {
+            guard oldValue == nil else { return }
             sortStoriesByLocation()
         }
     }
@@ -75,11 +76,6 @@ class MapViewModel: ObservableObject, MapViewModelType {
         collectionData = collectionData.sorted(by: { story1, story2 in
             story1.loc.distance(from: location) < story2.loc.distance(from: location)
         })
-        
-        collectionData.forEach {
-            print($0.id.stringValue)
-            print($0.loc.distance(from: location))
-        }
     }
     
     private func addTestStory() {

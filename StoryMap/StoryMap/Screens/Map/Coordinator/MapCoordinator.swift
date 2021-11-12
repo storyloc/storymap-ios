@@ -18,7 +18,11 @@ class MapCoordinator: CoordinatorType {
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = MapViewModel()
-        let viewController = MapViewController(viewModel: viewModel, locationManager: LocationManager())
+        let viewController = MapViewController(
+            viewModel: viewModel,
+            locationManager: LocationManager()
+        )
+        viewController.modalPresentationStyle = .fullScreen
         viewModel.onAddStory = { [weak self] location in
             self?.showAddStory(with: location)
         }
