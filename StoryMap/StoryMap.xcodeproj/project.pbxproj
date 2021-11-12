@@ -29,6 +29,8 @@
 		8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E502721A6B8003D0CE9 /* String+Localized.swift */; };
 		8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
 		8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */; };
+		8A6EE241273E97A300C5580F /* AddStorySimplifiedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */; };
+		8A6EE243273EB13400C5580F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE242273EB13400C5580F /* LocationManager.swift */; };
 		8AFAE47327316C5400BFC249 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47227316C5400BFC249 /* Story.swift */; };
 		8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE475273170C800BFC249 /* RealmDataProvider.swift */; };
 		8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */; };
@@ -89,6 +91,8 @@
 		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoordinatorType.swift; path = "../New Group/CoordinatorType.swift"; sourceTree = "<group>"; };
 		8A639E552721CB14003D0CE9 /* MapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
 		8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryCoordinator.swift; sourceTree = "<group>"; };
+		8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStorySimplifiedViewController.swift; sourceTree = "<group>"; };
+		8A6EE242273EB13400C5580F /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		8AFAE47227316C5400BFC249 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		8AFAE475273170C800BFC249 /* RealmDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmDataProvider.swift; sourceTree = "<group>"; };
 		8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryViewModelType.swift; sourceTree = "<group>"; };
@@ -238,6 +242,7 @@
 				8AFAE49B2731E42D00BFC249 /* View */,
 				8AFAE49A2731E42200BFC249 /* ViewModel */,
 				8AFAE4A22731F09700BFC249 /* Coordinator */,
+				8A6EE242273EB13400C5580F /* LocationManager.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -323,6 +328,7 @@
 			isa = PBXGroup;
 			children = (
 				8A344DB1271DA48C005A710B /* AddStoryViewController.swift */,
+				8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -653,6 +659,7 @@
 			files = (
 				8A4615D2273C17A300D25529 /* ThumbnailCell.swift in Sources */,
 				8A639E4427219FDD003D0CE9 /* StyleKit.swift in Sources */,
+				8A6EE241273E97A300C5580F /* AddStorySimplifiedViewController.swift in Sources */,
 				8AFAE48527319B2900BFC249 /* StoryDetailViewController.swift in Sources */,
 				8A639E3E27217D66003D0CE9 /* AddStoryViewModel.swift in Sources */,
 				8A4615D6273C260000D25529 /* Results+Array.swift in Sources */,
@@ -676,6 +683,7 @@
 				8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */,
 				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,
 				8AFAE4A42731F09700BFC249 /* MapCoordinator.swift in Sources */,
+				8A6EE243273EB13400C5580F /* LocationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

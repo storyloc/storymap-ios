@@ -17,7 +17,7 @@ struct Metrics {
     let tableRowHeight: CGFloat = 56
     let textFieldHeight: CGFloat = 40
     let imageWidth: CGFloat = 200
-    let thumbnailSize: CGFloat = 100
+    let thumbnailSize: CGFloat = 150
 
     struct Padding {
         let common: CGFloat = 20

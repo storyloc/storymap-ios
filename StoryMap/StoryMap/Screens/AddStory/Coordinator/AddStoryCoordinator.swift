@@ -17,15 +17,15 @@ class AddStoryCoordinator: CoordinatorType {
     var onDidStop: (() -> Void)?
     var onShowStory: ((Story) -> Void)?
     
+    private let usedSimplifiedView = true
+    
     init(location: Location) {
         self.location = location
     }
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = AddStoryViewModel(location: location)
-        
-        let viewController = AddStoryViewController(viewModel: viewModel)
-        viewController.isModalInPresentation = true
+        let viewController = makeViewController(with: viewModel, simplified: usedSimplifiedView)
         
         viewModel.onShowAlert = { [weak self] alert in
             self?.presenter.present(alert.controller, animated: true)
@@ -46,18 +46,19 @@ class AddStoryCoordinator: CoordinatorType {
             }
         }
         viewModel.onConfirm = { [weak self] story in
-            self?.stop(story: story)
+            guard let self = self else { return }
+            self.usedSimplifiedView ? self.stop() : self.stop(story: story)
         }
-
+        
         presenter.viewControllers = [viewController]
-        presentFrom?.present(presenter, animated: true)
+        presentFrom?.present(presenter, animated: false)
     }
     
     func stop() {
         presenter.visibleViewController?.dismiss(animated: true, completion: nil)
     }
     
-    func showChooseImageController(with delegate: PHPickerViewControllerDelegate) {
+    private func showChooseImageController(with delegate: PHPickerViewControllerDelegate) {
         PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
             guard let self = self else { return }
             
@@ -99,6 +100,19 @@ class AddStoryCoordinator: CoordinatorType {
         imagePicker.sourceType = .camera
         imagePicker.delegate = delegate
         return imagePicker
+    }
+    
+    private func makeViewController(with viewModel: AddStoryViewModelType, simplified: Bool) -> AddStoryViewControllerType {
+        var viewController: AddStoryViewControllerType
+        
+        if simplified {
+            viewController = AddStorySimplifiedViewController(viewModel: viewModel)
+            viewController.modalPresentationStyle = .overCurrentContext
+        } else {
+            viewController = AddStoryViewController(viewModel: viewModel)
+            viewController.isModalInPresentation = true
+        }
+        return viewController
     }
     
     private func makeMissingPermissionsAlert() -> AlertConfig {

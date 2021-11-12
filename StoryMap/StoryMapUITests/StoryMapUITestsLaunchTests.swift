@@ -6,7 +6,6 @@
 //
 
 import XCTest
-import EarlGreyTest
 
 class StoryMapUITestsLaunchTests: XCTestCase {
 

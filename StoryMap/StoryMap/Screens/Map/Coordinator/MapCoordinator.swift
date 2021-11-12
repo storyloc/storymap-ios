@@ -18,7 +18,7 @@ class MapCoordinator: CoordinatorType {
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = MapViewModel()
-        let viewController = MapViewController(viewModel: viewModel)
+        let viewController = MapViewController(viewModel: viewModel, locationManager: LocationManager())
         viewModel.onAddStory = { [weak self] location in
             self?.showAddStory(with: location)
         }
