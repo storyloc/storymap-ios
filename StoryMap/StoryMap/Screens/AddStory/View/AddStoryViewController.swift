@@ -10,7 +10,9 @@ import UIKit
 import SnapKit
 import PhotosUI
 
-class AddStoryViewController: UIViewController {
+protocol AddStoryViewControllerType: UIViewController, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {}
+
+class AddStoryViewController: UIViewController, AddStoryViewControllerType {
     
     // MARK: - Constants
     

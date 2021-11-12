@@ -14,7 +14,7 @@ class AddStoryViewModel: AddStoryViewModelType {
     
     var location: Location
     
-    var title: String? 
+    var title: String? = "title"
     
     var titleError: String {
         get {
@@ -102,6 +102,10 @@ class AddStoryViewModel: AddStoryViewModelType {
         onShowAlert?(alert)
     }
     
+    func capturePhoto() {
+        onShowImagePicker?(.camera)
+    }
+    
     func confirm() {
         guard let title = title, let image = image else {
             return
@@ -110,8 +114,9 @@ class AddStoryViewModel: AddStoryViewModelType {
         let story = Story(
             title: title,
             image: image,
-            location: location
+            location: location.randomize()
         )
+        
         realmDataProvider?.write(object: story)
         onConfirm?(story)
     }

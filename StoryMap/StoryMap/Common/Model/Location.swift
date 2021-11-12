@@ -14,6 +14,16 @@ class Location: EmbeddedObject {
     @Persisted var latitude: Double
     @Persisted var longitude: Double
     
+    var clLocation: CLLocation {
+        CLLocation(latitude: latitude, longitude: longitude)
+    }
+    
+    convenience init(latitude: Double, longitude: Double) {
+        self.init()
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+    
     convenience init(location: CLLocation) {
         self.init()
         self.latitude = location.coordinate.latitude
@@ -23,5 +33,16 @@ class Location: EmbeddedObject {
     func region(latDelta: Double = 0.01, lonDelta: Double = 0.01) -> MKCoordinateRegion {
         let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         return MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta))
+    }
+    
+    func distance(from location: Location) -> Double {
+        return clLocation.distance(from: location.clLocation)
+    }
+    
+    func randomize() -> Location {
+        return Location(
+            latitude: latitude + (Double.random(in: 0...99) / 10000),
+            longitude: longitude + (Double.random(in: 0...99) / 10000)
+        )
     }
 }

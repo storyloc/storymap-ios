@@ -21,11 +21,24 @@ class ThumbnailCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+   
+    
     public func update(with image: UIImage?) {
         imageView.image = image
     }
     
+    public func select(_ selected: Bool) {
+        if selected {
+            imageView.layer.borderWidth = 3
+            imageView.layer.borderColor = UIColor.systemBlue.cgColor
+        } else {
+            imageView.layer.borderColor = UIColor.clear.cgColor
+        }
+    }
+    
     private func setupUI() {
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = StyleKit.metrics.cornerRadius
         imageView.contentMode = .scaleToFill
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { make in

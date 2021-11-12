@@ -7,91 +7,24 @@
 
 import Foundation
 import UIKit
-import MapKit
-import CoreLocation
+import Combine
+import SwiftUI
 
 class MapViewController: UIViewController {
-    
-    // MARK: - Variables
-    
-    private var viewModel: MapViewModelType
     
     // MARK: - Constants
     
     private let addButton = UIButton(type: .system)
     private let centerButton = UIButton(type: .system)
-    private let mapView = MKMapView()
-    private let locationManager = CLLocationManager()
     
-    private var currentLocation: Location? {
-        didSet {
-            updateAddButton()
-        }
-    }
+    // MARK: - Variables
     
-    var collectionView: UICollectionView!
+    @ObservedObject private var viewModel: MapViewModel
+    @ObservedObject private var locationManager: LocationManager
     
-    // MARK: - Initializers
+    private lazy var mapView = locationManager.mapView
     
-    init(viewModel: MapViewModelType) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: Overrides
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
-        requestLocationPermissions()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        navigationController?.setNavigationBarHidden(false, animated: true)
-    }
-    
-    // MARK: - Private methods
-    
-    private func setupUI() {
-        viewModel.onUpdate = { [weak self] in
-            self?.collectionView.reloadData()
-            // TODO: Add only stories in current region 
-            self?.addStoriesToMap()
-        }
-        
-        view.backgroundColor = .white
-        setupCollectionView()
-        setupAddButton()
-        setupCenterButton()
-        setupMap()
-    }
-    
-    private func requestLocationPermissions() {
-        locationManager.delegate = self
-        locationManager.startUpdatingLocation()
-        locationManager.requestWhenInUseAuthorization()
-    }
-    
-    private func setupMap() {
-        view.addSubview(mapView)
-        mapView.showsUserLocation = true
-        mapView.camera.centerCoordinateDistance = 100
-        mapView.snp.makeConstraints { make in
-            make.top.equalTo(collectionView.snp.bottom)
-            make.leading.trailing.equalToSuperview()
-            make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.large)
-        }
-        
-        addStoriesToMap()
-    }
-    
-    private func setupCollectionView() {
+    private lazy var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: StyleKit.metrics.thumbnailSize, height: StyleKit.metrics.thumbnailSize)
@@ -105,18 +38,106 @@ class MapViewController: UIViewController {
             bottom: StyleKit.metrics.padding.small,
             right: StyleKit.metrics.padding.small
         )
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        return layout
+    }()
+    
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    
+    private var collectionViewHeightConstraint: NSLayoutConstraint?
+    
+    private var locCancellable: AnyCancellable?
+    private var vmCancellable: AnyCancellable?
+    
+    // MARK: - Initializers
+    
+    init(viewModel: MapViewModel, locationManager: LocationManager) {
+        self.viewModel = viewModel
+        self.locationManager = locationManager
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Overrides
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        locationManager.centerMap()
+    }
+    
+    // MARK: - Private methods
+    
+    private func setupUI() {
+        view.backgroundColor = .white
+        
+        [mapView, collectionView, addButton, centerButton].forEach(view.addSubview)
+        
+        setupCollectionView()
+        setupAddButton()
+        setupCenterButton()
+        setupMap()
+        
+        setupObservers()
+    }
+    
+    private func setupObservers() {
+        vmCancellable = viewModel.objectWillChange.sink { [weak self] _ in
+            guard let self = self else { return }
+            self.collectionViewHeightConstraint?.isActive = !self.viewModel.collectionData.isEmpty
+            self.collectionView.reloadData()
+            self.addStoriesToMap()
+        }
+        
+        locCancellable = locationManager.objectWillChange.sink { [weak self] _ in
+            self?.updateCenterButton()
+            self?.updateAddButton()
+            self?.viewModel.location = self?.locationManager.userLocation
+            self?.collectionView.reloadData()
+            
+            guard !(self?.viewModel.collectionData.isEmpty ?? true) else { return }
+            
+            self?.collectionView.scrollToItem(
+                at: IndexPath(row: self?.locationManager.selectedPinIndex ?? 0, section: 0),
+                at: .centeredHorizontally,
+                animated: true
+            )
+        }
+    }
+    
+    private func setupMap() {
+        mapView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        addStoriesToMap()
+    }
+    
+    private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.backgroundColor = .clear
         collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: "ThumbnailCell")
         
-        
-        view.addSubview(collectionView)
+        collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: StyleKit.metrics.thumbnailSize + 2 * StyleKit.metrics.padding.small)
+        collectionViewHeightConstraint?.isActive = !viewModel.collectionData.isEmpty
         
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(StyleKit.metrics.padding.verySmall)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(StyleKit.metrics.padding.verySmall)
             make.leading.trailing.equalToSuperview()
-            make.height.equalTo(StyleKit.metrics.thumbnailSize + 2 * StyleKit.metrics.padding.small)
         }
     }
  
@@ -128,15 +149,13 @@ class MapViewController: UIViewController {
             ),
             for: .normal
         )
-        addButton.backgroundColor = .white
         
         addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         addButton.accessibilityIdentifier = "Add Story Button"
-        view.addSubview(addButton)
         
         addButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(StyleKit.metrics.padding.medium)
-            make.trailing.equalToSuperview().inset(StyleKit.metrics.padding.large)
+            make.bottom.equalTo(collectionView.snp.top).offset(-StyleKit.metrics.padding.medium)
+            make.trailing.equalToSuperview().inset(StyleKit.metrics.padding.medium)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
         
@@ -144,43 +163,42 @@ class MapViewController: UIViewController {
     }
     
     private func setupCenterButton() {
-        centerButton.setTitle("Center Map", for: .normal)
         centerButton.addTarget(self, action: #selector(centerButtonTapped), for: .touchUpInside)
         
-        view.addSubview(centerButton)
         centerButton.snp.makeConstraints { make in
-            make.centerY.equalTo(addButton)
-            make.leading.equalToSuperview().offset(StyleKit.metrics.padding.large)
+            make.centerX.equalTo(addButton)
+            make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
+            make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
+        updateCenterButton()
     }
     
     func updateAddButton() {
-        addButton.isEnabled = currentLocation != nil
+        addButton.isEnabled = locationManager.userLocationAvailable
     }
     
-    func centerMap() {
-        if let currentLocation = currentLocation {
-            mapView.setRegion(currentLocation.region(), animated: true)
-        }
+    func updateCenterButton() {
+        let iconName = locationManager.isMapCentered ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
+        centerButton.setImage(StyleKit.image.make(from: iconName), for: .normal)
     }
-    
+
     func addStoriesToMap() {
-        viewModel.collectionData.forEach { story in
-            guard let location = story.location else { return }
-            let marker = MKPointAnnotation()
-            marker.coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
-            mapView.addAnnotation(marker)
-        }
+        let locations: [IndexLocation] = viewModel.collectionData.map({ (index: $0.id.stringValue, location: $0.loc) })
+        locationManager.addMarkers(to: locations)
     }
     
     // MARK: - Button actions
     
     @objc private func centerButtonTapped() {
-        centerMap()
+        locationManager.centerMap()
     }
     
     @objc private func addButtonTapped() {
-        viewModel.addStory(with: currentLocation!)
+        guard let location = locationManager.userLocation else {
+            // TODO: Add a warning if we don't have location permissions
+            return
+        }
+        viewModel.addStory(with: location)
     }
 }
 
@@ -192,31 +210,17 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        viewModel.openStory(with: indexPath.row)
+        // TODO: Uncomment after testing
+        // viewModel.openStory(with: indexPath.row)
+        locationManager.selectMarker(with: viewModel.collectionData[indexPath.row].id.stringValue)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: indexPath) as? ThumbnailCell ?? ThumbnailCell()
         let cellData = viewModel.collectionData[indexPath.row]
-        cell.update(with: UIImage(data: cellData.image))
+        
+        cell.select(indexPath.row == locationManager.selectedPinIndex)
+
         return cell
-    }
-}
-
-// MARK: - CLLocationManagerDelegate
-
-extension MapViewController: CLLocationManagerDelegate {
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        switch manager.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse: break
-        default: break
-        }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
-            currentLocation = Location(location: location)
-            centerMap()
-        }
     }
 }

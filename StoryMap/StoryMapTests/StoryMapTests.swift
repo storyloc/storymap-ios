@@ -7,8 +7,10 @@
 
 import XCTest
 @testable import StoryMap
+import AVFAudio
 
 class AddStoryViewModelTests: XCTestCase {
+    let testLocation = Location(latitude: 0, longitude: 0)
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -21,7 +23,7 @@ class AddStoryViewModelTests: XCTestCase {
 
     func testConfirmButtonEnabledWhenImageIsNil() {
         // Given
-        let viewModel = AddStoryViewModel()
+        let viewModel = AddStoryViewModel(location: testLocation)
         
         // When
         viewModel.title = "Title"
@@ -33,7 +35,7 @@ class AddStoryViewModelTests: XCTestCase {
     
     func testConfirmButtonEnabledWhenTitleAndImageIsNil() {
         // Given
-        let viewModel = AddStoryViewModel()
+        let viewModel = AddStoryViewModel(location: testLocation)
         
         // When
         viewModel.title = nil
