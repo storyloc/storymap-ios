@@ -100,15 +100,16 @@ class MapViewController: UIViewController {
     private func setupObservers() {
         vmCancellable = viewModel.objectWillChange.sink { [weak self] _ in
             guard let self = self else { return }
-            
+            print("MVC:Observer viewModel changed")
             self.collectionViewHeightConstraint?.isActive = !self.viewModel.collectionData.isEmpty
             self.collectionView.reloadData()
             self.addStoriesToMap()
+            print("---- viewModel")
         }
         
         locCancellable = locationManager.objectWillChange.sink { [weak self] _ in
             guard let self = self else { return }
-            
+            print("MVC:Observer locationManager changed")
             self.updateCenterButton()
             self.updateAddButton()
             
@@ -118,10 +119,11 @@ class MapViewController: UIViewController {
             
             self.collectionView.reloadData()
             self.collectionView.scrollToItem(
-                at: IndexPath(row: self.locationManager.selectedPinIndex, section: 0),
+                at: IndexPath(row: self.locationManager.selectedPinId, section: 0),
                 at: .centeredHorizontally,
                 animated: true
             )
+            print("---- locationManager")
         }
     }
     
@@ -129,8 +131,6 @@ class MapViewController: UIViewController {
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
-        addStoriesToMap()
     }
     
     private func setupCollectionView() {
@@ -190,16 +190,18 @@ class MapViewController: UIViewController {
 
     func addStoriesToMap() {
         let locations: [IndexLocation] = viewModel.collectionData.map { item in
-            (index: item.id.stringValue, location: item.loc)
+            (cid: item.id.stringValue, location: item.loc)
         }
-        
+        print("MVC:addStoriesToMap")
         locationManager.addMarkers(to: locations)
     }
     
     // MARK: - Button actions
     
     @objc private func centerButtonTapped() {
-        locationManager.centerMap()
+        locationManager.isMapCentered = !locationManager.isMapCentered
+        updateCenterButton()
+        print("Center Map, isMapCentered: \(locationManager.isMapCentered)")
     }
     
     @objc private func addButtonTapped() {
@@ -219,6 +221,7 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("MVC:cV didSelectItem \(indexPath.row): \(viewModel.collectionData[indexPath.row].id)")
         // TODO: Uncomment after testing
         // viewModel.openStory(with: indexPath.row)
         locationManager.selectMarker(with: viewModel.collectionData[indexPath.row].id.stringValue)
@@ -229,8 +232,7 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
         let cellData = viewModel.collectionData[indexPath.row]
         
         cell.update(with: UIImage(data: cellData.image))
-        cell.select(indexPath.row == locationManager.selectedPinIndex)
-
+        cell.select(indexPath.row == locationManager.selectedPinId)
         return cell
     }
 }

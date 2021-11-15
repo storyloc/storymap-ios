@@ -10,17 +10,17 @@ import MapKit
 import CoreLocation
 import Combine
 
-typealias IndexLocation = (index: String, location: Location)
+typealias IndexLocation = (cid: String, location: Location)
 
 protocol LocationManagerType: CLLocationManagerDelegate, MKMapViewDelegate {
     var mapView: MKMapView { get }
     var isMapCentered: Bool { get }
     var userLocationAvailable: Bool { get }
     var userLocation: Location? { get }
-    var selectedPinIndex: Int { get }
+    var selectedPinId: Int { get }
     
     func centerMap()
-    func selectMarker(with index: String)
+    func selectMarker(with cid: String)
     func addMarkers(to locations: [IndexLocation])
 }
 
@@ -30,12 +30,12 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     
     @Published var isMapCentered: Bool = true
     @Published var userLocationAvailable: Bool = false
-    @Published var selectedPinIndex: Int = 0
+    @Published var selectedPinId: Int = 0
     
     private let locationManager = CLLocationManager()
     private var pinLocations: [IndexLocation] = []
     
-    private var mapCenterLocation: Location?
+    private var mapCenterLocation = Location(latitude: 21.282778, longitude: -157.829444) //Honululu
     
     override init() {
         super.init()
@@ -45,32 +45,36 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         
         mapView.delegate = self
         mapView.showsUserLocation = true
-        mapView.camera.centerCoordinateDistance = 500
     }
     
     func centerMap() {
         guard let userLocation = userLocation else {
             return
         }
-
-        mapView.setRegion(userLocation.region(), animated: true)
+        mapView.setCenter(userLocation.clLocation2D, animated: true)
         isMapCentered = true
+        print("centerMap")
     }
     
-    func selectMarker(with index: String) {
-        if let annotation = mapView.annotations.first(where: { $0.title == index }) {
+    func selectMarker(with cid: String) {
+        if let annotation = mapView.annotations.first(where: { $0.title == cid }) {
             mapView.selectAnnotation(annotation, animated: true)
-            selectedPinIndex = pinLocations.firstIndex(where: { $0.index == index }) ?? 0
+            selectedPinId = pinLocations.firstIndex(where: { $0.cid == cid }) ?? 0
         }
+        print("Select Marker, \(cid): \(selectedPinId)")
     }
     
     func addMarkers(to locations: [IndexLocation]) {
         pinLocations = locations
         
-        locations.forEach { loc in
+        // remove existing Annotations to not have them twice
+        let allAnnotations = self.mapView.annotations
+        self.mapView.removeAnnotations(allAnnotations)
+
+        pinLocations.forEach { loc in
             let marker = MKPointAnnotation()
             
-            marker.title = loc.index
+            marker.title = loc.cid
             marker.coordinate = CLLocationCoordinate2D(
                 latitude: loc.location.latitude,
                 longitude: loc.location.longitude
@@ -78,6 +82,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
             
             mapView.addAnnotation(marker)
         }
+        print("LM:addMarkers, annotations: \(mapView.annotations.count)")
     }
 }
 
@@ -90,21 +95,26 @@ extension LocationManager: MKMapViewDelegate {
             longitude: mapView.centerCoordinate.longitude
         )
         
-        if let userLocation = userLocation,
-        let mapCenterLocation = mapCenterLocation,
-        mapCenterLocation.distance(from: userLocation).rounded() > 0 {
-            isMapCentered = false
+        var distance = 0.1
+        if let userLocation = userLocation {
+            distance = mapCenterLocation.distance(from: userLocation).rounded()
+            if distance > 0.0 {
+                isMapCentered = false
+            }
         }
+        print("Move Map, isMapCentered: \(isMapCentered), distance: \(distance)")
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         guard let annotation = view.annotation else {
             return
         }
+        print("LM:didSelect")
         
-        if let index = pinLocations.firstIndex(where: { $0.index == annotation.title }) {
-            selectedPinIndex = index
+        if let index = pinLocations.firstIndex(where: { $0.cid == annotation.title }) {
+            selectedPinId = index
         }
+        print("Selected Pin: \(selectedPinId): \(pinLocations[selectedPinId].cid)")
     }
 }
 
@@ -122,8 +132,12 @@ extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             userLocation = Location(location: location)
-            userLocationAvailable = true
-            
+
+            if !userLocationAvailable, let userLocation = userLocation {
+                userLocationAvailable = true
+                mapView.setRegion(userLocation.region(), animated: true)
+            }
+
             if isMapCentered {
                 centerMap()
             }

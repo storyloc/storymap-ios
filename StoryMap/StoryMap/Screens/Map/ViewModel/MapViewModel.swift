@@ -26,8 +26,8 @@ class MapViewModel: ObservableObject, MapViewModelType {
     
     var location: Location? {
         didSet {
-            guard oldValue == nil else { return }
-            sortStoriesByLocation()
+            print("MVM:location didSet, start sorting")
+            collectionData = sortStoriesByLocation(stories: collectionData)
         }
     }
     
@@ -62,28 +62,34 @@ class MapViewModel: ObservableObject, MapViewModelType {
     
     private func loadStories() {
         results = realmDataProvider?.read(type: Story.self, with: nil)
+        print("MVM:loadStories read")
+
         if let results = results {
+            // Triggers combine publish event for collectionData twice:
             collectionData = results.toArray(ofType: Story.self)
+            collectionData = sortStoriesByLocation(stories: collectionData)
         }
-        sortStoriesByLocation()
     }
     
-    private func sortStoriesByLocation() {
+    private func sortStoriesByLocation(stories: [Story]) -> [Story] {
         guard let location = location else {
-            return
+            return stories
         }
 
-        collectionData = collectionData.sorted(by: { story1, story2 in
+        let result = stories.sorted(by: { story1, story2 in
             story1.loc.distance(from: location) < story2.loc.distance(from: location)
         })
+        print("MVM Sorted \(result.map{ $0.id })")
+        return result
     }
     
     private func addTestStory() {
-        guard let imageData = StyleKit.image.make(from: StyleKit.image.examples.waterfall)?.jpegData(compressionQuality: 1) else {
+        guard let imageData = StyleKit.image.make(from: StyleKit.image.examples.random())?.jpegData(compressionQuality: 1) else {
             return
         }
+        let n = collectionData.count
         let story = Story(
-            title: "Title",
+            title: "Story \(n)",
             image: imageData,
             location: location!.randomize()
         )

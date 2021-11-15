@@ -17,6 +17,9 @@ class Location: EmbeddedObject {
     var clLocation: CLLocation {
         CLLocation(latitude: latitude, longitude: longitude)
     }
+    var clLocation2D: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
     
     convenience init(latitude: Double, longitude: Double) {
         self.init()
@@ -30,9 +33,8 @@ class Location: EmbeddedObject {
         self.longitude = location.coordinate.longitude
     }
     
-    func region(latDelta: Double = 0.01, lonDelta: Double = 0.01) -> MKCoordinateRegion {
-        let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        return MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta))
+    func region(latDelta: Double = 0.05, lonDelta: Double = 0.05) -> MKCoordinateRegion {
+        return MKCoordinateRegion(center: clLocation2D, span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta))
     }
     
     func distance(from location: Location) -> Double {
