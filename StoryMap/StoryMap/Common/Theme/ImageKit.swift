@@ -23,6 +23,10 @@ extension ImageKit {
     struct Examples {
         let waterfall = "ex-waterfall"
         let mountain = "ex-mountain"
+        
+        func random() -> String {
+            return [waterfall, mountain].randomElement()!
+        }
     }
 }
 
