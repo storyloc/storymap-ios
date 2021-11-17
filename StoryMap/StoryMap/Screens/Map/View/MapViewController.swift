@@ -136,11 +136,14 @@ class MapViewController: UIViewController {
             }
             
             self?.collectionView.reloadData()
-            self?.collectionView.scrollToItem(
-                at: IndexPath(row: index, section: 0),
-                at: .centeredHorizontally,
-                animated: true
-            )
+            
+            if index != self?.locationManager.selectedPinId {
+                self?.collectionView.scrollToItem(
+                    at: IndexPath(row: index, section: 0),
+                    at: .centeredHorizontally,
+                    animated: true
+                )
+            }
             
             logger.info("MapVC: Observer selectedPinId changed: \(index)")
         })
