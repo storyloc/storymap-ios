@@ -62,8 +62,11 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         if let annotation = mapView.annotations.first(where: { $0.title == cid }) {
             mapView.selectAnnotation(annotation, animated: true)
             selectedPinId = pinLocations.firstIndex(where: { $0.cid == cid }) ?? 0
+            
+            logger.info("LocManager: selectedMarker, \(cid): \(self.selectedPinId)")
+        } else {
+            logger.warning("LocManager: selectMarker not found: \(cid)")
         }
-        logger.info("LocManager: selectMarker, \(cid): \(self.selectedPinId)")
     }
     
     func addMarkers(to locations: [IndexLocation]) {
@@ -79,6 +82,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         
         pinLocations.forEach { loc in
             let marker = MKPointAnnotation()
+            marker.title = loc.cid
             
             marker.coordinate = CLLocationCoordinate2D(
                 latitude: loc.location.latitude,
@@ -151,10 +155,6 @@ extension LocationManager: CLLocationManagerDelegate {
             if !userLocationAvailable, let userLocation = userLocation {
                 userLocationAvailable = true
                 mapView.setRegion(userLocation.region(), animated: true)
-            }
-
-            if isMapCentered {
-                centerMap()
             }
         }
     }
