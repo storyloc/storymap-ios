@@ -26,6 +26,10 @@ class MapViewModel: ObservableObject, MapViewModelType {
     
     var location: Location? {
         didSet {
+            guard oldValue == nil else {
+                return
+            }
+            
             collectionData = sortStoriesByLocation(stories: collectionData)
             
             logger.info("MapVM:location didSet, start sorting")

@@ -12,7 +12,6 @@
 		8A4615BC273BFCEE00D25529 /* StoryMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615BB273BFCEE00D25529 /* StoryMapTests.swift */; };
 		8A4615C9273C046000D25529 /* StoryMapUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615C8273C046000D25529 /* StoryMapUITests.swift */; };
 		8A4615CB273C046000D25529 /* StoryMapUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615CA273C046000D25529 /* StoryMapUITestsLaunchTests.swift */; };
-		8A4615D2273C17A300D25529 /* ThumbnailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615D1273C17A300D25529 /* ThumbnailCell.swift */; };
 		8A4615D6273C260000D25529 /* Results+Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615D5273C260000D25529 /* Results+Array.swift */; };
 		8A4615D8273C4ECB00D25529 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615D7273C4ECB00D25529 /* Location.swift */; };
 		8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4A86E5271D882600F17B4E /* AppDelegate.swift */; };
@@ -29,6 +28,7 @@
 		8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E502721A6B8003D0CE9 /* String+Localized.swift */; };
 		8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
 		8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */; };
+		8A6DB02827456B4D00970FE9 /* MapStoryThumbnailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02727456B4D00970FE9 /* MapStoryThumbnailCell.swift */; };
 		8A6EE241273E97A300C5580F /* AddStorySimplifiedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */; };
 		8A6EE243273EB13400C5580F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE242273EB13400C5580F /* LocationManager.swift */; };
 		8AFAE47327316C5400BFC249 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47227316C5400BFC249 /* Story.swift */; };
@@ -71,7 +71,6 @@
 		8A4615C6273C046000D25529 /* StoryMapUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StoryMapUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A4615C8273C046000D25529 /* StoryMapUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMapUITests.swift; sourceTree = "<group>"; };
 		8A4615CA273C046000D25529 /* StoryMapUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMapUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		8A4615D1273C17A300D25529 /* ThumbnailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailCell.swift; sourceTree = "<group>"; };
 		8A4615D5273C260000D25529 /* Results+Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Results+Array.swift"; sourceTree = "<group>"; };
 		8A4615D7273C4ECB00D25529 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		8A4A86E2271D882600F17B4E /* StoryMap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryMap.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,6 +90,7 @@
 		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoordinatorType.swift; path = "../New Group/CoordinatorType.swift"; sourceTree = "<group>"; };
 		8A639E552721CB14003D0CE9 /* MapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
 		8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryCoordinator.swift; sourceTree = "<group>"; };
+		8A6DB02727456B4D00970FE9 /* MapStoryThumbnailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapStoryThumbnailCell.swift; sourceTree = "<group>"; };
 		8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStorySimplifiedViewController.swift; sourceTree = "<group>"; };
 		8A6EE242273EB13400C5580F /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		8AFAE47227316C5400BFC249 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
@@ -411,8 +411,8 @@
 		8AFAE49B2731E42D00BFC249 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				8A6DB02727456B4D00970FE9 /* MapStoryThumbnailCell.swift */,
 				8A4A8702271D8B0200F17B4E /* MapViewController.swift */,
-				8A4615D1273C17A300D25529 /* ThumbnailCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -665,13 +665,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A4615D2273C17A300D25529 /* ThumbnailCell.swift in Sources */,
 				8A639E4427219FDD003D0CE9 /* StyleKit.swift in Sources */,
 				8A6EE241273E97A300C5580F /* AddStorySimplifiedViewController.swift in Sources */,
 				8AFAE48527319B2900BFC249 /* StoryDetailViewController.swift in Sources */,
 				8A639E3E27217D66003D0CE9 /* AddStoryViewModel.swift in Sources */,
 				8A4615D6273C260000D25529 /* Results+Array.swift in Sources */,
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
+				8A6DB02827456B4D00970FE9 /* MapStoryThumbnailCell.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
 				8A4615D8273C4ECB00D25529 /* Location.swift in Sources */,
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,

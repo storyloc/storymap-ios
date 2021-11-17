@@ -216,9 +216,9 @@ class MapViewController: UIViewController {
     // MARK: - Button actions
     
     @objc private func centerButtonTapped() {
-        locationManager.isMapCentered = !locationManager.isMapCentered
+        locationManager.centerMap()
         
-        logger.info("MapVC center Map, isMapCentered: \(self.locationManager.isMapCentered)")
+        logger.info("MapVC centerMap")
     }
     
     @objc private func addButtonTapped() {
