@@ -27,6 +27,7 @@ class MapViewModel: ObservableObject, MapViewModelType {
     var location: Location? {
         didSet {
             print("MVM:location didSet, start sorting")
+            
             collectionData = sortStoriesByLocation(stories: collectionData)
         }
     }

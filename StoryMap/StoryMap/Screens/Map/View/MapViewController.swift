@@ -44,9 +44,15 @@ class MapViewController: UIViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     
     private var collectionViewHeightConstraint: NSLayoutConstraint?
+    private var collectionData: [Story] = []
     
-    private var locCancellable: AnyCancellable?
-    private var vmCancellable: AnyCancellable?
+    // MARK: - Subscribers
+    
+    private var isMapCenteredSubscriber: AnyCancellable?
+    private var userLocAvailableSubscriber: AnyCancellable?
+    private var selectedPinIdSubscriber: AnyCancellable?
+    private var collectionDataSubscriber: AnyCancellable?
+    private var userLocationSubscriber: AnyCancellable?
     
     // MARK: - Initializers
     
@@ -93,38 +99,54 @@ class MapViewController: UIViewController {
         
         setupObservers()
         
-        updateAddButton()
+        updateAddButton(false)
         updateCenterButton()
     }
     
     private func setupObservers() {
-        vmCancellable = viewModel.objectWillChange.sink { [weak self] _ in
+        collectionDataSubscriber = viewModel.$collectionData.sink { [weak self] data in
             guard let self = self else { return }
-            print("MVC:Observer viewModel changed")
-            self.collectionViewHeightConstraint?.isActive = !self.viewModel.collectionData.isEmpty
+            print("MVC:Observer collectionData changed")
+            self.collectionViewHeightConstraint?.isActive = !data.isEmpty
+            self.collectionData = data
             self.collectionView.reloadData()
             self.addStoriesToMap()
             print("---- viewModel")
         }
         
-        locCancellable = locationManager.objectWillChange.sink { [weak self] _ in
-            guard let self = self else { return }
-            print("MVC:Observer locationManager changed")
-            self.updateCenterButton()
-            self.updateAddButton()
+        userLocAvailableSubscriber = locationManager.$userLocationAvailable.sink(receiveValue: { [weak self] available in
+            print("MVC:Observer userLocationAvailable changed: \(available), \(self?.locationManager.userLocationAvailable), \(self?.locationManager.userLocation)")
             
-            self.viewModel.location = self.locationManager.userLocation
+            self?.updateCenterButton()
+            self?.updateAddButton(available)
             
-            guard !self.viewModel.collectionData.isEmpty else { return }
+            self?.viewModel.location = self?.locationManager.userLocation
+            print("---- locationManager")
+        })
+        
+        userLocationSubscriber = locationManager.$userLocation.assign(to: \.location, on: viewModel)
+        
+        isMapCenteredSubscriber = locationManager.$isMapCentered.sink(receiveValue: { [weak self] _ in
+            print("MVC:Observer isMapCentered changed")
+            self?.updateCenterButton()
+            print("---- locationManager")
+        })
+        
+        selectedPinIdSubscriber = locationManager.$selectedPinId.sink(receiveValue: { [weak self] index in
+            print("MVC:Observer selectedPinId changed")
             
-            self.collectionView.reloadData()
-            self.collectionView.scrollToItem(
-                at: IndexPath(row: self.locationManager.selectedPinId, section: 0),
+            guard !(self?.collectionData.isEmpty ?? true) else {
+                return
+            }
+            
+            self?.collectionView.reloadData()
+            self?.collectionView.scrollToItem(
+                at: IndexPath(row: index, section: 0),
                 at: .centeredHorizontally,
                 animated: true
             )
             print("---- locationManager")
-        }
+        })
     }
     
     private func setupMap() {
@@ -140,7 +162,7 @@ class MapViewController: UIViewController {
         collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: "ThumbnailCell")
         
         collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: StyleKit.metrics.thumbnailSize + 2 * StyleKit.metrics.padding.small)
-        collectionViewHeightConstraint?.isActive = !viewModel.collectionData.isEmpty
+        collectionViewHeightConstraint?.isActive = !collectionData.isEmpty
         
         collectionView.snp.makeConstraints { make in
             make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(StyleKit.metrics.padding.medium)
@@ -179,8 +201,8 @@ class MapViewController: UIViewController {
         updateCenterButton()
     }
     
-    func updateAddButton() {
-        addButton.isEnabled = locationManager.userLocationAvailable
+    func updateAddButton(_ enabled: Bool) {
+        addButton.isEnabled = enabled
     }
     
     func updateCenterButton() {
@@ -189,7 +211,7 @@ class MapViewController: UIViewController {
     }
 
     func addStoriesToMap() {
-        let locations: [IndexLocation] = viewModel.collectionData.map { item in
+        let locations: [IndexLocation] = collectionData.map { item in
             (cid: item.id.stringValue, location: item.loc)
         }
         print("MVC:addStoriesToMap")
@@ -217,19 +239,19 @@ class MapViewController: UIViewController {
 
 extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        viewModel.collectionData.count
+        collectionData.count
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("MVC:cV didSelectItem \(indexPath.row): \(viewModel.collectionData[indexPath.row].id)")
+        print("MVC:cV didSelectItem \(indexPath.row): \(collectionData[indexPath.row].id)")
         // TODO: Uncomment after testing
         // viewModel.openStory(with: indexPath.row)
-        locationManager.selectMarker(with: viewModel.collectionData[indexPath.row].id.stringValue)
+        locationManager.selectMarker(with: collectionData[indexPath.row].id.stringValue)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: indexPath) as? ThumbnailCell ?? ThumbnailCell()
-        let cellData = viewModel.collectionData[indexPath.row]
+        let cellData = collectionData[indexPath.row]
         
         cell.update(with: UIImage(data: cellData.image))
         cell.select(indexPath.row == locationManager.selectedPinId)
