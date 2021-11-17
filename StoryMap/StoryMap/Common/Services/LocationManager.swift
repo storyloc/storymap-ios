@@ -72,6 +72,10 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         let allAnnotations = self.mapView.annotations
         self.mapView.removeAnnotations(allAnnotations)
 
+        guard !pinLocations.isEmpty else {
+            return
+        }
+        
         pinLocations.forEach { loc in
             let marker = MKPointAnnotation()
             
@@ -83,9 +87,14 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
             
             mapView.addAnnotation(marker)
         }
-        selectMarker(with: pinLocations[selectedPinId].cid)
         
         logger.info("LocManager: addMarkers, annotations: \(self.mapView.annotations.count)")
+        
+        if selectedPinId >= pinLocations.count {
+            selectedPinId = 0
+        }
+        
+        selectMarker(with: pinLocations[selectedPinId].cid)
     }
 }
 

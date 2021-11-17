@@ -156,7 +156,7 @@ class MapViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = .clear
-        collectionView.register(ThumbnailCell.self, forCellWithReuseIdentifier: "ThumbnailCell")
+        collectionView.register(MapStoryThumbnailCell.self, forCellWithReuseIdentifier: "ThumbnailCell")
         
         collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: StyleKit.metrics.thumbnailSize + 2 * StyleKit.metrics.padding.small)
         collectionViewHeightConstraint?.isActive = !collectionData.isEmpty
@@ -239,13 +239,16 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         logger.info("MapVC: collectionView didSelectItem \(indexPath.row): \(self.collectionData[indexPath.row].id)")
-        // TODO: Uncomment after testing
-        // viewModel.openStory(with: indexPath.row)
-        locationManager.selectMarker(with: collectionData[indexPath.row].id.stringValue)
+        
+        if locationManager.selectedPinId == indexPath.row {
+            viewModel.openStory(with: indexPath.row)
+        } else {
+            locationManager.selectMarker(with: collectionData[indexPath.row].id.stringValue)
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: indexPath) as? ThumbnailCell ?? ThumbnailCell()
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: indexPath) as? MapStoryThumbnailCell ?? MapStoryThumbnailCell()
         let cellData = collectionData[indexPath.row]
         
         cell.update(with: UIImage(data: cellData.image))
