@@ -23,7 +23,7 @@ class RealmDataProvider {
         do {
             self.realm = try Realm(configuration: RealmDataProvider.config, queue: .main)
         } catch let error as NSError {
-            print(error.localizedDescription)
+            logger.error("RealmDP: init failed: \(error.localizedDescription)")
             return nil
         }
     }
@@ -34,7 +34,7 @@ class RealmDataProvider {
                 realm.add(object)
             }
         } catch let error as NSError {
-            print(error.localizedDescription)
+            logger.error("RealmDP: write object failed: \(error.localizedDescription)")
         }
     }
     
@@ -46,7 +46,7 @@ class RealmDataProvider {
                 }
             }
         } catch let error as NSError {
-            print(error.localizedDescription)
+            logger.error("RealmDP: write objects failed: \(error.localizedDescription)")
         }
     }
     
@@ -65,7 +65,7 @@ class RealmDataProvider {
                 closure()
             }
         } catch let error as NSError {
-            print(error.localizedDescription)
+            logger.error("RealmDP: update failed: \(error.localizedDescription)")
         }
     }
     
@@ -76,7 +76,7 @@ class RealmDataProvider {
                 realm.delete(object)
             }
         } catch let error as NSError {
-            print(error.localizedDescription)
+            logger.error("RealmDP: delete failed: \(error.localizedDescription)")
         }
     }
     
@@ -86,7 +86,7 @@ class RealmDataProvider {
                 realm.deleteAll()
             }
         } catch let error as NSError {
-            print(error.localizedDescription)
+            logger.error("RealmDP: deleteAll failed: \(error.localizedDescription)")
         }
     }
 }

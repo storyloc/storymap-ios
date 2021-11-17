@@ -242,7 +242,6 @@
 				8AFAE49B2731E42D00BFC249 /* View */,
 				8AFAE49A2731E42200BFC249 /* ViewModel */,
 				8AFAE4A22731F09700BFC249 /* Coordinator */,
-				8A6EE242273EB13400C5580F /* LocationManager.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -268,6 +267,7 @@
 		8A639E4127219F69003D0CE9 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				8A6DB0242745346E00970FE9 /* Services */,
 				8AFAE474273170A300BFC249 /* DataProviders */,
 				8AFAE47127316C2E00BFC249 /* Model */,
 				8AFAE470273167F800BFC249 /* Coordinators */,
@@ -296,6 +296,14 @@
 				8A4615D5273C260000D25529 /* Results+Array.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		8A6DB0242745346E00970FE9 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8A6EE242273EB13400C5580F /* LocationManager.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		8AFAE470273167F800BFC249 /* Coordinators */ = {

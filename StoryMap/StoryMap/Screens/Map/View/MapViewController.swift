@@ -48,11 +48,11 @@ class MapViewController: UIViewController {
     
     // MARK: - Subscribers
     
-    private var isMapCenteredSubscriber: AnyCancellable?
-    private var userLocAvailableSubscriber: AnyCancellable?
-    private var selectedPinIdSubscriber: AnyCancellable?
-    private var collectionDataSubscriber: AnyCancellable?
-    private var userLocationSubscriber: AnyCancellable?
+    private var isMapCenteredObserver: AnyCancellable?
+    private var userLocAvailableObserver: AnyCancellable?
+    private var selectedPinIdObserver: AnyCancellable?
+    private var collectionDataObserver: AnyCancellable?
+    private var userLocationObserver: AnyCancellable?
     
     // MARK: - Initializers
     
@@ -100,41 +100,37 @@ class MapViewController: UIViewController {
         setupObservers()
         
         updateAddButton(false)
-        updateCenterButton()
+        updateCenterButton(false)
     }
     
     private func setupObservers() {
-        collectionDataSubscriber = viewModel.$collectionData.sink { [weak self] data in
+        collectionDataObserver = viewModel.$collectionData.sink { [weak self] data in
             guard let self = self else { return }
-            print("MVC:Observer collectionData changed")
+            
             self.collectionViewHeightConstraint?.isActive = !data.isEmpty
             self.collectionData = data
             self.collectionView.reloadData()
             self.addStoriesToMap()
-            print("---- viewModel")
+            
+            logger.info("MapVC: Observer collectionData changed")
         }
         
-        userLocAvailableSubscriber = locationManager.$userLocationAvailable.sink(receiveValue: { [weak self] available in
-            print("MVC:Observer userLocationAvailable changed: \(available), \(self?.locationManager.userLocationAvailable), \(self?.locationManager.userLocation)")
-            
-            self?.updateCenterButton()
+        userLocAvailableObserver = locationManager.$userLocationAvailable.sink(receiveValue: { [weak self] available in
             self?.updateAddButton(available)
-            
             self?.viewModel.location = self?.locationManager.userLocation
-            print("---- locationManager")
-        })
-        
-        userLocationSubscriber = locationManager.$userLocation.assign(to: \.location, on: viewModel)
-        
-        isMapCenteredSubscriber = locationManager.$isMapCentered.sink(receiveValue: { [weak self] _ in
-            print("MVC:Observer isMapCentered changed")
-            self?.updateCenterButton()
-            print("---- locationManager")
-        })
-        
-        selectedPinIdSubscriber = locationManager.$selectedPinId.sink(receiveValue: { [weak self] index in
-            print("MVC:Observer selectedPinId changed")
             
+            logger.info("MapVC: Observer userLocationAvailable changed: \(available)")
+        })
+        
+        userLocationObserver = locationManager.$userLocation.assign(to: \.location, on: viewModel)
+        
+        isMapCenteredObserver = locationManager.$isMapCentered.sink(receiveValue: { [weak self] centered in
+            self?.updateCenterButton(centered)
+            
+            logger.info("MapVC: Observer isMapCentered changed: \(centered)")
+        })
+        
+        selectedPinIdObserver = locationManager.$selectedPinId.sink(receiveValue: { [weak self] index in
             guard !(self?.collectionData.isEmpty ?? true) else {
                 return
             }
@@ -145,7 +141,8 @@ class MapViewController: UIViewController {
                 at: .centeredHorizontally,
                 animated: true
             )
-            print("---- locationManager")
+            
+            logger.info("MapVC: Observer selectedPinId changed: \(index)")
         })
     }
     
@@ -180,7 +177,6 @@ class MapViewController: UIViewController {
         )
         
         addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
-        addButton.accessibilityIdentifier = "Add Story Button"
         
         addButton.snp.makeConstraints { make in
             make.bottom.equalTo(collectionView.snp.top).offset(-StyleKit.metrics.padding.medium)
@@ -197,16 +193,14 @@ class MapViewController: UIViewController {
             make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
-        
-        updateCenterButton()
     }
     
     func updateAddButton(_ enabled: Bool) {
         addButton.isEnabled = enabled
     }
     
-    func updateCenterButton() {
-        let iconName = locationManager.isMapCentered ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
+    func updateCenterButton(_ centered: Bool) {
+        let iconName = centered ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
         centerButton.setImage(StyleKit.image.make(from: iconName), for: .normal)
     }
 
@@ -214,16 +208,17 @@ class MapViewController: UIViewController {
         let locations: [IndexLocation] = collectionData.map { item in
             (cid: item.id.stringValue, location: item.loc)
         }
-        print("MVC:addStoriesToMap")
         locationManager.addMarkers(to: locations)
+        
+        logger.info("MapVC: addStoriesToMap")
     }
     
     // MARK: - Button actions
     
     @objc private func centerButtonTapped() {
         locationManager.isMapCentered = !locationManager.isMapCentered
-        updateCenterButton()
-        print("Center Map, isMapCentered: \(locationManager.isMapCentered)")
+        
+        logger.info("MapVC center Map, isMapCentered: \(self.locationManager.isMapCentered)")
     }
     
     @objc private func addButtonTapped() {
@@ -243,7 +238,7 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("MVC:cV didSelectItem \(indexPath.row): \(collectionData[indexPath.row].id)")
+        logger.info("MapVC: collectionView didSelectItem \(indexPath.row): \(self.collectionData[indexPath.row].id)")
         // TODO: Uncomment after testing
         // viewModel.openStory(with: indexPath.row)
         locationManager.selectMarker(with: collectionData[indexPath.row].id.stringValue)
