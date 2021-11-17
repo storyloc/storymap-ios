@@ -1,5 +1,5 @@
 //
-//  ThumbnailCell.swift
+//  MapStoryThumbnailCell.swift
 //  StoryMap
 //
 //  Created by Dory on 10/11/2021.
@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class ThumbnailCell: UICollectionViewCell {
+class MapStoryThumbnailCell: UICollectionViewCell {
     private let imageView = UIImageView()
     
     override init(frame: CGRect) {
@@ -31,8 +31,10 @@ class ThumbnailCell: UICollectionViewCell {
         if selected {
             imageView.layer.borderWidth = 3
             imageView.layer.borderColor = UIColor.systemBlue.cgColor
+            isSelected = true
         } else {
             imageView.layer.borderColor = UIColor.clear.cgColor
+            isSelected = false
         }
     }
     
