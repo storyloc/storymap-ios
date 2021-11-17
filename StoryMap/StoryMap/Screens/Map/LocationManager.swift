@@ -26,8 +26,8 @@ protocol LocationManagerType: CLLocationManagerDelegate, MKMapViewDelegate {
 
 class LocationManager: NSObject, ObservableObject, LocationManagerType {
     let mapView = MKMapView()
-    var userLocation: Location?
     
+    @Published var userLocation: Location?
     @Published var isMapCentered: Bool = true
     @Published var userLocationAvailable: Bool = false
     @Published var selectedPinId: Int = 0
@@ -82,6 +82,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
             
             mapView.addAnnotation(marker)
         }
+        selectMarker(with: pinLocations[selectedPinId].cid)
         print("LM:addMarkers, annotations: \(mapView.annotations.count)")
     }
 }
