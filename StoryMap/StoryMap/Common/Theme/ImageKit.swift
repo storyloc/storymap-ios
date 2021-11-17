@@ -19,6 +19,7 @@ extension ImageKit {
         let centerOn = "ic-center-on"
         let centerOff = "ic-center-off"
         let record = "ic-record"
+        let delete = "ic-delete"
     }
     struct Examples {
         let waterfall = "ex-waterfall"

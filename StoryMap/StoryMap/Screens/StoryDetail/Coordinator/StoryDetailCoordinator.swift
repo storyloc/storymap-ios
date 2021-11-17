@@ -20,6 +20,10 @@ class StoryDetailCoordinator: CoordinatorType {
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = StoryDetailViewModel(story: story)
+        viewModel.onClose = { [weak self] in
+            self?.stop()
+        }
+        
         let viewController = StoryDetailViewController(viewModel: viewModel)
         presenter.pushViewController(viewController, animated: true)
     }
