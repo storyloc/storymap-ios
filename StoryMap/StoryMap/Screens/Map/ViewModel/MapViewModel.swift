@@ -26,9 +26,9 @@ class MapViewModel: ObservableObject, MapViewModelType {
     
     var location: Location? {
         didSet {
-            print("MVM:location didSet, start sorting")
-            
             collectionData = sortStoriesByLocation(stories: collectionData)
+            
+            logger.info("MapVM:location didSet, start sorting")
         }
     }
     
@@ -63,13 +63,13 @@ class MapViewModel: ObservableObject, MapViewModelType {
     
     private func loadStories() {
         results = realmDataProvider?.read(type: Story.self, with: nil)
-        print("MVM:loadStories read")
 
         if let results = results {
-            // Triggers combine publish event for collectionData twice:
-            collectionData = results.toArray(ofType: Story.self)
-            collectionData = sortStoriesByLocation(stories: collectionData)
+            let data = results.toArray(ofType: Story.self)
+            collectionData = sortStoriesByLocation(stories: data)
         }
+        
+        logger.info("MapVM: loaded stories from realm")
     }
     
     private func sortStoriesByLocation(stories: [Story]) -> [Story] {
@@ -80,7 +80,8 @@ class MapViewModel: ObservableObject, MapViewModelType {
         let result = stories.sorted(by: { story1, story2 in
             story1.loc.distance(from: location) < story2.loc.distance(from: location)
         })
-        print("MVM Sorted \(result.map{ $0.id })")
+        
+        logger.info("MapVM sortStories: \(result.map{ $0.id })")
         return result
     }
     

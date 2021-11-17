@@ -53,7 +53,8 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         }
         mapView.setCenter(userLocation.clLocation2D, animated: true)
         isMapCentered = true
-        print("centerMap")
+        
+        logger.info("LocManager: centerMap")
     }
     
     func selectMarker(with cid: String) {
@@ -61,7 +62,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
             mapView.selectAnnotation(annotation, animated: true)
             selectedPinId = pinLocations.firstIndex(where: { $0.cid == cid }) ?? 0
         }
-        print("Select Marker, \(cid): \(selectedPinId)")
+        logger.info("LocManager: selectMarker, \(cid): \(self.selectedPinId)")
     }
     
     func addMarkers(to locations: [IndexLocation]) {
@@ -83,7 +84,8 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
             mapView.addAnnotation(marker)
         }
         selectMarker(with: pinLocations[selectedPinId].cid)
-        print("LM:addMarkers, annotations: \(mapView.annotations.count)")
+        
+        logger.info("LocManager: addMarkers, annotations: \(self.mapView.annotations.count)")
     }
 }
 
@@ -103,19 +105,22 @@ extension LocationManager: MKMapViewDelegate {
                 isMapCentered = false
             }
         }
-        print("Move Map, isMapCentered: \(isMapCentered), distance: \(distance)")
+        
+        logger.info("LocManager: move map, isMapCentered: \(self.isMapCentered), distance: \(distance)")
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        logger.info("LocManager: didSelectMarker")
+        
         guard let annotation = view.annotation else {
             return
         }
-        print("LM:didSelect")
         
         if let index = pinLocations.firstIndex(where: { $0.cid == annotation.title }) {
             selectedPinId = index
         }
-        print("Selected Pin: \(selectedPinId): \(pinLocations[selectedPinId].cid)")
+        
+        logger.info("LocManager: selectedPin: \(self.selectedPinId): \(self.pinLocations[self.selectedPinId].cid)")
     }
 }
 
