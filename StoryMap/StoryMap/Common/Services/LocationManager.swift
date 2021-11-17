@@ -51,6 +51,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         guard let userLocation = userLocation else {
             return
         }
+        
         mapView.setCenter(userLocation.clLocation2D, animated: true)
         isMapCentered = true
         
@@ -79,7 +80,6 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         pinLocations.forEach { loc in
             let marker = MKPointAnnotation()
             
-            marker.title = loc.cid
             marker.coordinate = CLLocationCoordinate2D(
                 latitude: loc.location.latitude,
                 longitude: loc.location.longitude
