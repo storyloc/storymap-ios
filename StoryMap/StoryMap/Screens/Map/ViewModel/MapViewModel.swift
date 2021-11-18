@@ -26,6 +26,10 @@ class MapViewModel: ObservableObject, MapViewModelType {
     
     var location: Location? {
         didSet {
+            guard oldValue == nil else {
+                return
+            }
+            
             collectionData = sortStoriesByLocation(stories: collectionData)
             
             logger.info("MapVM:location didSet, start sorting")
@@ -38,12 +42,16 @@ class MapViewModel: ObservableObject, MapViewModelType {
     private let realmDataProvider = RealmDataProvider.shared
     
     init() {
-        loadStories()
+        results = realmDataProvider?.read(type: Story.self, with: nil)
         
         notificationToken = results?.observe(on: .main, { [weak self] changes in
             switch changes {
             case .update(let items, _, _, _):
-                self?.collectionData = items.toArray(ofType: Story.self)
+                self?.updateStories(with: items)
+                logger.info("MapVM: realm results observer updated")
+            case .initial(let items):
+                self?.updateStories(with: items)
+                logger.info("MapVM: realm results observer initial")
             default: break
             }
         })
@@ -61,15 +69,11 @@ class MapViewModel: ObservableObject, MapViewModelType {
         #endif
     }
     
-    private func loadStories() {
-        results = realmDataProvider?.read(type: Story.self, with: nil)
-
-        if let results = results {
-            let data = results.toArray(ofType: Story.self)
-            collectionData = sortStoriesByLocation(stories: data)
-        }
+    private func updateStories(with results: Results<Story>) {
+        let data = results.toArray(ofType: Story.self)
+        self.collectionData = self.sortStoriesByLocation(stories: data)
         
-        logger.info("MapVM: loaded stories from realm")
+        logger.info("MapVM: collectionData updated")
     }
     
     private func sortStoriesByLocation(stories: [Story]) -> [Story] {
@@ -96,6 +100,5 @@ class MapViewModel: ObservableObject, MapViewModelType {
             location: location!.randomize()
         )
         realmDataProvider?.write(object: story)
-        loadStories()
     }
 }

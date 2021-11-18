@@ -51,6 +51,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         guard let userLocation = userLocation else {
             return
         }
+        
         mapView.setCenter(userLocation.clLocation2D, animated: true)
         isMapCentered = true
         
@@ -61,8 +62,11 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         if let annotation = mapView.annotations.first(where: { $0.title == cid }) {
             mapView.selectAnnotation(annotation, animated: true)
             selectedPinId = pinLocations.firstIndex(where: { $0.cid == cid }) ?? 0
+            
+            logger.info("LocManager: selectedMarker, \(cid): \(self.selectedPinId)")
+        } else {
+            logger.warning("LocManager: selectMarker not found: \(cid)")
         }
-        logger.info("LocManager: selectMarker, \(cid): \(self.selectedPinId)")
     }
     
     func addMarkers(to locations: [IndexLocation]) {
@@ -72,10 +76,14 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         let allAnnotations = self.mapView.annotations
         self.mapView.removeAnnotations(allAnnotations)
 
+        guard !pinLocations.isEmpty else {
+            return
+        }
+        
         pinLocations.forEach { loc in
             let marker = MKPointAnnotation()
-            
             marker.title = loc.cid
+            
             marker.coordinate = CLLocationCoordinate2D(
                 latitude: loc.location.latitude,
                 longitude: loc.location.longitude
@@ -83,9 +91,14 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
             
             mapView.addAnnotation(marker)
         }
-        selectMarker(with: pinLocations[selectedPinId].cid)
         
         logger.info("LocManager: addMarkers, annotations: \(self.mapView.annotations.count)")
+        
+        if selectedPinId >= pinLocations.count {
+            selectedPinId = 0
+        }
+        
+        selectMarker(with: pinLocations[selectedPinId].cid)
     }
 }
 
@@ -142,10 +155,6 @@ extension LocationManager: CLLocationManagerDelegate {
             if !userLocationAvailable, let userLocation = userLocation {
                 userLocationAvailable = true
                 mapView.setRegion(userLocation.region(), animated: true)
-            }
-
-            if isMapCentered {
-                centerMap()
             }
         }
     }
