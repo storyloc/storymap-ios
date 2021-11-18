@@ -69,11 +69,10 @@ class RealmDataProvider {
         }
     }
     
-    
     func delete(object: Object) {
         do {
             try realm.write {
-                realm.delete(object)
+                realm.delete(object, cascading: true)
             }
         } catch let error as NSError {
             logger.error("RealmDP: delete failed: \(error.localizedDescription)")

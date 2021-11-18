@@ -18,10 +18,16 @@ class StoryDetailViewController: UIViewController {
 
     private let imageView = UIImageView()
     private let recordButton = UIButton(type: .custom)
+    private let tableView = UITableView(frame: .zero, style: .plain)
+    private var recordings: [AudioRecordingInfo] = []
+    
+    private let reuseIdentifier = "RecordingCell"
     
     // MARK: - Observers
     
     private var stateObserver: AnyCancellable?
+    private var recordingsObserver: AnyCancellable?
+    private var recordButtonEnabledObserver: AnyCancellable?
     
     // MARK: - Initializers
     
@@ -50,17 +56,34 @@ class StoryDetailViewController: UIViewController {
         title = viewModel.story.title
         view.backgroundColor = .white
         
-        [imageView, recordButton].forEach(view.addSubview)
+        [imageView, tableView, recordButton].forEach(view.addSubview)
         
         setupNavBar()
         setupImageView()
         setupRecordButton()
+        setupTableView()
         setupGestureRecognizer()
     }
     
     private func setupObservers() {
         stateObserver = viewModel.$state.sink { [weak self] state in
             self?.updateRecordButton(with: state)
+            logger.info("DetailVC: stateObserver changed: \(state.rawValue)")
+        }
+        recordingsObserver = viewModel.$recordings.sink { [weak self] info in
+            logger.info("DetailVC: recordingsObserver changed: \(info)")
+            
+            guard let self = self else { return }
+            
+            self.recordings = info
+            
+            guard !self.recordings.isEmpty else {
+                self.tableView.isHidden = true
+                return
+            }
+            
+            self.tableView.isHidden = false
+            self.tableView.reloadData()
         }
     }
     
@@ -99,12 +122,17 @@ class StoryDetailViewController: UIViewController {
         recordButton.layer.shadowOpacity = 0.7
     }
     
-    private func setupGestureRecognizer() {
-        let recognizer = UILongPressGestureRecognizer(
-            target: self,
-            action: #selector(handleLongPress)
-        )
-        recordButton.addGestureRecognizer(recognizer)
+    private func setupTableView() {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.estimatedRowHeight = UITableView.automaticDimension
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(recordButton.snp.bottom).offset(StyleKit.metrics.padding.medium)
+            make.leading.trailing.equalToSuperview().inset(StyleKit.metrics.padding.common)
+            make.bottom.equalToSuperview()
+        }
     }
     
     private func setupImageView() {
@@ -115,9 +143,17 @@ class StoryDetailViewController: UIViewController {
         
         imageView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(StyleKit.metrics.padding.verySmall)
-            make.width.height.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.width)
+            make.size.lessThanOrEqualTo(view.snp.width).multipliedBy(0.7)
             make.centerX.equalToSuperview()
         }
+    }
+    
+    private func setupGestureRecognizer() {
+        let recognizer = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(handleLongPress)
+        )
+        recordButton.addGestureRecognizer(recognizer)
     }
     
     private func updateRecordButton(with state: StoryDetailViewModel.RecordingState) {
@@ -143,5 +179,38 @@ class StoryDetailViewController: UIViewController {
     
     @objc private func deleteTapped() {
         viewModel.delete()
+    }
+}
+
+// MARK: - UITableViewDelegate
+
+extension StoryDetailViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let recording = recordings[indexPath.row].recording
+        viewModel.play(recording: recording)
+        tableView.reloadData()
+    }
+}
+
+// MARK: - UITableViewDataSource
+
+extension StoryDetailViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        recordings.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cellData = recordings[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) ?? UITableViewCell(style: .default, reuseIdentifier: reuseIdentifier)
+        
+        var content = cell.defaultContentConfiguration()
+        content.text = cellData.recording.createdAt
+        content.image = StyleKit.image.make(
+            from: cellData.isPlaying ? StyleKit.image.icons.pause : StyleKit.image.icons.play,
+            with: .alwaysTemplate
+        )
+        
+        cell.contentConfiguration = content
+        return cell
     }
 }

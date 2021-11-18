@@ -14,6 +14,7 @@ class Story: Object {
     @Persisted var timestamp: Date
     @Persisted var image: Data
     @Persisted var location: Location?
+    @Persisted var audioRecordings: List<AudioRecording>
     
     var loc: Location {
         return location!

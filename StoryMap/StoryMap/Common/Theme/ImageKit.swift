@@ -20,7 +20,10 @@ extension ImageKit {
         let centerOff = "ic-center-off"
         let record = "ic-record"
         let delete = "ic-delete"
+        let play = "ic-play"
+        let pause = "ic-pause"
     }
+    
     struct Examples {
         let waterfall = "ex-waterfall"
         let mountain = "ex-mountain"
