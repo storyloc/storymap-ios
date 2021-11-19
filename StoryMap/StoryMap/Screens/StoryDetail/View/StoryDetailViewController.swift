@@ -51,6 +51,14 @@ class StoryDetailViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
+	
+	override func viewDidLayoutSubviews() {
+		super.viewDidLayoutSubviews()
+		recordButton.clipsToBounds = true
+		recordButton.layer.cornerRadius = recordButton.frame.height / 2
+	}
+	
+	// MARK: - Private methods
     
     private func setupUI() {
         title = viewModel.story.title
@@ -108,18 +116,9 @@ class StoryDetailViewController: UIViewController {
             make.top.equalTo(imageView.snp.bottom).offset(StyleKit.metrics.padding.medium)
             make.width.height.equalTo(StyleKit.metrics.recordButtonSize)
         }
-        
-        recordButton.layer.cornerRadius = recordButton.frame.height / 2
-        
-        recordButton.clipsToBounds = false
-        recordButton.layer.masksToBounds = false
-        recordButton.layer.shouldRasterize = true
-        
-        recordButton.layer.shadowColor = UIColor.lightGray.cgColor
-        recordButton.layer.shadowPath = UIBezierPath(roundedRect: recordButton.bounds, cornerRadius: recordButton.frame.height / 2).cgPath
-        recordButton.layer.shadowOffset = .zero
-        recordButton.layer.shadowRadius = StyleKit.metrics.padding.verySmall
-        recordButton.layer.shadowOpacity = 0.7
+		
+		recordButton.layer.borderWidth = StyleKit.metrics.separator
+		recordButton.layer.borderColor = UIColor.lightGray.cgColor
     }
     
     private func setupTableView() {
@@ -161,9 +160,11 @@ class StoryDetailViewController: UIViewController {
         case .initial, .done:
             recordButton.backgroundColor = .white
             recordButton.tintColor = .gray
+			recordButton.layer.borderColor = UIColor.lightGray.cgColor
         case .inProgress:
             recordButton.backgroundColor = .red
             recordButton.tintColor = .white
+			recordButton.layer.borderColor = UIColor.red.cgColor
         }
     }
     
