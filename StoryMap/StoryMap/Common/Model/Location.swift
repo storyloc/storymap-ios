@@ -33,7 +33,7 @@ class Location: EmbeddedObject {
         self.longitude = location.coordinate.longitude
     }
     
-    func region(latDelta: Double = 0.05, lonDelta: Double = 0.05) -> MKCoordinateRegion {
+    func region(latDelta: Double = 0.02, lonDelta: Double = 0.02) -> MKCoordinateRegion {
         return MKCoordinateRegion(center: clLocation2D, span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta))
     }
     
@@ -43,8 +43,8 @@ class Location: EmbeddedObject {
     
     func randomize() -> Location {
         return Location(
-            latitude: latitude + (Double.random(in: 0...99) / 10000),
-            longitude: longitude + (Double.random(in: 0...99) / 10000)
+            latitude: latitude - 0.005 + (Double.random(in: 0...99) / 10000),
+            longitude: longitude - 0.005 + (Double.random(in: 0...99) / 10000)
         )
     }
 }
