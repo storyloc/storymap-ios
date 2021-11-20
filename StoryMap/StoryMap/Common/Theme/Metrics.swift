@@ -19,7 +19,7 @@ struct Metrics {
     let imageWidth: CGFloat = 200
     let thumbnailSize: CGFloat = 150
     let recordButtonSize: CGFloat = 80
-
+	
     struct Padding {
         let common: CGFloat = 20
         let verySmall: CGFloat = 5

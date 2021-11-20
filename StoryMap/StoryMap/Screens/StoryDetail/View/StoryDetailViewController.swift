@@ -19,12 +19,13 @@ class StoryDetailViewController: UIViewController {
     private let imageView = UIImageView()
     private let recordButton = UIButton(type: .custom)
     private let tableView = UITableView(frame: .zero, style: .plain)
+	
     private var recordings: [AudioRecordingInfo] = []
     
     private let reuseIdentifier = "RecordingCell"
     
     // MARK: - Observers
-    
+	
     private var stateObserver: AnyCancellable?
     private var recordingsObserver: AnyCancellable?
     private var recordButtonEnabledObserver: AnyCancellable?
