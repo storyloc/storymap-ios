@@ -23,36 +23,13 @@ class MapViewController: UIViewController {
     @ObservedObject private var locationManager: LocationManager
     
     private lazy var mapView = locationManager.mapView
-    
-    private lazy var layout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: StyleKit.metrics.thumbnailSize, height: StyleKit.metrics.thumbnailSize)
-        layout.minimumInteritemSpacing = .greatestFiniteMagnitude
-        layout.minimumLineSpacing = StyleKit.metrics.padding.small
-        layout.estimatedItemSize = .zero
-        
-        layout.sectionInset = UIEdgeInsets(
-            top: StyleKit.metrics.padding.small,
-            left: StyleKit.metrics.padding.small,
-            bottom: StyleKit.metrics.padding.small,
-            right: StyleKit.metrics.padding.small
-        )
-        return layout
-    }()
-    
+    private lazy var layout: UICollectionViewFlowLayout = makeLayout()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     
     private var collectionViewHeightConstraint: NSLayoutConstraint?
     private var collectionData: [Story] = []
     
-    // MARK: - Subscribers
-    
-    private var isMapCenteredObserver: AnyCancellable?
-    private var userLocAvailableObserver: AnyCancellable?
-    private var selectedPinIdObserver: AnyCancellable?
-    private var collectionDataObserver: AnyCancellable?
-    private var userLocationObserver: AnyCancellable?
+	private var subscribers = Set<AnyCancellable>()
     
     // MARK: - Initializers
     
@@ -76,6 +53,7 @@ class MapViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+		setupObservers()
         navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
@@ -84,6 +62,12 @@ class MapViewController: UIViewController {
         
         locationManager.centerMap()
     }
+	
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		
+		subscribers.forEach { $0.cancel() }
+	}
     
     // MARK: - Private methods
     
@@ -104,50 +88,47 @@ class MapViewController: UIViewController {
     }
     
     private func setupObservers() {
-        collectionDataObserver = viewModel.$collectionData.sink { [weak self] data in
-            guard let self = self else { return }
-            
-            self.collectionViewHeightConstraint?.isActive = !data.isEmpty
-            self.collectionData = data
-            self.collectionView.reloadData()
-            self.addStoriesToMap()
-            
-            logger.info("MapVC: Observer collectionData changed")
-        }
+		viewModel.$collectionData
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] data in
+				self?.updateCollectionView(with: data)
+				logger.info("MapVC: Observer collectionData changed")
+			}
+			.store(in: &subscribers)
         
-        userLocAvailableObserver = locationManager.$userLocationAvailable.sink(receiveValue: { [weak self] available in
-            self?.updateAddButton(available)
-            self?.viewModel.location = self?.locationManager.userLocation
+        locationManager.$userLocationAvailable
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] available in
+				self?.updateAddButton(available)
+				self?.viewModel.location = self?.locationManager.userLocation
             
-            logger.info("MapVC: Observer userLocationAvailable changed: \(available)")
-        })
+				logger.info("MapVC: Observer userLocationAvailable changed: \(available)")
+			}
+			.store(in: &subscribers)
         
-        userLocationObserver = locationManager.$userLocation.assign(to: \.location, on: viewModel)
+        locationManager.$userLocation
+			.receive(on: DispatchQueue.main)
+			.assign(to: \.location, on: viewModel)
+			.store(in: &subscribers)
         
-        isMapCenteredObserver = locationManager.$isMapCentered.sink(receiveValue: { [weak self] centered in
-            self?.updateCenterButton(centered)
-            
-            logger.info("MapVC: Observer isMapCentered changed: \(centered)")
-        })
+        locationManager.$isMapCentered
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] centered in
+				self?.updateCenterButton(centered)
+				logger.info("MapVC: Observer isMapCentered changed: \(centered)")
+			}
+			.store(in: &subscribers)
         
-        selectedPinIdObserver = locationManager.$selectedPinId.sink(receiveValue: { [weak self] index in
-            guard !(self?.collectionData.isEmpty ?? true) else {
-                return
-            }
-            
-            self?.collectionView.reloadData()
-            
-            if index != self?.locationManager.selectedPinId {
-                self?.collectionView.scrollToItem(
-                    at: IndexPath(row: index, section: 0),
-                    at: .centeredHorizontally,
-                    animated: true
-                )
-            }
-            
-            logger.info("MapVC: Observer selectedPinId changed: \(index)")
-        })
+        locationManager.$selectedPinId
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] index in
+				self?.selectStory(at: index)
+				logger.info("MapVC: Observer selectedPinId changed: \(index)")
+			}
+			.store(in: &subscribers)
     }
+	
+	// MARK: - UI setup
     
     private func setupMap() {
         mapView.snp.makeConstraints { make in
@@ -197,12 +178,54 @@ class MapViewController: UIViewController {
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
     }
+	
+	private func makeLayout() -> UICollectionViewFlowLayout {
+		let layout = UICollectionViewFlowLayout()
+		layout.scrollDirection = .horizontal
+		layout.itemSize = CGSize(width: StyleKit.metrics.thumbnailSize, height: StyleKit.metrics.thumbnailSize)
+		layout.minimumInteritemSpacing = .greatestFiniteMagnitude
+		layout.minimumLineSpacing = StyleKit.metrics.padding.small
+		layout.estimatedItemSize = .zero
+		
+		layout.sectionInset = UIEdgeInsets(
+			top: StyleKit.metrics.padding.small,
+			left: StyleKit.metrics.padding.small,
+			bottom: StyleKit.metrics.padding.small,
+			right: StyleKit.metrics.padding.small
+		)
+		return layout
+	}
+	
+	// MARK: - UI updates
+	
+	private func selectStory(at index: Int) {
+		guard !collectionData.isEmpty else {
+			return
+		}
+		
+		collectionView.reloadData()
+		
+		if index != locationManager.selectedPinId {
+			collectionView.scrollToItem(
+				at: IndexPath(row: index, section: 0),
+				at: .centeredHorizontally,
+				animated: true
+			)
+		}
+	}
+	
+	private func updateCollectionView(with data: [Story]) {
+		collectionViewHeightConstraint?.isActive = !data.isEmpty
+		collectionData = data
+		collectionView.reloadData()
+		addStoriesToMap()
+	}
     
-    func updateAddButton(_ enabled: Bool) {
+    private func updateAddButton(_ enabled: Bool) {
         addButton.isEnabled = enabled
     }
     
-    func updateCenterButton(_ centered: Bool) {
+    private func updateCenterButton(_ centered: Bool) {
         let iconName = centered ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
         centerButton.setImage(StyleKit.image.make(from: iconName), for: .normal)
     }
