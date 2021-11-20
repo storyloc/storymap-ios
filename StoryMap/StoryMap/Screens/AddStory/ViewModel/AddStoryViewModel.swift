@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AddStoryViewModel: AddStoryViewModelType {
+final class AddStoryViewModel: AddStoryViewModelType {
     let titlePlaceholder: String = LocalizationKit.addStory.titlePlaceholder
     
     let confirmTitle: String = LocalizationKit.addStory.confirmButtonTitle
@@ -106,8 +106,9 @@ class AddStoryViewModel: AddStoryViewModelType {
         onShowImagePicker?(.camera)
     }
     
-    func confirm() {
+	func confirm() {
         guard let title = title, let image = image else {
+			logger.warning("AddVM: confirm failed: title or image is missing")
             return
         }
         

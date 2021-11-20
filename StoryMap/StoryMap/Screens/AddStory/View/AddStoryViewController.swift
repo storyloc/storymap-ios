@@ -12,7 +12,7 @@ import PhotosUI
 
 protocol AddStoryViewControllerType: UIViewController, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {}
 
-class AddStoryViewController: UIViewController, AddStoryViewControllerType {
+final class AddStoryViewController: UIViewController, AddStoryViewControllerType {
     
     // MARK: - Constants
     

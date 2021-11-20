@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import PhotosUI
 
-class AddStorySimplifiedViewController: UIViewController, AddStoryViewControllerType {
+final class AddStorySimplifiedViewController: UIViewController, AddStoryViewControllerType {
     
     private var viewModel: AddStoryViewModelType
     
@@ -24,27 +24,32 @@ class AddStorySimplifiedViewController: UIViewController, AddStoryViewController
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .clear
+        view.backgroundColor = .white
         navigationController?.setNavigationBarHidden(true, animated: false)
-        viewModel.capturePhoto()
     }
+	
+	override func addChild(_ viewController: UIViewController) {
+		super.addChild(viewController)
+		view.addSubview(viewController.view)
+		
+		viewController.view.snp.makeConstraints { make in
+			make.edges.equalToSuperview()
+		}
+	}
 }
 
 // MARK: - UIImagePickerControllerDelegate
 
 extension AddStorySimplifiedViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     func imagePickerController (_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        guard let image = info[.originalImage] as? UIImage else {
+		guard let image = info[.originalImage] as? UIImage else {
+			logger.warning("AddVC: captured image not converted")
             return
         }
-        
-        dismiss(animated: false) { [weak self] in
-            self?.viewModel.image = image.jpegData(compressionQuality: 1)
-            self?.viewModel.confirm()
-        }
+		
+		viewModel.image = image.jpegData(compressionQuality: 0.5)
+		viewModel.confirm()
     }
     
-    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        
-    }
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {}
 }
