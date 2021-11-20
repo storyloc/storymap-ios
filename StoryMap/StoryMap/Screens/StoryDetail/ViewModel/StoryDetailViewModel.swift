@@ -63,6 +63,7 @@ final class StoryDetailViewModel: ObservableObject, StoryDetailViewModelType {
     func delete() {
         logger.info("DetailVM: deleteStory: \(self.story)")
         
+		story.audioRecordings.forEach { realmDataProvider?.delete(object: $0) }
         realmDataProvider?.delete(object: story)
         onClose?()
     }
