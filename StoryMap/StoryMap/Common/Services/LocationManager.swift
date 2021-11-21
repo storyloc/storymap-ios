@@ -82,7 +82,11 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         
         pinLocations.forEach { loc in
             let marker = MKPointAnnotation()
-            guard let center = userLocation else { return }
+
+            guard let center = userLocation else {
+				return
+			}
+			
             let distance = Int(loc.location.distance(from: center))
             marker.title = loc.cid
             marker.subtitle = "\(distance)m"

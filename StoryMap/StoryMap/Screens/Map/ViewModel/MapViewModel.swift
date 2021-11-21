@@ -67,7 +67,6 @@ class MapViewModel: ObservableObject, MapViewModelType {
         #else
         onAddStory?(location)
         #endif
-        collectionData = sortStoriesByLocation(stories: collectionData)
     }
     
     private func updateStories(with results: Results<Story>) {
