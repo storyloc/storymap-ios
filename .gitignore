@@ -87,3 +87,5 @@ fastlane/test_output
 iOSInjectionProject/
 StoryMap/StoryMap.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 StoryMap/StoryMap.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+.DS_Store
+*.xcworkspacedata
