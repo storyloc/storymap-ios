@@ -8,7 +8,7 @@
 import Foundation
 import RealmSwift
 import Combine
-import UIKit
+import Alamofire
 
 protocol MapViewModelType: AnyObject {
     var collectionData: [Story] { get }
@@ -62,10 +62,22 @@ class MapViewModel: ObservableObject, MapViewModelType {
     }
     
     func addStory(with location: Location) {
+		AF.request(Configuration.domain, method: .get)
+			.response { response in
+				print(response.error?.localizedDescription)
+				switch response.result {
+				case .success(let data):
+					guard let data = data else { return }
+					print(String(data: data, encoding: .utf8))
+				case .failure(let error):
+					print(error.localizedDescription)
+				}
+			}
+		
         #if targetEnvironment(simulator)
-        addTestStory()
+        //addTestStory()
         #else
-        onAddStory?(location)
+        //onAddStory?(location)
         #endif
     }
     
