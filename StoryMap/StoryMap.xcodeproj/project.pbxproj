@@ -10,8 +10,6 @@
 		84114AC55A8F98054317F9C1 /* Pods_StoryMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23A5CD55F391F9DBFD6338E6 /* Pods_StoryMap.framework */; };
 		8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A344DB1271DA48C005A710B /* AddStoryViewController.swift */; };
 		8A4615BC273BFCEE00D25529 /* StoryMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615BB273BFCEE00D25529 /* StoryMapTests.swift */; };
-		8A4615C9273C046000D25529 /* StoryMapUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615C8273C046000D25529 /* StoryMapUITests.swift */; };
-		8A4615CB273C046000D25529 /* StoryMapUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615CA273C046000D25529 /* StoryMapUITestsLaunchTests.swift */; };
 		8A4615D6273C260000D25529 /* Results+Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615D5273C260000D25529 /* Results+Array.swift */; };
 		8A4615D8273C4ECB00D25529 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615D7273C4ECB00D25529 /* Location.swift */; };
 		8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4A86E5271D882600F17B4E /* AppDelegate.swift */; };
@@ -54,13 +52,6 @@
 			remoteGlobalIDString = 8A4A86E1271D882600F17B4E;
 			remoteInfo = StoryMap;
 		};
-		8A4615CC273C046000D25529 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8A4A86DA271D882600F17B4E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8A4A86E1271D882600F17B4E;
-			remoteInfo = StoryMap;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -70,7 +61,6 @@
 		8A344DB1271DA48C005A710B /* AddStoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryViewController.swift; sourceTree = "<group>"; };
 		8A4615B9273BFCEE00D25529 /* StoryMapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StoryMapTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A4615BB273BFCEE00D25529 /* StoryMapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMapTests.swift; sourceTree = "<group>"; };
-		8A4615C6273C046000D25529 /* StoryMapUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StoryMapUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A4615C8273C046000D25529 /* StoryMapUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMapUITests.swift; sourceTree = "<group>"; };
 		8A4615CA273C046000D25529 /* StoryMapUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMapUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		8A4615D5273C260000D25529 /* Results+Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Results+Array.swift"; sourceTree = "<group>"; };
@@ -89,7 +79,7 @@
 		8A639E492721A0D2003D0CE9 /* ImageKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageKit.swift; sourceTree = "<group>"; };
 		8A639E4B2721A1B5003D0CE9 /* LocalizationKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationKit.swift; sourceTree = "<group>"; };
 		8A639E502721A6B8003D0CE9 /* String+Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Localized.swift"; sourceTree = "<group>"; };
-		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoordinatorType.swift; path = "../Coordinators/CoordinatorType.swift"; sourceTree = "<group>"; };
+		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoordinatorType.swift; path = ../Coordinators/CoordinatorType.swift; sourceTree = "<group>"; };
 		8A639E552721CB14003D0CE9 /* MapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
 		8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryCoordinator.swift; sourceTree = "<group>"; };
 		8A6DB02727456B4D00970FE9 /* MapStoryThumbnailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapStoryThumbnailCell.swift; sourceTree = "<group>"; };
@@ -119,13 +109,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C144BEA4B873A1BB42087F42 /* Pods_StoryMapTests.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8A4615C3273C046000D25529 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -205,7 +188,6 @@
 			children = (
 				8A4A86E2271D882600F17B4E /* StoryMap.app */,
 				8A4615B9273BFCEE00D25529 /* StoryMapTests.xctest */,
-				8A4615C6273C046000D25529 /* StoryMapUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -418,7 +400,6 @@
 		8AFAE49B2731E42D00BFC249 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				8A6DB02727456B4D00970FE9 /* MapStoryThumbnailCell.swift */,
 				8A4A8702271D8B0200F17B4E /* MapViewController.swift */,
 				8A6DB02927467CF500970FE9 /* MapStoryThumbnailCell.swift */,
 			);
@@ -465,24 +446,6 @@
 			productReference = 8A4615B9273BFCEE00D25529 /* StoryMapTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		8A4615C5273C046000D25529 /* StoryMapUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8A4615D0273C046000D25529 /* Build configuration list for PBXNativeTarget "StoryMapUITests" */;
-			buildPhases = (
-				8A4615C2273C046000D25529 /* Sources */,
-				8A4615C3273C046000D25529 /* Frameworks */,
-				8A4615C4273C046000D25529 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				8A4615CD273C046000D25529 /* PBXTargetDependency */,
-			);
-			name = StoryMapUITests;
-			productName = StoryMapUITests;
-			productReference = 8A4615C6273C046000D25529 /* StoryMapUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 		8A4A86E1271D882600F17B4E /* StoryMap */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8A4A86F6271D883200F17B4E /* Build configuration list for PBXNativeTarget "StoryMap" */;
@@ -515,10 +478,6 @@
 						CreatedOnToolsVersion = 13.1;
 						TestTargetID = 8A4A86E1271D882600F17B4E;
 					};
-					8A4615C5273C046000D25529 = {
-						CreatedOnToolsVersion = 13.1;
-						TestTargetID = 8A4A86E1271D882600F17B4E;
-					};
 					8A4A86E1271D882600F17B4E = {
 						CreatedOnToolsVersion = 12.4;
 					};
@@ -539,20 +498,12 @@
 			targets = (
 				8A4A86E1271D882600F17B4E /* StoryMap */,
 				8A4615B8273BFCEE00D25529 /* StoryMapTests */,
-				8A4615C5273C046000D25529 /* StoryMapUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8A4615B7273BFCEE00D25529 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8A4615C4273C046000D25529 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -661,15 +612,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8A4615C2273C046000D25529 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8A4615CB273C046000D25529 /* StoryMapUITestsLaunchTests.swift in Sources */,
-				8A4615C9273C046000D25529 /* StoryMapUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		8A4A86DE271D882600F17B4E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -681,14 +623,12 @@
 				8A639E3E27217D66003D0CE9 /* AddStoryViewModel.swift in Sources */,
 				8A4615D6273C260000D25529 /* Results+Array.swift in Sources */,
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
-				8A6DB02827456B4D00970FE9 /* MapStoryThumbnailCell.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
 				8A4615D8273C4ECB00D25529 /* Location.swift in Sources */,
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
 				8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */,
 				8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */,
 				8A6DB02C27467D8300970FE9 /* AudioRecorder.swift in Sources */,
-				8A639E542721CAE7003D0CE9 /* CoordinatorType.swift in Sources */,
 				8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */,
 				8AFAE48727319B3B00BFC249 /* StoryDetailViewModel.swift in Sources */,
 				8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */,
@@ -716,11 +656,6 @@
 			target = 8A4A86E1271D882600F17B4E /* StoryMap */;
 			targetProxy = 8A4615BD273BFCEE00D25529 /* PBXContainerItemProxy */;
 		};
-		8A4615CD273C046000D25529 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8A4A86E1271D882600F17B4E /* StoryMap */;
-			targetProxy = 8A4615CC273C046000D25529 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -743,7 +678,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = H44389JMW4;
+				DEVELOPMENT_TEAM = V78Y8H7C52;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -769,7 +704,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = H44389JMW4;
+				DEVELOPMENT_TEAM = V78Y8H7C52;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -784,54 +719,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StoryMap.app/StoryMap";
-			};
-			name = Release;
-		};
-		8A4615CE273C046000D25529 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = H44389JMW4;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.dory.StoryMapUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = StoryMap;
-			};
-			name = Debug;
-		};
-		8A4615CF273C046000D25529 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = H44389JMW4;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.dory.StoryMapUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = StoryMap;
 			};
 			name = Release;
 		};
@@ -960,14 +847,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = H44389JMW4;
+				DEVELOPMENT_TEAM = V78Y8H7C52;
 				INFOPLIST_FILE = "StoryMap/Supporting files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = sk.dory.StoryMap;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blockmatiq.storymap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -981,14 +868,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = H44389JMW4;
+				DEVELOPMENT_TEAM = V78Y8H7C52;
 				INFOPLIST_FILE = "StoryMap/Supporting files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = sk.dory.StoryMap;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blockmatiq.storymap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1003,15 +890,6 @@
 			buildConfigurations = (
 				8A4615C0273BFCEE00D25529 /* Debug */,
 				8A4615C1273BFCEE00D25529 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		8A4615D0273C046000D25529 /* Build configuration list for PBXNativeTarget "StoryMapUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8A4615CE273C046000D25529 /* Debug */,
-				8A4615CF273C046000D25529 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
