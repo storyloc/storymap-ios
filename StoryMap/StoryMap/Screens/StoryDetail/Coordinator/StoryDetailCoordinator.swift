@@ -11,6 +11,7 @@ import UIKit
 class StoryDetailCoordinator: CoordinatorType {
     var presenter = UINavigationController()
     var onDidStop: (() -> Void)?
+	var onDeleteStory: ((Story) -> Void)?
     
     var story: Story
     
@@ -20,6 +21,11 @@ class StoryDetailCoordinator: CoordinatorType {
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = StoryDetailViewModel(story: story)
+		
+		viewModel.onDeleteStory = { [weak self] story in
+			self?.onDeleteStory?(story)
+			self?.stop()
+		}
         viewModel.onClose = { [weak self] in
             self?.stop()
         }

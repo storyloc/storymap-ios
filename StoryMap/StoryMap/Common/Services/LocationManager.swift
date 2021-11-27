@@ -17,10 +17,10 @@ protocol LocationManagerType: CLLocationManagerDelegate, MKMapViewDelegate {
     var isMapCentered: Bool { get }
     var userLocationAvailable: Bool { get }
     var userLocation: Location? { get }
-    var selectedPinId: Int { get }
+    var selectedPinIndex: Int { get }
     
     func centerMap()
-    func selectMarker(with cid: String)
+    func selectMarker(at index: Int)
     func addMarkers(to locations: [IndexLocation])
 }
 
@@ -30,10 +30,11 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     @Published var userLocation: Location?
     @Published var isMapCentered: Bool = true
     @Published var userLocationAvailable: Bool = false
-    @Published var selectedPinId: Int = 0
+	@Published var selectedPinIndex: Int = Int.max
     
     private let locationManager = CLLocationManager()
     private var pinLocations: [IndexLocation] = []
+	private var annotations: [MapAnnotation] = []
     
     private var mapCenterLocation = Location(latitude: 21.282778, longitude: -157.829444) //Honululu
     
@@ -58,54 +59,55 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         logger.info("LocManager: centerMap")
     }
     
-    func selectMarker(with cid: String) {
-        if let annotation = mapView.annotations.first(where: { $0.title == cid }) {
-            mapView.selectAnnotation(annotation, animated: true)
-            selectedPinId = pinLocations.firstIndex(where: { $0.cid == cid }) ?? 0
-            
-            logger.info("LocManager: selectedMarker, \(cid): \(self.selectedPinId)")
-        } else {
-            logger.warning("LocManager: selectMarker not found: \(cid)")
-        }
+    func selectMarker(at index: Int) {
+		if selectedPinIndex != index {
+			selectedPinIndex = index
+			mapView.selectAnnotation(annotations[index], animated: true)
+			
+			logger.info("LocManager: selectedMarker, \(index)")
+		}
     }
     
     func addMarkers(to locations: [IndexLocation]) {
         pinLocations = locations
         
         // remove existing Annotations to not have them twice
-        let allAnnotations = self.mapView.annotations
-        self.mapView.removeAnnotations(allAnnotations)
+        let allAnnotations = mapView.annotations
+        mapView.removeAnnotations(allAnnotations)
+		annotations.removeAll()
 
         guard !pinLocations.isEmpty else {
             return
         }
         
         pinLocations.forEach { loc in
-            let marker = MKPointAnnotation()
-
-            guard let center = userLocation else {
+			guard let center = userLocation else {
 				return
 			}
 			
-            let distance = Int(loc.location.distance(from: center))
-            marker.title = loc.cid
-            marker.subtitle = "\(distance)m"
+			let distance = Int(loc.location.distance(from: center))
+			
+			let annotation = MapAnnotation(
+				cid: loc.cid,
+				title: "\(distance)m",
+				coordinate: CLLocationCoordinate2D(
+					latitude: loc.location.latitude,
+					longitude: loc.location.longitude
+				)
+			)
             
-            marker.coordinate = CLLocationCoordinate2D(
-                latitude: loc.location.latitude,
-                longitude: loc.location.longitude
-            )
-            
-            mapView.addAnnotation(marker)
+			annotations.append(annotation)
+            mapView.addAnnotation(annotation)
         }
         
         logger.info("LocManager: addMarkers, annotations: \(self.mapView.annotations.count)")
         
-        if selectedPinId >= pinLocations.count {
-            selectedPinId = 0
+        if selectedPinIndex >= pinLocations.count {
+            selectMarker(at: 0)
+			return
         }
         
-        selectMarker(with: pinLocations[selectedPinId].cid)
+        selectMarker(at: selectedPinIndex)
     }
 }
 
@@ -132,15 +134,15 @@ extension LocationManager: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         logger.info("LocManager: didSelectMarker")
         
-        guard let annotation = view.annotation else {
+        guard let annotation = view.annotation as? MapAnnotation else {
             return
         }
         
-        if let index = pinLocations.firstIndex(where: { $0.cid == annotation.title }) {
-            selectedPinId = index
+		if let index = pinLocations.firstIndex(where: { $0.cid == annotation.cid }) {
+            selectedPinIndex = index
         }
         
-        logger.info("LocManager: selectedPin: \(self.selectedPinId): \(self.pinLocations[self.selectedPinId].cid)")
+        logger.info("LocManager: selectedPin: \(self.selectedPinIndex): \(self.pinLocations[self.selectedPinIndex].cid)")
     }
 }
 

@@ -10,6 +10,7 @@ import Foundation
 struct LocalizationKit {
     static let general = General()
     static let addStory = AddStory()
+	static let storyDetail = StoryDetail()
 }
 
 extension LocalizationKit {
@@ -34,4 +35,8 @@ extension LocalizationKit {
         let missingPermissionsTitle = "addStory_missingPermissions_title".localized
         let missingPermissionsMessage = "addStory_missingPermissions_message".localized
     }
+	
+	struct StoryDetail {
+		let playAllButtonTitle = "storyDetail_playAll_buttonTitle".localized
+	}
 }

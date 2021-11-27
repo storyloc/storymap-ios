@@ -16,8 +16,13 @@ final class AudioRecorder: NSObject, ObservableObject {
         case recording
         case recorded(AudioRecording)
         case playing
-        case error(String)
+		case error(AudioRecorder.Error)
     }
+	
+	enum Error: Swift.Error {
+		case permissionDenied
+		case unknown(Swift.Error?)
+	}
     
     // MARK: - Public properties
     
@@ -31,6 +36,7 @@ final class AudioRecorder: NSObject, ObservableObject {
     private var audioRecorder: AVAudioRecorder?
     private var audioPlayer: AVAudioPlayer?
     private var audioURL: URL?
+	private var playQueue: [AudioRecording]?
     
     override init() {
         super.init()
@@ -39,16 +45,17 @@ final class AudioRecorder: NSObject, ObservableObject {
             try recordingSession.setCategory(.playAndRecord, mode: .default)
             try recordingSession.setActive(true)
         } catch {
-            state = .error(error.localizedDescription)
+			state = .error(.unknown(error))
             logger.error("AudioRecorder: setup failed: \(error.localizedDescription)")
         }
+		
+		askForMicrophonePermissions()
     }
     
     // MARK: - Public methods
     
     public func startRecording() {
         stopPlaying()
-        askForMicrophonePermissions()
         
         guard recordingAllowed else {
             logger.warning("AudioRecorder: startRecording failed: missing permissions.")
@@ -72,7 +79,7 @@ final class AudioRecorder: NSObject, ObservableObject {
             state = .recording
             logger.error("AudioRecorder: startRecording success")
         } catch {
-            state = .error(error.localizedDescription)
+            state = .error(.unknown(error))
             logger.error("AudioRecorder: startRecording failed: \(error.localizedDescription)")
         }
     }
@@ -94,6 +101,14 @@ final class AudioRecorder: NSObject, ObservableObject {
 			logger.warning("AudioRecorder: playRecording failed: \(error.localizedDescription)")
 		}
     }
+	
+	public func play(recordings: [AudioRecording]) {
+		playQueue = recordings
+		
+		if let first = recordings.first {
+			play(recording: first)
+		}
+	}
     
     public func stopPlaying() {
         if let audioPlayer = audioPlayer {
@@ -108,13 +123,14 @@ final class AudioRecorder: NSObject, ObservableObject {
     }
     
     public func askForMicrophonePermissions() {
+		guard recordingSession.recordPermission == .undetermined else {
+			self.recordingAllowed = recordingSession.recordPermission == .granted
+			return
+		}
+		
         recordingSession.requestRecordPermission() { [weak self] allowed in
             DispatchQueue.main.async {
-                if allowed {
-                    self?.recordingAllowed = true
-                } else {
-                    self?.recordingAllowed = false
-                }
+				self?.recordingAllowed = allowed
             }
         }
     }
@@ -143,7 +159,7 @@ extension AudioRecorder: AVAudioRecorderDelegate {
             state = .recorded(recording)
             logger.info("AudioRecorder: finishRecording success")
         } else {
-            state = .error("AudioRecorder: finishRecording failed.")
+			state = .error(.unknown(nil))
             logger.error("AudioRecorder: finishRecording failed.")
         }
     }
@@ -154,6 +170,15 @@ extension AudioRecorder: AVAudioRecorderDelegate {
 extension AudioRecorder: AVAudioPlayerDelegate {
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         logger.info("AudioRecorder: didFinishPlaying")
+		
         stopPlaying()
+		
+		if let queue = playQueue, !queue.isEmpty {
+			playQueue?.removeFirst()
+			
+			if let next = playQueue?.first {
+				play(recording: next)
+			}
+		}
     }
 }
