@@ -31,6 +31,7 @@ class MapViewController: UIViewController {
     
     private var collectionViewHeightConstraint: Constraint?
     private var collectionViewLayoutPadding: CGFloat = 0
+    private var autoScrolling = false
 	private var collectionData: [MapCollectionData] = []
 	
 	private var selectedStoryIndex: Int = 0
@@ -217,12 +218,13 @@ class MapViewController: UIViewController {
 		collectionView.reloadData()
 
 		if index != selectedStoryIndex {
+            self.autoScrolling = true
+            logger.info("AutoScrolling: \(self.autoScrolling)")
 			collectionView.scrollToItem(
 				at: IndexPath(row: index, section: 0),
 				at: .centeredHorizontally,
 				animated: true
-			)
-			
+            )
 			selectedStoryIndex = index
 		}
 	}
@@ -294,6 +296,9 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if autoScrolling {
+            return
+        }
         let pos = Int(scrollView.contentOffset.x)
 
         let padding = Int(collectionViewLayoutPadding)
@@ -307,5 +312,10 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
         logger.info("Did Scroll: \(pos) \(id)")
 
         locationManager.selectMarker(at: id)
+    }
+
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        self.autoScrolling = false
+        logger.info("AutoScrolling did end: \(self.autoScrolling)")
     }
 }
