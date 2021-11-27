@@ -30,6 +30,7 @@ class MapViewController: UIViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     
     private var collectionViewHeightConstraint: Constraint?
+    private var collectionViewLayoutPadding: CGFloat = 0
 	private var collectionData: [MapCollectionData] = []
 	
 	private var selectedStoryIndex: Int = 0
@@ -144,7 +145,8 @@ class MapViewController: UIViewController {
         
         collectionView.snp.makeConstraints { make in
 			self.collectionViewHeightConstraint = make.height.equalTo(layout.itemSize.height + 2 * StyleKit.metrics.padding.small).constraint
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(StyleKit.metrics.padding.medium)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+//                .inset(StyleKit.metrics.padding.medium)
             make.leading.trailing.equalToSuperview()
         }
 		
@@ -193,12 +195,14 @@ class MapViewController: UIViewController {
 		
 		let size = (view.bounds.width - 2 * StyleKit.metrics.padding.small) / 2
 		layout.itemSize = CGSize(width: size, height: size)
-		
+
+        // Center first and last item
+        collectionViewLayoutPadding = (view.bounds.width - size) / 2
 		layout.sectionInset = UIEdgeInsets(
 			top: StyleKit.metrics.padding.small,
-			left: StyleKit.metrics.padding.large,
+			left: collectionViewLayoutPadding,
 			bottom: StyleKit.metrics.padding.small,
-			right: StyleKit.metrics.padding.large
+			right: collectionViewLayoutPadding
 		)
 		return layout
 	}
@@ -287,5 +291,21 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
 		cell.update(with: collectionData[indexPath.row].cell)
         cell.select(indexPath.row == locationManager.selectedPinIndex)
         return cell
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let pos = Int(scrollView.contentOffset.x)
+
+        let padding = Int(collectionViewLayoutPadding)
+        let screenSize = view.bounds.width
+        let lateration = Int(screenSize / 2) - padding
+
+        let spacing = Int(StyleKit.metrics.padding.small)
+        let width = Int(layout.itemSize.width) + spacing
+
+        let id = Int((pos + lateration) / (width))
+        logger.info("Did Scroll: \(pos) \(id)")
+
+        locationManager.selectMarker(at: id)
     }
 }

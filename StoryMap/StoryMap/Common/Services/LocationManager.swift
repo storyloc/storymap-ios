@@ -62,9 +62,12 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     func selectMarker(at index: Int) {
 		if selectedPinIndex != index {
 			selectedPinIndex = index
-			mapView.selectAnnotation(annotations[index], animated: true)
-			
-			logger.info("LocManager: selectedMarker, \(index)")
+            if annotations.count > index {
+                mapView.selectAnnotation(annotations[index], animated: true)
+                logger.info("LocManager: selectedMarker, \(index)")
+            } else {
+                logger.info("LocManager: selectedMarker, \(index) Out of Bound")
+            }
 		}
     }
     
