@@ -17,6 +17,7 @@ class MapViewController: UIViewController {
     
     // MARK: - Constants
     
+    private let listButton = UIButton(type: .system)
     private let addButton = UIButton(type: .system)
     private let centerButton = UIButton(type: .system)
     
@@ -76,15 +77,16 @@ class MapViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .white
         
-        [mapView, collectionView, addButton, centerButton].forEach(view.addSubview)
+        [mapView, collectionView, listButton, addButton, centerButton].forEach(view.addSubview)
         
         setupCollectionView()
+        setupListButton()
         setupAddButton()
         setupCenterButton()
         setupMap()
-        
+
         setupObservers()
-        
+
         updateAddButton(false)
         updateCenterButton(false)
     }
@@ -153,7 +155,7 @@ class MapViewController: UIViewController {
 		
 		collectionViewHeightConstraint?.isActive = !collectionData.isEmpty
     }
- 
+
     private func setupAddButton() {
         addButton.setImage(
             StyleKit.image.make(
@@ -162,29 +164,47 @@ class MapViewController: UIViewController {
             ),
             for: .normal
         )
-		addButton.backgroundColor = .white.withAlphaComponent(0.8)
-		
         addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
-        
+        addButton.backgroundColor = .white.withAlphaComponent(0.8)
+        addButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
+
         addButton.snp.makeConstraints { make in
+            make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
             make.bottom.equalTo(collectionView.snp.top).offset(-StyleKit.metrics.padding.small)
             make.trailing.equalToSuperview().inset(StyleKit.metrics.padding.small)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
-		
-		addButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
+    }
+
+    private func setupListButton() {
+        listButton.setImage(
+            StyleKit.image.make(
+                from: StyleKit.image.icons.list,
+                with: .alwaysTemplate
+            ),
+            for: .normal
+        )
+        listButton.addTarget(self, action: #selector(listButtonTapped), for: .touchUpInside)
+        listButton.backgroundColor = .white.withAlphaComponent(0.8)
+        listButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
+
+        listButton.snp.makeConstraints { make in
+            make.centerX.equalTo(addButton)
+            make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
+            make.width.height.equalTo(StyleKit.metrics.buttonHeight)
+        }
     }
     
     private func setupCenterButton() {
         centerButton.addTarget(self, action: #selector(centerButtonTapped), for: .touchUpInside)
 		centerButton.backgroundColor = .white.withAlphaComponent(0.8)
+        centerButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
         
         centerButton.snp.makeConstraints { make in
             make.centerX.equalTo(addButton)
-            make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
+            make.bottom.equalTo(listButton.snp.top).offset(-StyleKit.metrics.padding.small)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
-		centerButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
     }
 	
 	private func makeLayout() -> UICollectionViewFlowLayout {
@@ -255,6 +275,10 @@ class MapViewController: UIViewController {
     
     // MARK: - Button actions
     
+    @objc private func listButtonTapped() {
+        viewModel.openStoryList()
+    }
+
     @objc private func centerButtonTapped() {
         locationManager.centerMap()
         

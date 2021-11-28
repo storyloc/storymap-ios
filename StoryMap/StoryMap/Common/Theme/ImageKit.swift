@@ -22,6 +22,7 @@ extension ImageKit {
         let delete = "ic-delete"
         let play = "ic-play"
         let pause = "ic-pause"
+        let list = "ic-list"
     }
     
     struct Examples {

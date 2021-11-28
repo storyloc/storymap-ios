@@ -15,6 +15,7 @@ class MapViewModel: ObservableObject {
     
     var onAddStory: ((Location) -> Void)?
     var onOpenStory: ((Story) -> Void)?
+    var onOpenStoryList: (() -> Void)?
 	
 	@Published private var stories: [Story] = []
 	
@@ -53,7 +54,6 @@ class MapViewModel: ObservableObject {
     func openStory(with index: Int) {
         onOpenStory?(stories[index])
 		audioRecorder.stopPlaying()
-		
     }
     
     func addStory(with location: Location) {
@@ -63,6 +63,10 @@ class MapViewModel: ObservableObject {
         onAddStory?(location)
         #endif
 		audioRecorder.stopPlaying()
+    }
+
+    func openStoryList() {
+        onOpenStoryList?()
     }
 	
 	private func setupObservers() {

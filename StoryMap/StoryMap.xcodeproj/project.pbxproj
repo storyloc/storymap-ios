@@ -44,6 +44,9 @@
 		8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE49C2731E44400BFC249 /* MapViewModel.swift */; };
 		8AFAE4A42731F09700BFC249 /* MapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */; };
 		C144BEA4B873A1BB42087F42 /* Pods_StoryMapTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ECFA277CE4EC29456E68255 /* Pods_StoryMapTests.framework */; };
+		DC0A032F2753B84D00F378E4 /* StoryListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */; };
+		DC0A03312753B98800F378E4 /* StoryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A03302753B98800F378E4 /* StoryListViewController.swift */; };
+		DC0A03342753BA2200F378E4 /* StoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */; };
 		DC5D56D127481B5000CC119C /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
 /* End PBXBuildFile section */
 
@@ -113,6 +116,9 @@
 		8C5E9C2673824F2925C8F0E0 /* Pods-StoryMapTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMapTests.debug.xcconfig"; path = "Target Support Files/Pods-StoryMapTests/Pods-StoryMapTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BD12A9DCCF2D3E26C71DB3E4 /* Pods-StoryMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.release.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.release.xcconfig"; sourceTree = "<group>"; };
 		CC38A8FD7FE0C91AFCBB9737 /* Pods-StoryMapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMapTests.release.xcconfig"; path = "Target Support Files/Pods-StoryMapTests/Pods-StoryMapTests.release.xcconfig"; sourceTree = "<group>"; };
+		DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListCoordinator.swift; sourceTree = "<group>"; };
+		DC0A03302753B98800F378E4 /* StoryListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListViewController.swift; sourceTree = "<group>"; };
+		DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,6 +242,7 @@
 		8A4A86FD271D8A7200F17B4E /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				DC0A032B2753B81900F378E4 /* StoryList */,
 				8AFAE48127319AEF00BFC249 /* StoryDetail */,
 				8A344DB0271DA472005A710B /* AddStory */,
 				8A4A86FE271D8A8700F17B4E /* Map */,
@@ -442,6 +449,40 @@
 				8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */,
 			);
 			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		DC0A032B2753B81900F378E4 /* StoryList */ = {
+			isa = PBXGroup;
+			children = (
+				DC0A03322753BA1200F378E4 /* ViewModel */,
+				DC0A032D2753B82C00F378E4 /* Coordinator */,
+				DC0A032C2753B82100F378E4 /* View */,
+			);
+			path = StoryList;
+			sourceTree = "<group>";
+		};
+		DC0A032C2753B82100F378E4 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				DC0A03302753B98800F378E4 /* StoryListViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		DC0A032D2753B82C00F378E4 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		DC0A03322753BA1200F378E4 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -685,6 +726,7 @@
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
 				8A4615D8273C4ECB00D25529 /* Location.swift in Sources */,
+				DC0A03342753BA2200F378E4 /* StoryListViewModel.swift in Sources */,
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
 				8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */,
 				8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */,
@@ -696,11 +738,13 @@
 				8AFAE48327319B1400BFC249 /* StoryDetailCoordinator.swift in Sources */,
 				8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
+				DC0A032F2753B84D00F378E4 /* StoryListCoordinator.swift in Sources */,
 				8A019DEC27524D1D00E52DC7 /* MapMarker.swift in Sources */,
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,
 				8A6DB02A27467CF500970FE9 /* MapStoryThumbnailCell.swift in Sources */,
 				8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */,
+				DC0A03312753B98800F378E4 /* StoryListViewController.swift in Sources */,
 				8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */,
 				8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */,
 				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,
