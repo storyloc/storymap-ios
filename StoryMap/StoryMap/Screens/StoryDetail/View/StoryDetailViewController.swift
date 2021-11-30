@@ -18,6 +18,7 @@ class StoryDetailViewController: UIViewController {
 
     private let imageView = UIImageView()
     private let recordButton = UIButton(type: .custom)
+    private var recordButtonShadow = UIView()
     private let tableView = UITableView(frame: .zero, style: .plain)
 	private let playAllButton = UIButton(type: .system)
 	
@@ -72,6 +73,7 @@ class StoryDetailViewController: UIViewController {
         setupNavBar()
         setupImageView()
         setupRecordButton()
+        setupRecordButtonShadow()
         setupTableView()
 		setupPlayAllButton()
         setupGestureRecognizer()
@@ -133,7 +135,19 @@ class StoryDetailViewController: UIViewController {
 		
 		recordButton.layer.borderWidth = StyleKit.metrics.separator
     }
-    
+
+    private func setupRecordButtonShadow() {
+        view.insertSubview(recordButtonShadow, belowSubview: recordButton)
+        recordButtonShadow.clipsToBounds = true
+        recordButtonShadow.layer.cornerRadius = StyleKit.metrics.recordButtonSize * 1.5 / 2
+        recordButtonShadow.backgroundColor = .white
+        
+        recordButtonShadow.snp.makeConstraints { make in
+            make.centerX.centerY.equalTo(recordButton)
+            make.size.equalTo(recordButton).multipliedBy(1.5)
+        }
+    }
+
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -177,6 +191,8 @@ class StoryDetailViewController: UIViewController {
             target: self,
             action: #selector(handleLongPress)
         )
+        recognizer.minimumPressDuration = 0
+        recognizer.allowableMovement = 150        // Large area
         recordButton.addGestureRecognizer(recognizer)
     }
     
@@ -187,16 +203,19 @@ class StoryDetailViewController: UIViewController {
             recordButton.backgroundColor = .white
             recordButton.tintColor = .systemBlue
 			recordButton.layer.borderColor = UIColor.systemBlue.cgColor
+            recordButtonShadow.backgroundColor = .white
         case .inProgress:
 			recordButton.isEnabled = true
             recordButton.backgroundColor = .red
             recordButton.tintColor = .white
 			recordButton.layer.borderColor = UIColor.red.cgColor
+            recordButtonShadow.backgroundColor = UIColor.red.withAlphaComponent(0.4)
 		case .permissionDenied:
 			recordButton.isEnabled = false
 			recordButton.backgroundColor = .white
 			recordButton.tintColor = .systemBlue
 			recordButton.layer.borderColor = UIColor.systemBlue.cgColor
+            recordButtonShadow.backgroundColor = .white
 		}
     }
     

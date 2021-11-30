@@ -14,8 +14,6 @@ class AudioRecording: Object {
     @Persisted var length: Double
     @Persisted var createdAt: String
     
-    @Persisted(originProperty: "audioRecordings") var assignee: LinkingObjects<Story>
-    
     convenience init(fileName: String, length: Double) {
         self.init()
         self.fileName = fileName

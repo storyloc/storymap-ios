@@ -17,7 +17,7 @@ class RealmDataProvider {
         return config
     }
     
-    var realm: Realm
+    private var realm: Realm
     
     private init?() {
         do {
@@ -87,5 +87,9 @@ class RealmDataProvider {
         } catch let error as NSError {
             logger.error("RealmDP: deleteAll failed: \(error.localizedDescription)")
         }
+    }
+
+    func count<T: Object>(type: T.Type) -> Int {
+        realm.objects(T.self).count
     }
 }

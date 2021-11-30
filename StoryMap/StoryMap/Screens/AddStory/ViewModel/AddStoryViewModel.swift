@@ -14,7 +14,7 @@ final class AddStoryViewModel: AddStoryViewModelType {
     
     var location: Location
     
-    var title: String? = "title"
+    var title: String? = ""
     
     var titleError: String {
         get {
@@ -107,11 +107,19 @@ final class AddStoryViewModel: AddStoryViewModelType {
     }
     
 	func confirm() {
-        guard let title = title, let image = image else {
+        guard var title = title, let image = image else {
 			logger.warning("AddVM: confirm failed: title or image is missing")
             return
         }
         
+        if title.isEmpty {
+            if let n = realmDataProvider?.count(type: Story.self) {
+                title = "Story \(n)"
+            } else {
+                title = "Story"
+            }
+        }
+        #if targetEnvironment(simulator)
         let story = Story(
             title: title,
             image: image,
@@ -119,6 +127,13 @@ final class AddStoryViewModel: AddStoryViewModelType {
 				? location.randomize()
 				: location
         )
+        #else
+        let story = Story(
+            title: title,
+            image: image,
+            location: location
+        )
+        #endif
         
         realmDataProvider?.write(object: story)
         onConfirm?(story)

@@ -12,20 +12,20 @@ import PhotosUI
 final class AddStoryCoordinator: CoordinatorType {
     var presenter = UINavigationController()
     
-    var location: Location
-    
     var onDidStop: (() -> Void)?
     var onShowStory: ((Story) -> Void)?
     
-    private let usedSimplifiedView = true
+    private var location: Location
+    private var useSimplifiedView = true
     
-    init(location: Location) {
+    init(location: Location, simple: Bool = true) {
         self.location = location
+        self.useSimplifiedView = simple
     }
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = AddStoryViewModel(location: location)
-        let viewController = makeViewController(with: viewModel, simplified: usedSimplifiedView)
+        let viewController = makeViewController(with: viewModel, simplified: useSimplifiedView)
         
         viewModel.onShowAlert = { [weak self] alert in
             self?.presenter.present(alert.controller, animated: true)
@@ -47,11 +47,11 @@ final class AddStoryCoordinator: CoordinatorType {
         }
         viewModel.onConfirm = { [weak self] story in
             guard let self = self else { return }
-            self.usedSimplifiedView ? self.stop() : self.stop(story: story)
+            self.useSimplifiedView ? self.stop() : self.stop(story: story)
         }
         
         presenter.viewControllers = [viewController]
-		presenter.modalPresentationStyle = usedSimplifiedView ? .fullScreen : .automatic
+		presenter.modalPresentationStyle = useSimplifiedView ? .fullScreen : .automatic
         presentFrom?.present(presenter, animated: true)
     }
     
@@ -99,6 +99,7 @@ final class AddStoryCoordinator: CoordinatorType {
     private func makePhotoCaptureController(with delegate: UIImagePickerControllerDelegate & UINavigationControllerDelegate) -> UIViewController {
         let imagePicker = UIImagePickerController()
         imagePicker.sourceType = .camera
+        imagePicker.allowsEditing = true
         imagePicker.delegate = delegate
         return imagePicker
     }

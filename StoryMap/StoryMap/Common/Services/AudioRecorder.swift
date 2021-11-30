@@ -42,7 +42,15 @@ final class AudioRecorder: NSObject, ObservableObject {
         super.init()
         
         do {
-            try recordingSession.setCategory(.playAndRecord, mode: .default)
+            try recordingSession.setCategory(.playAndRecord,
+                                             mode: .default,
+                                             options: [
+                                                .defaultToSpeaker,
+                                                .allowBluetooth,
+                                                .allowAirPlay,
+                                                .mixWithOthers
+                                             ]
+            )
             try recordingSession.setActive(true)
         } catch {
 			state = .error(.unknown(error))
@@ -96,6 +104,7 @@ final class AudioRecorder: NSObject, ObservableObject {
 			audioPlayer?.play()
 			
 			currentlyPlaying = recording
+			state = .playing
 			logger.info("AudioRecorder: playRecording: \(recording.createdAt)")
 		} catch {
 			logger.warning("AudioRecorder: playRecording failed: \(error.localizedDescription)")
@@ -115,8 +124,14 @@ final class AudioRecorder: NSObject, ObservableObject {
             audioPlayer.stop()
             self.audioPlayer = nil
             currentlyPlaying = nil
-            
+			
             logger.info("AudioRecorder: stopPlaying")
+			
+			guard let playQueue = playQueue, !playQueue.isEmpty else {
+				return
+			}
+			
+			state = .initial
         } else {
             logger.warning("AudioRecorder: stopPlaying failed: audioPlayer is nil")
         }

@@ -15,11 +15,23 @@ class MapViewModel: ObservableObject {
     
     var onAddStory: ((Location) -> Void)?
     var onOpenStory: ((Story) -> Void)?
+    var onOpenStoryList: (() -> Void)?
 	
 	@Published private var stories: [Story] = []
 	
 	private let audioRecorder = AudioRecorder()
+	
 	private var storiesObserver: AnyCancellable?
+	private var currentlyPlayingObserver: AnyCancellable?
+	private var recorderStateObserver: AnyCancellable?
+	
+	private var currentlyPlaying: Story? {
+		didSet {
+			for (i, cell) in collectionData.enumerated() {
+				collectionData[i].cell.isPlaying = currentlyPlaying?.id.stringValue == cell.location.cid
+			}
+		}
+	}
 	
 	lazy var storyDeleted: (Story) -> Void = { [weak self] story in
 		guard let index = self?.stories.firstIndex(where: { $0 == story }) else {
@@ -51,14 +63,18 @@ class MapViewModel: ObservableObject {
     }
     
     func openStory(with index: Int) {
-        onOpenStory?(stories[index])
 		audioRecorder.stopPlaying()
-		
+        onOpenStory?(stories[index])
     }
     
     func addStory(with location: Location) {
 		Configuration.isSimulator ? addTestStory() : onAddStory?(location)
 		audioRecorder.stopPlaying()
+    }
+
+    func openStoryList() {
+		audioRecorder.stopPlaying()
+        onOpenStoryList?()
     }
 	
 	private func setupObservers() {
@@ -67,6 +83,22 @@ class MapViewModel: ObservableObject {
 		storiesObserver = $stories
 			.sink { [weak self] stories in
 				self?.collectionData = self?.makeCollectionData(from: stories) ?? []
+			}
+		
+		currentlyPlayingObserver = audioRecorder.$currentlyPlaying
+			.sink { [weak self] rec in
+				guard let rec = rec else {
+					self?.currentlyPlaying = nil
+					return
+				}
+				
+				let filteredStories = self?.stories.filter { story in
+					story.audioRecordings.contains { recording in
+						recording.id.stringValue == rec.id.stringValue
+					}
+				}
+				
+				self?.currentlyPlaying = filteredStories?.first
 			}
 	}
 	
@@ -94,33 +126,38 @@ class MapViewModel: ObservableObject {
     }
 	
 	private func makeCollectionData(from stories: [Story]) -> [MapCollectionData] {
-		stories.map { story in
-			var action: (() -> Void)?
-			if !story.audioRecordings.isEmpty {
-				action = { [weak self] in
-					guard let self = self else { return }
-					self.audioRecorder.currentlyPlaying == nil
-						? self.audioRecorder.play(recordings: Array(story.audioRecordings))
-						: self.audioRecorder.stopPlaying()
-					
-					if let index = self.collectionData.firstIndex(where: { $0.location.cid == story.id.stringValue }) {
-						self.collectionData[index].cell.isPlaying = self.audioRecorder.currentlyPlaying != nil
-					}
+		return stories.map { story in
+			makeCollectionData(for: story)
+		}
+	}
+	
+	private func makeCollectionData(for story: Story) -> MapCollectionData {
+		var action: (() -> Void)?
+		if !story.audioRecordings.isEmpty {
+			action = { [weak self] in
+				guard let self = self else { return }
+				
+				self.audioRecorder.currentlyPlaying == nil
+					? self.audioRecorder.play(recordings: Array(story.audioRecordings))
+					: self.audioRecorder.stopPlaying()
+				
+				if let index = self.collectionData.firstIndex(where: { $0.location.cid == story.id.stringValue }) {
+					self.collectionData[index].cell.isPlaying = self.currentlyPlaying == story
 				}
 			}
-			
-			return MapCollectionData(
-				cell: MapStoryThumbnailCell.Content(
-					image: story.uiImage,
-					isPlaying: audioRecorder.currentlyPlaying != nil,
-					playAction: action
-				),
-				location: IndexLocation(
-					cid: story.id.stringValue,
-					location: story.loc
-				)
-			)
 		}
+		
+		return MapCollectionData(
+			cell: MapStoryThumbnailCell.Content(
+				image: story.uiImage,
+				isPlaying: currentlyPlaying == story,
+				playAction: action
+			),
+			location: IndexLocation(
+				cid: story.id.stringValue,
+				location: story.loc
+			)
+		)
 	}
     
     private func sortStoriesByLocation(stories: [Story]) -> [Story] {

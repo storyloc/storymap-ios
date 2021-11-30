@@ -45,6 +45,9 @@
 		8AFAE4952731B10C00BFC249 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8AFAE4942731B10C00BFC249 /* Localizable.strings */; };
 		8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE49C2731E44400BFC249 /* MapViewModel.swift */; };
 		8AFAE4A42731F09700BFC249 /* MapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */; };
+		DC0A032F2753B84D00F378E4 /* StoryListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */; };
+		DC0A03312753B98800F378E4 /* StoryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A03302753B98800F378E4 /* StoryListViewController.swift */; };
+		DC0A03342753BA2200F378E4 /* StoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */; };
 		DC5D56D127481B5000CC119C /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
 /* End PBXBuildFile section */
 
@@ -114,6 +117,9 @@
 		8AFAE4942731B10C00BFC249 /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		8AFAE49C2731E44400BFC249 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
+		DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListCoordinator.swift; sourceTree = "<group>"; };
+		DC0A03302753B98800F378E4 /* StoryListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListViewController.swift; sourceTree = "<group>"; };
+		DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListViewModel.swift; sourceTree = "<group>"; };
 		901A24094A2835AD7DC4CA2B /* Pods-StoryMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.debug.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.debug.xcconfig"; sourceTree = "<group>"; };
 		ED86319BE6A023744102F184 /* Pods_StoryMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StoryMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA0C75E96E5D87640949C29E /* Pods-StoryMapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMapTests.release.xcconfig"; path = "Target Support Files/Pods-StoryMapTests/Pods-StoryMapTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -233,6 +239,7 @@
 		8A4A86FD271D8A7200F17B4E /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				DC0A032B2753B81900F378E4 /* StoryList */,
 				8AFAE48127319AEF00BFC249 /* StoryDetail */,
 				8A344DB0271DA472005A710B /* AddStory */,
 				8A4A86FE271D8A8700F17B4E /* Map */,
@@ -440,6 +447,40 @@
 				8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */,
 			);
 			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		DC0A032B2753B81900F378E4 /* StoryList */ = {
+			isa = PBXGroup;
+			children = (
+				DC0A032D2753B82C00F378E4 /* Coordinator */,
+				DC0A032C2753B82100F378E4 /* View */,
+				DC0A03322753BA1200F378E4 /* ViewModel */,
+			);
+			path = StoryList;
+			sourceTree = "<group>";
+		};
+		DC0A032C2753B82100F378E4 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				DC0A03302753B98800F378E4 /* StoryListViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		DC0A032D2753B82C00F378E4 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		DC0A03322753BA1200F378E4 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		B3409C64C0C2CCDA6111AD9A /* Frameworks */ = {
@@ -692,6 +733,7 @@
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
 				8A4615D8273C4ECB00D25529 /* Location.swift in Sources */,
+				DC0A03342753BA2200F378E4 /* StoryListViewModel.swift in Sources */,
 				8A3CF17427568E9600335E64 /* Configuration.swift in Sources */,
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
 				8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */,
@@ -704,11 +746,13 @@
 				8AFAE48327319B1400BFC249 /* StoryDetailCoordinator.swift in Sources */,
 				8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
+				DC0A032F2753B84D00F378E4 /* StoryListCoordinator.swift in Sources */,
 				8A019DEC27524D1D00E52DC7 /* MapMarker.swift in Sources */,
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,
 				8A6DB02A27467CF500970FE9 /* MapStoryThumbnailCell.swift in Sources */,
 				8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */,
+				DC0A03312753B98800F378E4 /* StoryListViewController.swift in Sources */,
 				8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */,
 				8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */,
 				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,
