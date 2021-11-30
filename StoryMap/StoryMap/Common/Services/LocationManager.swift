@@ -125,11 +125,12 @@ extension LocationManager: MKMapViewDelegate {
             latitude: mapView.centerCoordinate.latitude,
             longitude: mapView.centerCoordinate.longitude
         )
-        
-        var distance = 0.1
+		
+		var distance = 0.0
+		
         if let userLocation = userLocation {
             distance = mapCenterLocation.distance(from: userLocation).rounded()
-            if distance > 0.0 {
+            if distance > 3 {
                 isMapCentered = false
             }
         }
