@@ -62,13 +62,9 @@ class MapViewModel: ObservableObject, MapViewModelType {
     }
     
     func addStory(with location: Location) {
-        #if targetEnvironment(simulator)
-        addTestStory()
-        #else
-        onAddStory?(location)
-        #endif
+		Configuration.isSimulator ? addTestStory() : onAddStory?(location)
     }
-    
+	
     private func updateStories(with results: Results<Story>) {
         let data = results.toArray(ofType: Story.self)
         self.collectionData = self.sortStoriesByLocation(stories: data)
