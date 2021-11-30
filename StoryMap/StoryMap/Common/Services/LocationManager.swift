@@ -165,12 +165,20 @@ extension LocationManager: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            userLocation = Location(location: location)
-
-            if let userLocation = userLocation {
-                userLocationAvailable = true
-                mapView.setRegion(userLocation.region(span: mapView.region.span), animated: true)
-            }
+			userLocation = Location(location: location)
+			
+			guard let userLocation = userLocation else { return }
+			
+			if !userLocationAvailable {
+				userLocationAvailable = true
+				mapView.setRegion(userLocation.region(), animated: true)
+				logger.info("LocManager: didUpdateLocations location init")
+			}
+			
+			if isMapCentered, userLocationAvailable {
+				mapView.setRegion(userLocation.region(span: mapView.region.span), animated: true)
+				logger.info("LocManager: didUpdateLocations center region")
+			}
         }
     }
 }

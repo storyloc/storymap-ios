@@ -11,7 +11,10 @@ import Combine
 import SwiftUI
 import SnapKit
 
-typealias MapCollectionData = (cell: MapStoryThumbnailCell.Content, location: IndexLocation)
+struct MapCollectionData {
+	var cell: MapStoryThumbnailCell.Content
+	var location: IndexLocation
+}
 
 class MapViewController: UIViewController {
     
@@ -148,8 +151,7 @@ class MapViewController: UIViewController {
         
         collectionView.snp.makeConstraints { make in
 			self.collectionViewHeightConstraint = make.height.equalTo(layout.itemSize.height + 2 * StyleKit.metrics.padding.small).constraint
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
-//                .inset(StyleKit.metrics.padding.medium)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(StyleKit.metrics.padding.small)
             make.leading.trailing.equalToSuperview()
         }
 		
@@ -159,7 +161,7 @@ class MapViewController: UIViewController {
     private func setupAddButton() {
         addButton.setImage(
             StyleKit.image.make(
-                from: StyleKit.image.icons.plus,
+                from: StyleKit.image.icons.plusCircle,
                 with: .alwaysTemplate
             ),
             for: .normal
@@ -187,6 +189,15 @@ class MapViewController: UIViewController {
         listButton.addTarget(self, action: #selector(listButtonTapped), for: .touchUpInside)
         listButton.backgroundColor = .white.withAlphaComponent(0.8)
         listButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
+		listButton.layer.borderWidth = 1.5
+		listButton.layer.borderColor = UIColor.systemBlue.cgColor
+		listButton.imageView?.contentMode = .scaleAspectFit
+		listButton.imageEdgeInsets = UIEdgeInsets(
+			top: StyleKit.metrics.padding.small,
+			left: StyleKit.metrics.padding.small,
+			bottom: StyleKit.metrics.padding.small,
+			right: StyleKit.metrics.padding.small
+		)
 
         listButton.snp.makeConstraints { make in
             make.centerX.equalTo(addButton)

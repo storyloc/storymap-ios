@@ -16,6 +16,7 @@ struct ImageKit {
 extension ImageKit {
     struct Icons {
         let plus = "ic-plus"
+		let plusCircle = "ic-plus-circle"
         let centerOn = "ic-center-on"
         let centerOff = "ic-center-off"
         let record = "ic-record"
