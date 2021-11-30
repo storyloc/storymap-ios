@@ -42,7 +42,15 @@ final class AudioRecorder: NSObject, ObservableObject {
         super.init()
         
         do {
-            try recordingSession.setCategory(.playAndRecord, mode: .default)
+            try recordingSession.setCategory(.playAndRecord,
+                                             mode: .default,
+                                             options: [
+                                                .defaultToSpeaker,
+                                                .allowBluetooth,
+                                                .allowAirPlay,
+                                                .mixWithOthers
+                                             ]
+            )
             try recordingSession.setActive(true)
         } catch {
 			state = .error(.unknown(error))

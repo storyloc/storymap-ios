@@ -88,11 +88,14 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
 				return
 			}
 			
-			let distance = Int(loc.location.distance(from: center))
-			
+            let distance = Int(loc.location.distance(from: center))
+            let distanceString = distance > 1000
+                ? "\(Double(round(Double(distance/100))/10))km"
+                : "\(distance)m"
+
 			let annotation = MapAnnotation(
 				cid: loc.cid,
-				title: "\(distance)m",
+				title: distanceString,
 				coordinate: CLLocationCoordinate2D(
 					latitude: loc.location.latitude,
 					longitude: loc.location.longitude
@@ -164,9 +167,9 @@ extension LocationManager: CLLocationManagerDelegate {
         if let location = locations.last {
             userLocation = Location(location: location)
 
-            if !userLocationAvailable, let userLocation = userLocation {
+            if let userLocation = userLocation {
                 userLocationAvailable = true
-                mapView.setRegion(userLocation.region(), animated: true)
+                mapView.setRegion(userLocation.region(span: mapView.region.span), animated: true)
             }
         }
     }

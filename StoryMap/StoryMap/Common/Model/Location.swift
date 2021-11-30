@@ -33,8 +33,8 @@ class Location: EmbeddedObject {
         self.longitude = location.coordinate.longitude
     }
     
-    func region(latDelta: Double = 0.02, lonDelta: Double = 0.02) -> MKCoordinateRegion {
-        return MKCoordinateRegion(center: clLocation2D, span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta))
+    func region(span: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)) -> MKCoordinateRegion {
+        return MKCoordinateRegion(center: clLocation2D, span: span)
     }
     
     func distance(from location: Location) -> Double {

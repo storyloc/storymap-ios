@@ -103,6 +103,12 @@ class StoryListViewController: UIViewController {
         }
         viewModel.addStory(with: location)
     }
+
+    private func humanReadableTime(from timestamp: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "YY-MM-dd HH:mm:ss"
+        return formatter.string(from: timestamp)
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -127,8 +133,12 @@ extension StoryListViewController: UITableViewDataSource {
         
         var content = cell.defaultContentConfiguration()
         
+        content.image = cellData.uiImage
+        content.imageProperties.maximumSize = CGSize(width: 50, height: 50)
+        
         content.text = cellData.title
-        content.secondaryText = "\(cellData.timestamp) - \(cellData.audioRecordings.count)"
+        let time = humanReadableTime(from: cellData.timestamp)
+        content.secondaryText = "\(time) - \(cellData.audioRecordings.count) Records"
         
         cell.contentConfiguration = content
         return cell

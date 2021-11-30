@@ -88,4 +88,8 @@ class RealmDataProvider {
             logger.error("RealmDP: deleteAll failed: \(error.localizedDescription)")
         }
     }
+
+    func count<T: Object>(type: T.Type) -> Int {
+        realm.objects(T.self).count
+    }
 }

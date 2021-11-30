@@ -454,9 +454,9 @@
 		DC0A032B2753B81900F378E4 /* StoryList */ = {
 			isa = PBXGroup;
 			children = (
-				DC0A03322753BA1200F378E4 /* ViewModel */,
 				DC0A032D2753B82C00F378E4 /* Coordinator */,
 				DC0A032C2753B82100F378E4 /* View */,
+				DC0A03322753BA1200F378E4 /* ViewModel */,
 			);
 			path = StoryList;
 			sourceTree = "<group>";
