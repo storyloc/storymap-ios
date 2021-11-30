@@ -36,6 +36,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     private var pinLocations: [IndexLocation] = []
 	private var annotations: [MapAnnotation] = []
     
+    private var mapChangedFromUserInteraction = false
     private var mapCenterLocation = Location(latitude: 21.282778, longitude: -157.829444) //Honululu
     
     override init() {
@@ -120,22 +121,47 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
 // MARK: MKMapViewDelegate
 
 extension LocationManager: MKMapViewDelegate {
-    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        mapCenterLocation = Location(
-            latitude: mapView.centerCoordinate.latitude,
-            longitude: mapView.centerCoordinate.longitude
-        )
-		
-		var distance = 0.0
-		
-        if let userLocation = userLocation {
-            distance = mapCenterLocation.distance(from: userLocation).rounded()
-            if distance > 3 {
-                isMapCentered = false
+    private func mapViewRegionDidChangeFromUserInteraction() -> Bool {
+    let view = self.mapView.subviews[0]
+    //  Look through gesture recognizers to determine whether this region change is from user interaction
+    if let gestureRecognizers = view.gestureRecognizers {
+        for recognizer in gestureRecognizers {
+            if( recognizer.state == .began || recognizer.state == .ended ) {
+                return true
             }
         }
+    }
+    return false
+    }
+
+    public func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+        mapChangedFromUserInteraction = mapViewRegionDidChangeFromUserInteraction()
+    }
+    
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        if mapChangedFromUserInteraction {
+            isMapCentered = false
+            logger.info("LocManager: regionDidChange by User")
+            return
+        }
+        logger.info("LocManager: regionDidChange by Code")
         
-        logger.info("LocManager: move map, isMapCentered: \(self.isMapCentered), distance: \(distance)")
+//        mapCenterLocation = Location(
+//            latitude: mapView.centerCoordinate.latitude,
+//            longitude: mapView.centerCoordinate.longitude
+//        )
+//
+//		var distance = 0.0
+//
+//        if let userLocation = userLocation {
+//            distance = mapCenterLocation.distance(from: userLocation).rounded()
+//            if distance > 3 {
+//                isMapCentered = false
+//            }
+//        }
+//
+//        isMapCentered = false
+//        logger.info("LocManager: move map, isMapCentered: \(self.isMapCentered), distance: \(distance)")
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
