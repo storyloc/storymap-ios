@@ -115,7 +115,9 @@ final class AddStoryViewModel: AddStoryViewModelType {
         let story = Story(
             title: title,
             image: image,
-            location: location.randomize()
+            location: Configuration.isSimulator
+				? location.randomize()
+				: location
         )
         
         realmDataProvider?.write(object: story)

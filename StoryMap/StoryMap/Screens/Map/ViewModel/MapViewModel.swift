@@ -57,11 +57,7 @@ class MapViewModel: ObservableObject {
     }
     
     func addStory(with location: Location) {
-        #if targetEnvironment(simulator)
-        addTestStory()
-        #else
-        onAddStory?(location)
-        #endif
+		Configuration.isSimulator ? addTestStory() : onAddStory?(location)
 		audioRecorder.stopPlaying()
     }
 	
@@ -89,7 +85,7 @@ class MapViewModel: ObservableObject {
 			}
 		})
 	}
-    
+	
     private func updateStories(with results: Results<Story>) {
         let data = results.toArray(ofType: Story.self)
         self.stories = self.sortStoriesByLocation(stories: data)
