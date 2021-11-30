@@ -99,7 +99,6 @@ final class AddStoryCoordinator: CoordinatorType {
     private func makePhotoCaptureController(with delegate: UIImagePickerControllerDelegate & UINavigationControllerDelegate) -> UIViewController {
         let imagePicker = UIImagePickerController()
         imagePicker.sourceType = .camera
-        imagePicker.allowsEditing = true
         imagePicker.delegate = delegate
         return imagePicker
     }

@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -16,18 +17,29 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="StoryMap" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p2h-rl-p2M">
-                                <rect key="frame" x="119" y="424" width="176" height="48"/>
-                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="40"/>
-                                <nil key="textColor"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic-pin" translatesAutoresizingMaskIntoConstraints="NO" id="tFj-Yh-jSA">
+                                <rect key="frame" x="157" y="298" width="100" height="150"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="150" id="iSf-Wc-vVS"/>
+                                    <constraint firstAttribute="width" constant="100" id="z9o-Rc-Mrg"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="StoryMap" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p2h-rl-p2M">
+                                <rect key="frame" x="0.0" y="478" width="414" height="55"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="46"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                         <constraints>
-                            <constraint firstItem="p2h-rl-p2M" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="agz-jb-yQG"/>
-                            <constraint firstItem="p2h-rl-p2M" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="xwa-z8-tVq"/>
+                            <constraint firstItem="tFj-Yh-jSA" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="A64-5d-gBX"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="p2h-rl-p2M" secondAttribute="trailing" id="IQw-Wk-a1B"/>
+                            <constraint firstItem="tFj-Yh-jSA" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-75" id="aak-EY-ipn"/>
+                            <constraint firstItem="p2h-rl-p2M" firstAttribute="top" secondItem="tFj-Yh-jSA" secondAttribute="bottom" constant="30" id="hKB-at-FiO"/>
+                            <constraint firstItem="p2h-rl-p2M" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="qsy-XN-djE"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -36,4 +48,10 @@
             <point key="canvasLocation" x="53" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="ic-pin" width="231" height="332"/>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

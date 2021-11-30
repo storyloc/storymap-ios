@@ -15,4 +15,12 @@ struct Configuration {
 		return false
 		#endif
 	}
+	
+	static var isDebug: Bool {
+		#if DEBUG
+		return true
+		#else
+		return false
+		#endif
+	}
 }

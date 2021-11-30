@@ -117,10 +117,10 @@
 		8AFAE4942731B10C00BFC249 /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		8AFAE49C2731E44400BFC249 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
+		901A24094A2835AD7DC4CA2B /* Pods-StoryMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.debug.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.debug.xcconfig"; sourceTree = "<group>"; };
 		DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListCoordinator.swift; sourceTree = "<group>"; };
 		DC0A03302753B98800F378E4 /* StoryListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListViewController.swift; sourceTree = "<group>"; };
 		DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListViewModel.swift; sourceTree = "<group>"; };
-		901A24094A2835AD7DC4CA2B /* Pods-StoryMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.debug.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.debug.xcconfig"; sourceTree = "<group>"; };
 		ED86319BE6A023744102F184 /* Pods_StoryMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StoryMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA0C75E96E5D87640949C29E /* Pods-StoryMapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMapTests.release.xcconfig"; path = "Target Support Files/Pods-StoryMapTests/Pods-StoryMapTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -449,6 +449,15 @@
 			path = Coordinator;
 			sourceTree = "<group>";
 		};
+		B3409C64C0C2CCDA6111AD9A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ED86319BE6A023744102F184 /* Pods_StoryMap.framework */,
+				8225745B36A4F4389DD09D59 /* Pods_StoryMapTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		DC0A032B2753B81900F378E4 /* StoryList */ = {
 			isa = PBXGroup;
 			children = (
@@ -481,15 +490,6 @@
 				DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */,
 			);
 			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		B3409C64C0C2CCDA6111AD9A /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				ED86319BE6A023744102F184 /* Pods_StoryMap.framework */,
-				8225745B36A4F4389DD09D59 /* Pods_StoryMapTests.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -846,7 +846,6 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Beta;

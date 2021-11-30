@@ -13,7 +13,11 @@ class RealmDataProvider {
     
     private static var config: Realm.Configuration {
         var config = Realm.Configuration()
-        config.deleteRealmIfMigrationNeeded = true
+		
+		if Configuration.isDebug {
+			config.deleteRealmIfMigrationNeeded = true
+		}
+        
         return config
     }
     
