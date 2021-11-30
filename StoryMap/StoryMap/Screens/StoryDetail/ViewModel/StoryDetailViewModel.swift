@@ -66,12 +66,7 @@ final class StoryDetailViewModel {
     func delete() {
         logger.info("DetailVM: deleteStory: \(self.story)")
         
-		self.realmDataProvider?.update { [weak self] in
-			guard let self = self else { return }
-			self.realmDataProvider?.realm.delete(self.story.audioRecordings)
-			self.realmDataProvider?.realm.delete(self.story)
-		}
-		
+		self.realmDataProvider?.deleteCascading(object: story, associatedObjects: [Array(story.audioRecordings)])
 		onDeleteStory?(story)
     }
 	

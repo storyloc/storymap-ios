@@ -17,7 +17,7 @@ class RealmDataProvider {
         return config
     }
     
-    private var realm: Realm
+    var realm: Realm
     
     private init?() {
         do {
@@ -78,6 +78,20 @@ class RealmDataProvider {
             logger.error("RealmDP: delete failed: \(error.localizedDescription)")
         }
     }
+	
+	func deleteCascading(object: Object, associatedObjects: [[Object]]) {
+		do {
+			try realm.write {
+				associatedObjects.forEach { array in
+					realm.delete(array)
+				}
+				
+				realm.delete(object)
+			}
+		} catch let error as NSError {
+			logger.error("RealmDP: delete failed: \(error.localizedDescription)")
+		}
+	}
     
     func deleteAll() {
         do {

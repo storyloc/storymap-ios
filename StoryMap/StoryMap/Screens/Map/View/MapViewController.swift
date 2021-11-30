@@ -343,7 +343,14 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
         let spacing = Int(StyleKit.metrics.padding.small)
         let width = Int(layout.itemSize.width) + spacing
 
-        let id = Int((pos + lateration) / (width))
+        var id = Int((pos + lateration) / (width))
+		
+		if id < 0 {
+			id = 0
+		} else if id >= collectionData.count {
+			id = collectionData.count - 1
+		}
+		
         logger.info("Did Scroll: \(pos) \(id)")
 
         locationManager.selectMarker(at: id)
