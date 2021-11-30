@@ -16,6 +16,9 @@
 		8A4615CB273C046000D25529 /* StoryMapUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615CA273C046000D25529 /* StoryMapUITestsLaunchTests.swift */; };
 		8A4615D6273C260000D25529 /* Results+Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615D5273C260000D25529 /* Results+Array.swift */; };
 		8A4615D8273C4ECB00D25529 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4615D7273C4ECB00D25529 /* Location.swift */; };
+		8A46373B2756BB700088AD92 /* StoryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A46373A2756BB700088AD92 /* StoryListViewController.swift */; };
+		8A46373D2756BB800088AD92 /* StoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A46373C2756BB7F0088AD92 /* StoryListViewModel.swift */; };
+		8A46373F2756BB8D0088AD92 /* StoryListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A46373E2756BB8C0088AD92 /* StoryListCoordinator.swift */; };
 		8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4A86E5271D882600F17B4E /* AppDelegate.swift */; };
 		8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4A86E7271D882600F17B4E /* SceneDelegate.swift */; };
 		8A4A86EF271D883200F17B4E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A4A86EE271D883200F17B4E /* Assets.xcassets */; };
@@ -45,9 +48,6 @@
 		8AFAE4952731B10C00BFC249 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8AFAE4942731B10C00BFC249 /* Localizable.strings */; };
 		8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE49C2731E44400BFC249 /* MapViewModel.swift */; };
 		8AFAE4A42731F09700BFC249 /* MapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */; };
-		DC0A032F2753B84D00F378E4 /* StoryListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */; };
-		DC0A03312753B98800F378E4 /* StoryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A03302753B98800F378E4 /* StoryListViewController.swift */; };
-		DC0A03342753BA2200F378E4 /* StoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */; };
 		DC5D56D127481B5000CC119C /* CoordinatorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */; };
 /* End PBXBuildFile section */
 
@@ -84,6 +84,9 @@
 		8A4615CA273C046000D25529 /* StoryMapUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMapUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		8A4615D5273C260000D25529 /* Results+Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Results+Array.swift"; sourceTree = "<group>"; };
 		8A4615D7273C4ECB00D25529 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		8A46373A2756BB700088AD92 /* StoryListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryListViewController.swift; sourceTree = "<group>"; };
+		8A46373C2756BB7F0088AD92 /* StoryListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryListViewModel.swift; sourceTree = "<group>"; };
+		8A46373E2756BB8C0088AD92 /* StoryListCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryListCoordinator.swift; sourceTree = "<group>"; };
 		8A4A86E2271D882600F17B4E /* StoryMap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryMap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A4A86E5271D882600F17B4E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8A4A86E7271D882600F17B4E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -118,9 +121,6 @@
 		8AFAE49C2731E44400BFC249 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		8AFAE4A32731F09700BFC249 /* MapCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
 		901A24094A2835AD7DC4CA2B /* Pods-StoryMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMap.debug.xcconfig"; path = "Target Support Files/Pods-StoryMap/Pods-StoryMap.debug.xcconfig"; sourceTree = "<group>"; };
-		DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListCoordinator.swift; sourceTree = "<group>"; };
-		DC0A03302753B98800F378E4 /* StoryListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListViewController.swift; sourceTree = "<group>"; };
-		DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListViewModel.swift; sourceTree = "<group>"; };
 		ED86319BE6A023744102F184 /* Pods_StoryMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StoryMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA0C75E96E5D87640949C29E /* Pods-StoryMapTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StoryMapTests.release.xcconfig"; path = "Target Support Files/Pods-StoryMapTests/Pods-StoryMapTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -471,7 +471,7 @@
 		DC0A032C2753B82100F378E4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				DC0A03302753B98800F378E4 /* StoryListViewController.swift */,
+				8A46373A2756BB700088AD92 /* StoryListViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -479,7 +479,7 @@
 		DC0A032D2753B82C00F378E4 /* Coordinator */ = {
 			isa = PBXGroup;
 			children = (
-				DC0A032E2753B84D00F378E4 /* StoryListCoordinator.swift */,
+				8A46373E2756BB8C0088AD92 /* StoryListCoordinator.swift */,
 			);
 			path = Coordinator;
 			sourceTree = "<group>";
@@ -487,7 +487,7 @@
 		DC0A03322753BA1200F378E4 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				DC0A03332753BA2200F378E4 /* StoryListViewModel.swift */,
+				8A46373C2756BB7F0088AD92 /* StoryListViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -731,11 +731,12 @@
 				8A639E3E27217D66003D0CE9 /* AddStoryViewModel.swift in Sources */,
 				8A4615D6273C260000D25529 /* Results+Array.swift in Sources */,
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
+				8A46373F2756BB8D0088AD92 /* StoryListCoordinator.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
 				8A4615D8273C4ECB00D25529 /* Location.swift in Sources */,
-				DC0A03342753BA2200F378E4 /* StoryListViewModel.swift in Sources */,
 				8A3CF17427568E9600335E64 /* Configuration.swift in Sources */,
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
+				8A46373D2756BB800088AD92 /* StoryListViewModel.swift in Sources */,
 				8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */,
 				8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */,
 				8A6DB02C27467D8300970FE9 /* AudioRecorder.swift in Sources */,
@@ -743,16 +744,15 @@
 				8AFAE48727319B3B00BFC249 /* StoryDetailViewModel.swift in Sources */,
 				8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */,
 				8A639E4627219FEA003D0CE9 /* Metrics.swift in Sources */,
+				8A46373B2756BB700088AD92 /* StoryListViewController.swift in Sources */,
 				8AFAE48327319B1400BFC249 /* StoryDetailCoordinator.swift in Sources */,
 				8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
-				DC0A032F2753B84D00F378E4 /* StoryListCoordinator.swift in Sources */,
 				8A019DEC27524D1D00E52DC7 /* MapMarker.swift in Sources */,
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,
 				8A6DB02A27467CF500970FE9 /* MapStoryThumbnailCell.swift in Sources */,
 				8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */,
-				DC0A03312753B98800F378E4 /* StoryListViewController.swift in Sources */,
 				8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */,
 				8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */,
 				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,
