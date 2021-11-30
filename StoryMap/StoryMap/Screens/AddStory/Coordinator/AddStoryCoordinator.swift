@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import PhotosUI
 
-class AddStoryCoordinator: CoordinatorType {
+final class AddStoryCoordinator: CoordinatorType {
     var presenter = UINavigationController()
     
     var location: Location
@@ -51,7 +51,8 @@ class AddStoryCoordinator: CoordinatorType {
         }
         
         presenter.viewControllers = [viewController]
-        presentFrom?.present(presenter, animated: false)
+		presenter.modalPresentationStyle = usedSimplifiedView ? .fullScreen : .automatic
+        presentFrom?.present(presenter, animated: true)
     }
     
     func stop() {
@@ -107,11 +108,12 @@ class AddStoryCoordinator: CoordinatorType {
         
         if simplified {
             viewController = AddStorySimplifiedViewController(viewModel: viewModel)
-            viewController.modalPresentationStyle = .overCurrentContext
+			viewController.addChild(makePhotoCaptureController(with: viewController))
         } else {
             viewController = AddStoryViewController(viewModel: viewModel)
             viewController.isModalInPresentation = true
         }
+		
         return viewController
     }
     

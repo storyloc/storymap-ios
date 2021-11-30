@@ -7,6 +7,7 @@
 
 import Foundation
 import RealmSwift
+import UIKit
 
 class Story: Object {
     @Persisted var id: ObjectId
@@ -19,6 +20,10 @@ class Story: Object {
     var loc: Location {
         return location!
     }
+	
+	var uiImage: UIImage? {
+		UIImage(data: image)
+	}
     
     convenience init(title: String, image: Data, location: Location) {
         self.init()

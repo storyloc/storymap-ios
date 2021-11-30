@@ -9,6 +9,9 @@ import Foundation
 import UIKit
 import Combine
 import SwiftUI
+import SnapKit
+
+typealias MapCollectionData = (cell: MapStoryThumbnailCell.Content, location: IndexLocation)
 
 class MapViewController: UIViewController {
     
@@ -23,36 +26,17 @@ class MapViewController: UIViewController {
     @ObservedObject private var locationManager: LocationManager
     
     private lazy var mapView = locationManager.mapView
-    
-    private lazy var layout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: StyleKit.metrics.thumbnailSize, height: StyleKit.metrics.thumbnailSize)
-        layout.minimumInteritemSpacing = .greatestFiniteMagnitude
-        layout.minimumLineSpacing = StyleKit.metrics.padding.small
-        layout.estimatedItemSize = .zero
-        
-        layout.sectionInset = UIEdgeInsets(
-            top: StyleKit.metrics.padding.small,
-            left: StyleKit.metrics.padding.small,
-            bottom: StyleKit.metrics.padding.small,
-            right: StyleKit.metrics.padding.small
-        )
-        return layout
-    }()
-    
+    private lazy var layout: UICollectionViewFlowLayout = makeLayout()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     
-    private var collectionViewHeightConstraint: NSLayoutConstraint?
-    private var collectionData: [Story] = []
+    private var collectionViewHeightConstraint: Constraint?
+    private var collectionViewLayoutPadding: CGFloat = 0
+    private var autoScrolling = false
+	private var collectionData: [MapCollectionData] = []
+	
+	private var selectedStoryIndex: Int = 0
     
-    // MARK: - Subscribers
-    
-    private var isMapCenteredObserver: AnyCancellable?
-    private var userLocAvailableObserver: AnyCancellable?
-    private var selectedPinIdObserver: AnyCancellable?
-    private var collectionDataObserver: AnyCancellable?
-    private var userLocationObserver: AnyCancellable?
+	private var subscribers = Set<AnyCancellable>()
     
     // MARK: - Initializers
     
@@ -71,6 +55,7 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+		setupObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -83,6 +68,7 @@ class MapViewController: UIViewController {
         super.viewDidAppear(animated)
         
         locationManager.centerMap()
+		locationManager.selectMarker(at: 0)
     }
     
     // MARK: - Private methods
@@ -104,50 +90,47 @@ class MapViewController: UIViewController {
     }
     
     private func setupObservers() {
-        collectionDataObserver = viewModel.$collectionData.sink { [weak self] data in
-            guard let self = self else { return }
-            
-            self.collectionViewHeightConstraint?.isActive = !data.isEmpty
-            self.collectionData = data
-            self.collectionView.reloadData()
-            self.addStoriesToMap()
-            
-            logger.info("MapVC: Observer collectionData changed")
-        }
+		viewModel.$collectionData
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] data in
+				self?.updateCollectionView(with: data)
+				logger.info("MapVC: Observer collectionData changed: \(data)")
+			}
+			.store(in: &subscribers)
         
-        userLocAvailableObserver = locationManager.$userLocationAvailable.sink(receiveValue: { [weak self] available in
-            self?.updateAddButton(available)
-            self?.viewModel.location = self?.locationManager.userLocation
+        locationManager.$userLocationAvailable
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] available in
+				self?.updateAddButton(available)
+				self?.viewModel.location = self?.locationManager.userLocation
             
-            logger.info("MapVC: Observer userLocationAvailable changed: \(available)")
-        })
+				logger.info("MapVC: Observer userLocationAvailable changed: \(available)")
+			}
+			.store(in: &subscribers)
         
-        userLocationObserver = locationManager.$userLocation.assign(to: \.location, on: viewModel)
+        locationManager.$userLocation
+			.receive(on: DispatchQueue.main)
+			.assign(to: \.location, on: viewModel)
+			.store(in: &subscribers)
         
-        isMapCenteredObserver = locationManager.$isMapCentered.sink(receiveValue: { [weak self] centered in
-            self?.updateCenterButton(centered)
-            
-            logger.info("MapVC: Observer isMapCentered changed: \(centered)")
-        })
+        locationManager.$isMapCentered
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] centered in
+				self?.updateCenterButton(centered)
+				logger.info("MapVC: Observer isMapCentered changed: \(centered)")
+			}
+			.store(in: &subscribers)
         
-        selectedPinIdObserver = locationManager.$selectedPinId.sink(receiveValue: { [weak self] index in
-            guard !(self?.collectionData.isEmpty ?? true) else {
-                return
-            }
-            
-            self?.collectionView.reloadData()
-            
-            if index != self?.locationManager.selectedPinId {
-                self?.collectionView.scrollToItem(
-                    at: IndexPath(row: index, section: 0),
-                    at: .centeredHorizontally,
-                    animated: true
-                )
-            }
-            
-            logger.info("MapVC: Observer selectedPinId changed: \(index)")
-        })
+        locationManager.$selectedPinIndex
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] index in
+				self?.selectStory(at: index)
+				logger.info("MapVC: Observer selectedPinId changed: \(index)")
+			}
+			.store(in: &subscribers)
     }
+	
+	// MARK: - UI setup
     
     private func setupMap() {
         mapView.snp.makeConstraints { make in
@@ -161,13 +144,14 @@ class MapViewController: UIViewController {
         collectionView.backgroundColor = .clear
         collectionView.register(MapStoryThumbnailCell.self, forCellWithReuseIdentifier: "ThumbnailCell")
         
-        collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: StyleKit.metrics.thumbnailSize + 2 * StyleKit.metrics.padding.small)
-        collectionViewHeightConstraint?.isActive = !collectionData.isEmpty
-        
         collectionView.snp.makeConstraints { make in
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(StyleKit.metrics.padding.medium)
+			self.collectionViewHeightConstraint = make.height.equalTo(layout.itemSize.height + 2 * StyleKit.metrics.padding.small).constraint
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+//                .inset(StyleKit.metrics.padding.medium)
             make.leading.trailing.equalToSuperview()
         }
+		
+		collectionViewHeightConstraint?.isActive = !collectionData.isEmpty
     }
  
     private func setupAddButton() {
@@ -178,40 +162,93 @@ class MapViewController: UIViewController {
             ),
             for: .normal
         )
-        
+		addButton.backgroundColor = .white.withAlphaComponent(0.8)
+		
         addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         
         addButton.snp.makeConstraints { make in
-            make.bottom.equalTo(collectionView.snp.top).offset(-StyleKit.metrics.padding.medium)
-            make.trailing.equalToSuperview().inset(StyleKit.metrics.padding.medium)
+            make.bottom.equalTo(collectionView.snp.top).offset(-StyleKit.metrics.padding.small)
+            make.trailing.equalToSuperview().inset(StyleKit.metrics.padding.small)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
+		
+		addButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
     }
     
     private func setupCenterButton() {
         centerButton.addTarget(self, action: #selector(centerButtonTapped), for: .touchUpInside)
+		centerButton.backgroundColor = .white.withAlphaComponent(0.8)
         
         centerButton.snp.makeConstraints { make in
             make.centerX.equalTo(addButton)
             make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
         }
+		centerButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
     }
+	
+	private func makeLayout() -> UICollectionViewFlowLayout {
+		let layout = UICollectionViewFlowLayout()
+		layout.scrollDirection = .horizontal
+		layout.minimumInteritemSpacing = .greatestFiniteMagnitude
+		layout.minimumLineSpacing = StyleKit.metrics.padding.small
+		layout.estimatedItemSize = .zero
+		
+		let size = (view.bounds.width - 2 * StyleKit.metrics.padding.small) / 2
+		layout.itemSize = CGSize(width: size, height: size)
+
+        // Center first and last item
+        collectionViewLayoutPadding = (view.bounds.width - size) / 2
+		layout.sectionInset = UIEdgeInsets(
+			top: StyleKit.metrics.padding.small,
+			left: collectionViewLayoutPadding,
+			bottom: StyleKit.metrics.padding.small,
+			right: collectionViewLayoutPadding
+		)
+		return layout
+	}
+	
+	// MARK: - UI updates
+	
+	private func selectStory(at index: Int) {
+		guard !collectionData.isEmpty else {
+			return
+		}
+		
+		collectionView.reloadData()
+
+		if index != selectedStoryIndex {
+            self.autoScrolling = true
+            logger.info("AutoScrolling: \(self.autoScrolling)")
+			collectionView.scrollToItem(
+				at: IndexPath(row: index, section: 0),
+				at: .centeredHorizontally,
+				animated: true
+            )
+			selectedStoryIndex = index
+		}
+	}
+	
+	private func updateCollectionView(with data: [MapCollectionData]) {
+		collectionViewHeightConstraint?.isActive = !data.isEmpty
+		collectionData = data
+		collectionView.reloadData()
+		addStoriesToMap()
+	}
     
-    func updateAddButton(_ enabled: Bool) {
+    private func updateAddButton(_ enabled: Bool) {
         addButton.isEnabled = enabled
     }
     
-    func updateCenterButton(_ centered: Bool) {
+    private func updateCenterButton(_ centered: Bool) {
         let iconName = centered ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
         centerButton.setImage(StyleKit.image.make(from: iconName), for: .normal)
     }
 
     func addStoriesToMap() {
-        let locations: [IndexLocation] = collectionData.map { item in
-            (cid: item.id.stringValue, location: item.loc)
-        }
-        locationManager.addMarkers(to: locations)
+		guard !collectionData.isEmpty else { return }
+        let locations = collectionData.map { $0.location }
+		locationManager.addMarkers(to: locations)
         
         logger.info("MapVC: addStoriesToMap")
     }
@@ -241,21 +278,44 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        logger.info("MapVC: collectionView didSelectItem \(indexPath.row): \(self.collectionData[indexPath.row].id)")
+		logger.info("MapVC: collectionView didSelectItem \(indexPath.row): \(self.collectionData[indexPath.row].location.cid)")
         
-        if locationManager.selectedPinId == indexPath.row {
+        if locationManager.selectedPinIndex == indexPath.row {
             viewModel.openStory(with: indexPath.row)
         } else {
-            locationManager.selectMarker(with: collectionData[indexPath.row].id.stringValue)
+			locationManager.selectMarker(at: indexPath.row)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: indexPath) as? MapStoryThumbnailCell ?? MapStoryThumbnailCell()
-        let cellData = collectionData[indexPath.row]
-        
-        cell.update(with: UIImage(data: cellData.image))
-        cell.select(indexPath.row == locationManager.selectedPinId)
+     
+		cell.update(with: collectionData[indexPath.row].cell)
+        cell.select(indexPath.row == locationManager.selectedPinIndex)
         return cell
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if autoScrolling {
+            return
+        }
+        let pos = Int(scrollView.contentOffset.x)
+
+        let padding = Int(collectionViewLayoutPadding)
+        let screenSize = view.bounds.width
+        let lateration = Int(screenSize / 2) - padding
+
+        let spacing = Int(StyleKit.metrics.padding.small)
+        let width = Int(layout.itemSize.width) + spacing
+
+        let id = Int((pos + lateration) / (width))
+        logger.info("Did Scroll: \(pos) \(id)")
+
+        locationManager.selectMarker(at: id)
+    }
+
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        self.autoScrolling = false
+        logger.info("AutoScrolling did end: \(self.autoScrolling)")
     }
 }

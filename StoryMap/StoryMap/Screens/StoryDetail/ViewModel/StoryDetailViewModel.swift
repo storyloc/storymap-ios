@@ -11,23 +11,18 @@ import SwiftUI
 
 typealias AudioRecordingInfo = (recording: AudioRecording, isPlaying: Bool)
 
-protocol StoryDetailViewModelType: AnyObject {
-    var story: Story { get }
-    var state: StoryDetailViewModel.RecordingState { get }
-    var recordings: [AudioRecordingInfo] { get }
-    
-    func play(recording: AudioRecording)
-    func delete()
-    func startRecording()
-    func stopRecording()
-}
-
-final class StoryDetailViewModel: ObservableObject, StoryDetailViewModelType {
+final class StoryDetailViewModel {
     enum RecordingState: String {
         case initial
         case inProgress
         case done
+		case permissionDenied
     }
+	
+	enum RecordingsUpdate {
+		case delete(Int)
+		case update([AudioRecordingInfo])
+	}
     
     // MARK: - Public properties
     
@@ -35,8 +30,10 @@ final class StoryDetailViewModel: ObservableObject, StoryDetailViewModelType {
     
     @Published var state: RecordingState = .initial
     @Published var recordButtonEnabled = false
-    @Published var recordings: [AudioRecordingInfo]
-    
+	
+	let recordingsSubject = PassthroughSubject<RecordingsUpdate, Never>()
+	
+	var onDeleteStory: ((Story) -> Void)?
     var onClose: (() -> Void)?
     
     // MARK: - Private properties
@@ -44,6 +41,8 @@ final class StoryDetailViewModel: ObservableObject, StoryDetailViewModelType {
     private let realmDataProvider = RealmDataProvider.shared
     
     @ObservedObject private var audioRecorder = AudioRecorder()
+	
+	private var recordings: [AudioRecordingInfo]
     
     // MARK: - Observers
     
@@ -60,13 +59,32 @@ final class StoryDetailViewModel: ObservableObject, StoryDetailViewModelType {
     
     // MARK: - Public methods
     
+	func load() {
+		recordingsSubject.send(.update(recordings))
+	}
+	
     func delete() {
         logger.info("DetailVM: deleteStory: \(self.story)")
         
-		story.audioRecordings.forEach { realmDataProvider?.delete(object: $0) }
-        realmDataProvider?.delete(object: story)
-        onClose?()
+		self.realmDataProvider?.update { [weak self] in
+			guard let self = self else { return }
+			self.realmDataProvider?.realm.delete(self.story.audioRecordings)
+			self.realmDataProvider?.realm.delete(self.story)
+		}
+		
+		onDeleteStory?(story)
     }
+	
+	func deleteRecording(at index: Int) {
+		logger.info("DetailVM: deleteRecording at \(index)")
+		
+		recordings.remove(at: index)
+		recordingsSubject.send(.delete(index))
+		
+		realmDataProvider?.update(with: { [weak self] in
+			self?.story.audioRecordings.remove(at: index)
+		})
+	}
     
     func startRecording() {
         logger.info("DetailVM: startRecording")
@@ -84,6 +102,19 @@ final class StoryDetailViewModel: ObservableObject, StoryDetailViewModelType {
     func play(recording: AudioRecording) {
         audioRecorder.play(recording: recording)
     }
+	
+	func playAll() {
+		guard !recordings.isEmpty else {
+			logger.info("DetailVM: playAllRecordings failed: recordings are empty")
+			return
+		}
+		audioRecorder.play(recordings: recordings.map { $0.recording })
+		logger.info("DetailVM: playAllRecordings")
+	}
+	
+	func stopPlaying() {
+		audioRecorder.stopPlaying()
+	}
     
     // MARK: - Private methods
     
@@ -103,8 +134,10 @@ final class StoryDetailViewModel: ObservableObject, StoryDetailViewModelType {
                 self?.state = .done
             case .playing:
                 break
-            case .error(message: let message):
-                break
+            case .error(let error):
+				if case .permissionDenied = error {
+					self?.state = .permissionDenied
+				}
             }
         }
         
@@ -116,11 +149,13 @@ final class StoryDetailViewModel: ObservableObject, StoryDetailViewModelType {
             self.recordings = self.recordings.map { rec in
                 AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording == recording)
             }
+			self.recordingsSubject.send(.update(self.recordings))
         }
     }
     
     private func saveRecording(_ recording: AudioRecording) {
         recordings.append(AudioRecordingInfo(recording: recording, isPlaying: false))
+		recordingsSubject.send(.update(recordings))
         
         realmDataProvider?.update(with: { [weak self] in
             self?.story.audioRecordings.append(recording)

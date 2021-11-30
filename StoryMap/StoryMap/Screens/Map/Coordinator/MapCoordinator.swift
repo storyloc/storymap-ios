@@ -15,6 +15,8 @@ class MapCoordinator: CoordinatorType {
     var storyDetailCoordinator: StoryDetailCoordinator?
     
     var onDidStop: (() -> Void)?
+	
+	private var onDeleteStory: ((Story) -> Void)?
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = MapViewModel()
@@ -29,6 +31,8 @@ class MapCoordinator: CoordinatorType {
         viewModel.onOpenStory = { [weak self] story in
             self?.showStoryDetail(with: story)
         }
+		
+		onDeleteStory = viewModel.storyDeleted
         presenter.pushViewController(viewController, animated: true)
     }
     
@@ -46,6 +50,9 @@ class MapCoordinator: CoordinatorType {
     
     private func showStoryDetail(with story: Story) {
         storyDetailCoordinator = StoryDetailCoordinator(story: story)
+		storyDetailCoordinator?.onDeleteStory = { [weak self] story in
+			self?.onDeleteStory?(story)
+		}
         storyDetailCoordinator?.presenter = presenter
         storyDetailCoordinator?.start(nil)
     }
