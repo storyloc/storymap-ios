@@ -17,7 +17,7 @@ class RealmDataProvider {
         return config
     }
     
-    var realm: Realm
+    private var realm: Realm
     
     private init?() {
         do {
