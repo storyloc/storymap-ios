@@ -37,6 +37,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
 	private var annotations: [MapAnnotation] = []
     
     private var mapCenterLocation = Location(latitude: 21.282778, longitude: -157.829444) //Honululu
+    private var mapRegionChanging = false
     
     override init() {
         super.init()
@@ -120,22 +121,14 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
 // MARK: MKMapViewDelegate
 
 extension LocationManager: MKMapViewDelegate {
+    func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+        mapRegionChanging = true
+        isMapCentered = false
+        logger.info("LocManager: regionWillChangeAnimated")
+    }
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        mapCenterLocation = Location(
-            latitude: mapView.centerCoordinate.latitude,
-            longitude: mapView.centerCoordinate.longitude
-        )
-		
-		var distance = 0.0
-		
-        if let userLocation = userLocation {
-            distance = mapCenterLocation.distance(from: userLocation).rounded()
-            if distance > 3 {
-                isMapCentered = false
-            }
-        }
-        
-        logger.info("LocManager: move map, isMapCentered: \(self.isMapCentered), distance: \(distance)")
+        mapRegionChanging = false
+        logger.info("LocManager: regionDidChangeAnimated, isMapCentered: \(self.isMapCentered)")
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
@@ -176,7 +169,7 @@ extension LocationManager: CLLocationManagerDelegate {
 				logger.info("LocManager: didUpdateLocations location init")
 			}
 			
-			if isMapCentered, userLocationAvailable {
+			if isMapCentered, !mapRegionChanging {
 				mapView.setRegion(userLocation.region(span: mapView.region.span), animated: true)
 				logger.info("LocManager: didUpdateLocations center region")
 			}
