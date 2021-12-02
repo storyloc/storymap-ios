@@ -38,6 +38,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     
     private var mapCenterLocation = Location(latitude: 21.282778, longitude: -157.829444) //Honululu
     private var mapRegionChanging = false
+    private var centeringMap = false
     
     override init() {
         super.init()
@@ -123,11 +124,14 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
 extension LocationManager: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
         mapRegionChanging = true
-        isMapCentered = false
+        if !centeringMap {
+            isMapCentered = false
+        }
         logger.info("LocManager: regionWillChangeAnimated")
     }
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         mapRegionChanging = false
+        centeringMap = false
         logger.info("LocManager: regionDidChangeAnimated, isMapCentered: \(self.isMapCentered)")
     }
     
@@ -165,13 +169,22 @@ extension LocationManager: CLLocationManagerDelegate {
 			
 			if !userLocationAvailable {
 				userLocationAvailable = true
+                centeringMap = true
 				mapView.setRegion(userLocation.region(), animated: true)
 				logger.info("LocManager: didUpdateLocations location init")
 			}
 			
 			if isMapCentered, !mapRegionChanging {
-				mapView.setRegion(userLocation.region(span: mapView.region.span), animated: true)
-				logger.info("LocManager: didUpdateLocations center region")
+                let distance = mapCenterLocation.distance(from: userLocation).rounded()
+                if distance > 1 {
+                    centeringMap = true
+                    mapCenterLocation = Location(
+                        latitude: mapView.centerCoordinate.latitude,
+                        longitude: mapView.centerCoordinate.longitude
+                    )
+                    mapView.setRegion(userLocation.region(span: mapView.region.span), animated: true)
+                }
+				logger.info("LocManager: didUpdateLocations center region \(distance)")
 			}
         }
     }
