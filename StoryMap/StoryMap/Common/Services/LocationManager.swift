@@ -48,6 +48,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         
         mapView.delegate = self
         mapView.showsUserLocation = true
+        mapView.showsScale = true
     }
     
     func centerMap() {
