@@ -10,12 +10,18 @@ import RealmSwift
 import UIKit
 
 final class StoryDataProvider {
+	enum Update {
+		case initial(stories: [Story])
+		case inserted(stories: [Story], insertedStory: Story)
+	}
 	
 	// MARK: - Public properties
 	
 	static var shared = StoryDataProvider()
 	
 	@Published var stories: [Story] = []
+	
+	var storyUpdateSubject = PassthroughSubject<Update, Never>()
 	
 	// MARK: - Private properties
 	
@@ -80,11 +86,21 @@ final class StoryDataProvider {
 		
 		notificationToken = results?.observe(on: .main, { [weak self] changes in
 			switch changes {
-			case .update(let items, _, _, _):
-				self?.stories = items.toArray(ofType: Story.self)
+			case .update(let items, _, let insertions, _):
+				guard let self = self else { return }
 				logger.info("StoryDP: realm results observer updated")
+				
+				self.stories = items.toArray(ofType: Story.self)
+				
+				guard let i = insertions.first else {
+					self.storyUpdateSubject.send(.initial(stories: self.stories))
+					return
+				}
+				
+				self.storyUpdateSubject.send(.inserted(stories: self.stories, insertedStory: self.stories[i]))
 			case .initial(let items):
 				self?.stories = items.toArray(ofType: Story.self)
+				self?.storyUpdateSubject.send(.initial(stories: self?.stories ?? []))
 				logger.info("StoryDP: realm results observer initial")
 			default: break
 			}

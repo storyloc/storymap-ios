@@ -41,6 +41,9 @@ class MapViewController: UIViewController {
 	private var selectedStoryIndex: Int = 0
     
 	private var subscribers = Set<AnyCancellable>()
+	private var storyInsertedSubscriber: AnyCancellable?
+	
+	private var storyToSelect: Story?
     
     // MARK: - Initializers
     
@@ -59,6 +62,10 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+		
+		storyInsertedSubscriber = viewModel.storyInsertedSubject
+			.receive(on: DispatchQueue.main)
+			.assign(to: \.storyToSelect, on: self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -72,7 +79,6 @@ class MapViewController: UIViewController {
         super.viewDidAppear(animated)
         
         locationManager.centerMap()
-		locationManager.selectMarker(at: 0)
     }
 	
 	override func viewDidDisappear(_ animated: Bool) {
@@ -270,6 +276,12 @@ class MapViewController: UIViewController {
 		collectionData = data
 		collectionView.reloadData()
 		addStoriesToMap()
+		
+		if let story = storyToSelect,
+		   let index = collectionData.firstIndex(where: { $0.location.cid == story.id.stringValue }) {
+			locationManager.selectMarker(at: index)
+			storyToSelect = nil
+		}
 	}
     
     private func updateAddButton(_ enabled: Bool) {

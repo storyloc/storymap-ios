@@ -17,10 +17,12 @@ class MapViewModel: ObservableObject {
 	let openStorySubject = PassthroughSubject<Story, Never>()
 	let openStoryListSubject = PassthroughSubject<Void, Never>()
 	
+	var storyDeletedSubject = PassthroughSubject<Story, Never>()
+	var storyInsertedSubject = PassthroughSubject<Story?, Never>()
+	
 	@Published private var stories: [Story] = []
 	
 	private let audioRecorder = AudioRecorder()
-	
 	private var subscribers = Set<AnyCancellable>()
 	
 	private var currentlyPlaying: Story? {
@@ -30,8 +32,6 @@ class MapViewModel: ObservableObject {
 			}
 		}
 	}
-	
-	var storyDeletedSubject = PassthroughSubject<Story, Never>()
 
     var location: Location? {
         didSet {
@@ -48,7 +48,7 @@ class MapViewModel: ObservableObject {
     private var results: Results<Story>?
     private var notificationToken: NotificationToken? = nil
     
-    private let realmDataProvider = RealmDataProvider.shared
+    private let storyDataProvider = StoryDataProvider.shared
     
     init() {
 		setupSubscribers()
@@ -70,8 +70,6 @@ class MapViewModel: ObservableObject {
     }
 	
 	private func setupSubscribers() {
-		setupRealmObserver()
-		
 		$stories
 			.sink { [weak self] stories in
 				self?.collectionData = self?.makeCollectionData(from: stories) ?? []
@@ -104,30 +102,19 @@ class MapViewModel: ObservableObject {
 				self?.stories.remove(at: index)
 			}
 			.store(in: &subscribers)
-	}
-	
-	private func setupRealmObserver() {
-		results = realmDataProvider?.read(type: Story.self, with: nil)
 		
-		notificationToken = results?.observe(on: .main, { [weak self] changes in
-			switch changes {
-			case .update(let items, _, _, _):
-				self?.updateStories(with: items)
-				logger.info("MapVM: realm results observer updated")
-			case .initial(let items):
-				self?.updateStories(with: items)
-				logger.info("MapVM: realm results observer initial")
-			default: break
+		storyDataProvider.storyUpdateSubject
+			.sink { [weak self] update in
+				switch update {
+				case .initial(stories: let stories):
+					self?.updateStories(with: stories)
+				case .inserted(stories: let stories, insertedStory: let story):
+					self?.updateStories(with: stories)
+					self?.storyInsertedSubject.send(story)
+				}
 			}
-		})
+			.store(in: &subscribers)
 	}
-	
-    private func updateStories(with results: Results<Story>) {
-        let data = results.toArray(ofType: Story.self)
-        self.stories = self.sortStoriesByLocation(stories: data)
-        
-        logger.info("MapVM: collectionData updated")
-    }
 	
 	private func makeCollectionData(from stories: [Story]) -> [MapCollectionData] {
 		return stories.map { story in
@@ -176,6 +163,10 @@ class MapViewModel: ObservableObject {
         logger.info("MapVM sortStories: \(result.map{ $0.id })")
         return result
     }
+	
+	private func updateStories(with data: [Story]) {
+		stories = sortStoriesByLocation(stories: data)
+	}
     
     private func addTestStory() {
 		guard let imageData = StyleKit.image.make(from: StyleKit.image.examples.random())?.jpegData(compressionQuality: 0.0) else {
@@ -187,6 +178,7 @@ class MapViewModel: ObservableObject {
             image: imageData,
             location: location!.randomize()
         )
-        realmDataProvider?.write(object: story)
+        
+		storyDataProvider.save(story: story)
     }
 }
