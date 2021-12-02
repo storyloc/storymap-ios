@@ -5,16 +5,16 @@
 //  Created by Felix Böhm on 28.11.21.
 //
 
-import Foundation
 import UIKit
+import Combine
 
 class StoryListCoordinator: CoordinatorType {
-    var onDidStop: (() -> Void)?
-
     var addStoryCoordinator: AddStoryCoordinator?
     var storyDetailCoordinator: StoryDetailCoordinator?
 
     var presenter = UINavigationController()
+	
+	private var subscribers = Set<AnyCancellable>()
 
     func start(_ presentFrom: UIViewController?) {
         let viewModel = StoryListViewModel()
@@ -22,15 +22,17 @@ class StoryListCoordinator: CoordinatorType {
             viewModel: viewModel,
             locationManager: LocationManager() // Maybe share the instance with Map View?
         )
-        viewModel.onClose = { [weak self] in
-            self?.stop()
-        }
-        viewModel.onAddStory = { [weak self] location in
-            self?.showAddStory(with: location)
-        }
-        viewModel.onOpenStory = { [weak self] story in
-            self?.showStoryDetail(with: story)
-        }
+		
+		viewModel.addStorySubject
+			.sink { [weak self] location in
+				self?.showAddStory(with: location)
+			}
+			.store(in: &subscribers)
+		viewModel.openStorySubject
+			.sink { [weak self] story in
+				self?.showStoryDetail(with: story)
+			}
+			.store(in: &subscribers)
 
         viewController.modalPresentationStyle = .fullScreen
         presenter.pushViewController(viewController, animated: true)
@@ -41,18 +43,18 @@ class StoryListCoordinator: CoordinatorType {
     }
 
     private func showAddStory(with location: Location) {
-        addStoryCoordinator = AddStoryCoordinator(location: location, simple: false)
-        addStoryCoordinator?.onShowStory = { [weak self] story in
-            self?.showStoryDetail(with: story)
-        }
+        addStoryCoordinator = AddStoryCoordinator(location: location)
+		addStoryCoordinator?.showStorySubject
+			.sink { [weak self] story in
+				self?.showStoryDetail(with: story)
+			}
+			.store(in: &subscribers)
+        
         addStoryCoordinator?.start(presenter.topViewController)
     }
 
     private func showStoryDetail(with story: Story) {
         storyDetailCoordinator = StoryDetailCoordinator(story: story)
-        storyDetailCoordinator?.onDeleteStory = { story in
-            logger.info("StoryList: Delete \(story)")
-        }
         storyDetailCoordinator?.presenter = presenter
         storyDetailCoordinator?.start(nil)
     }

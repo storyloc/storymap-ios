@@ -19,6 +19,8 @@
 		8A46373B2756BB700088AD92 /* StoryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A46373A2756BB700088AD92 /* StoryListViewController.swift */; };
 		8A46373D2756BB800088AD92 /* StoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A46373C2756BB7F0088AD92 /* StoryListViewModel.swift */; };
 		8A46373F2756BB8D0088AD92 /* StoryListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A46373E2756BB8C0088AD92 /* StoryListCoordinator.swift */; };
+		8A4637432758F8310088AD92 /* StoryDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4637422758F8310088AD92 /* StoryDataProvider.swift */; };
+		8A46374527591CAE0088AD92 /* PhotoInputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A46374427591CAE0088AD92 /* PhotoInputManager.swift */; };
 		8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4A86E5271D882600F17B4E /* AppDelegate.swift */; };
 		8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4A86E7271D882600F17B4E /* SceneDelegate.swift */; };
 		8A4A86EF271D883200F17B4E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A4A86EE271D883200F17B4E /* Assets.xcassets */; };
@@ -36,7 +38,6 @@
 		8A6DB02A27467CF500970FE9 /* MapStoryThumbnailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02927467CF500970FE9 /* MapStoryThumbnailCell.swift */; };
 		8A6DB02C27467D8300970FE9 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02B27467D8300970FE9 /* AudioRecorder.swift */; };
 		8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02D2746941F00970FE9 /* AudioRecording.swift */; };
-		8A6EE241273E97A300C5580F /* AddStorySimplifiedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */; };
 		8A6EE243273EB13400C5580F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE242273EB13400C5580F /* LocationManager.swift */; };
 		8AFAE47327316C5400BFC249 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47227316C5400BFC249 /* Story.swift */; };
 		8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE475273170C800BFC249 /* RealmDataProvider.swift */; };
@@ -87,6 +88,8 @@
 		8A46373A2756BB700088AD92 /* StoryListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryListViewController.swift; sourceTree = "<group>"; };
 		8A46373C2756BB7F0088AD92 /* StoryListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryListViewModel.swift; sourceTree = "<group>"; };
 		8A46373E2756BB8C0088AD92 /* StoryListCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryListCoordinator.swift; sourceTree = "<group>"; };
+		8A4637422758F8310088AD92 /* StoryDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryDataProvider.swift; sourceTree = "<group>"; };
+		8A46374427591CAE0088AD92 /* PhotoInputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoInputManager.swift; sourceTree = "<group>"; };
 		8A4A86E2271D882600F17B4E /* StoryMap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoryMap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A4A86E5271D882600F17B4E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8A4A86E7271D882600F17B4E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -108,7 +111,6 @@
 		8A6DB02927467CF500970FE9 /* MapStoryThumbnailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapStoryThumbnailCell.swift; sourceTree = "<group>"; };
 		8A6DB02B27467D8300970FE9 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		8A6DB02D2746941F00970FE9 /* AudioRecording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecording.swift; sourceTree = "<group>"; };
-		8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStorySimplifiedViewController.swift; sourceTree = "<group>"; };
 		8A6EE242273EB13400C5580F /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		8AFAE47227316C5400BFC249 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		8AFAE475273170C800BFC249 /* RealmDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmDataProvider.swift; sourceTree = "<group>"; };
@@ -315,6 +317,7 @@
 			children = (
 				8A6EE242273EB13400C5580F /* LocationManager.swift */,
 				8A6DB02B27467D8300970FE9 /* AudioRecorder.swift */,
+				8A46374427591CAE0088AD92 /* PhotoInputManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -343,6 +346,7 @@
 			isa = PBXGroup;
 			children = (
 				8AFAE475273170C800BFC249 /* RealmDataProvider.swift */,
+				8A4637422758F8310088AD92 /* StoryDataProvider.swift */,
 			);
 			path = DataProviders;
 			sourceTree = "<group>";
@@ -351,7 +355,6 @@
 			isa = PBXGroup;
 			children = (
 				8A344DB1271DA48C005A710B /* AddStoryViewController.swift */,
-				8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -726,7 +729,7 @@
 			files = (
 				DC5D56D127481B5000CC119C /* CoordinatorType.swift in Sources */,
 				8A639E4427219FDD003D0CE9 /* StyleKit.swift in Sources */,
-				8A6EE241273E97A300C5580F /* AddStorySimplifiedViewController.swift in Sources */,
+				8A46374527591CAE0088AD92 /* PhotoInputManager.swift in Sources */,
 				8AFAE48527319B2900BFC249 /* StoryDetailViewController.swift in Sources */,
 				8A639E3E27217D66003D0CE9 /* AddStoryViewModel.swift in Sources */,
 				8A4615D6273C260000D25529 /* Results+Array.swift in Sources */,
@@ -738,6 +741,7 @@
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
 				8A46373D2756BB800088AD92 /* StoryListViewModel.swift in Sources */,
 				8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */,
+				8A4637432758F8310088AD92 /* StoryDataProvider.swift in Sources */,
 				8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */,
 				8A6DB02C27467D8300970FE9 /* AudioRecorder.swift in Sources */,
 				8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */,

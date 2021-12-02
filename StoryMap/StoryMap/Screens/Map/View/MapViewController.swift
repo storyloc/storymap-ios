@@ -59,12 +59,12 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-		setupObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+		setupSubscribers()
         navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
@@ -74,6 +74,13 @@ class MapViewController: UIViewController {
         locationManager.centerMap()
 		locationManager.selectMarker(at: 0)
     }
+	
+	override func viewDidDisappear(_ animated: Bool) {
+		super.viewDidDisappear(animated)
+		
+		subscribers.forEach { $0.cancel() }
+		subscribers.removeAll()
+	}
     
     // MARK: - Private methods
     
@@ -88,13 +95,11 @@ class MapViewController: UIViewController {
         setupCenterButton()
         setupMap()
 
-        setupObservers()
-
         updateAddButton(false)
         updateCenterButton(false)
     }
     
-    private func setupObservers() {
+    private func setupSubscribers() {
 		viewModel.$collectionData
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] data in

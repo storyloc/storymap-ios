@@ -5,116 +5,88 @@
 //  Created by Dory on 21/10/2021.
 //
 
-import Foundation
 import UIKit
 import PhotosUI
+import Combine
 
 final class AddStoryCoordinator: CoordinatorType {
     var presenter = UINavigationController()
     
-    var onDidStop: (() -> Void)?
-    var onShowStory: ((Story) -> Void)?
+	var showStorySubject = PassthroughSubject<Story, Never>()
     
     private var location: Location
-    private var useSimplifiedView = true
+	private let photoManager = PhotoInputManager()
+	private var subscribers = Set<AnyCancellable>()
     
-    init(location: Location, simple: Bool = true) {
+    init(location: Location) {
         self.location = location
-        self.useSimplifiedView = simple
     }
     
     func start(_ presentFrom: UIViewController?) {
         let viewModel = AddStoryViewModel(location: location)
-        let viewController = makeViewController(with: viewModel, simplified: useSimplifiedView)
-        
-        viewModel.onShowAlert = { [weak self] alert in
-            self?.presenter.present(alert.controller, animated: true)
-        }
-        viewModel.onClose = { [weak self] in
-            self?.stop()
-        }
-        viewModel.onShowImagePicker = { [weak self] type in
-            guard let self = self else { return }
-            
-            switch type {
-            case .camera: self.presenter.visibleViewController?.present(
-                self.makePhotoCaptureController(with: viewController),
-                animated: true,
-                completion: nil
-            )
-            case .photoLibrary: self.showChooseImageController(with: viewController)
-            }
-        }
-        viewModel.onConfirm = { [weak self] story in
-            guard let self = self else { return }
-            self.useSimplifiedView ? self.stop() : self.stop(story: story)
-        }
-        
+		let viewController = AddStoryViewController(viewModel: viewModel)
+		viewController.isModalInPresentation = true
+		
+		setupSubscribers(from: viewModel)
+	
         presenter.viewControllers = [viewController]
-		presenter.modalPresentationStyle = useSimplifiedView ? .fullScreen : .automatic
         presentFrom?.present(presenter, animated: true)
     }
     
     func stop() {
         presenter.visibleViewController?.dismiss(animated: true, completion: nil)
     }
-    
-    private func showChooseImageController(with delegate: PHPickerViewControllerDelegate) {
-        PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                switch status {
-                case .authorized:
-                    self.presenter.visibleViewController?.present(
-                        self.makeChooseImageController(with: delegate),
-                        animated: true,
-                        completion: nil
-                    )
-                default:
-                    let alert = self.makeMissingPermissionsAlert()
-                    self.presenter.visibleViewController?.present(alert.controller, animated: true)
-                }
-            }
-        }
-    }
+	
+	private func setupSubscribers(from viewModel: AddStoryViewModel) {
+		viewModel.showAlertSubject
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] alert in
+				self?.presenter.present(alert.controller, animated: true)
+			}
+			.store(in: &subscribers)
+		
+		viewModel.closeSubject
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] in
+				self?.stop()
+			}
+			.store(in: &subscribers)
+		
+		viewModel.addImageSubject
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] type in
+				self?.showAddImage(with: type)
+			}
+			.store(in: &subscribers)
+		
+		viewModel.confirmSubject
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] story in
+				guard let self = self else { return }
+				self.stop(story: story)
+			}
+			.store(in: &subscribers)
+		
+		photoManager.imageSubject
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self, weak viewModel] image in
+				self?.presenter.dismiss(animated: true)
+				viewModel?.image = image.jpegData(compressionQuality: 0.0)
+			}
+			.store(in: &subscribers)
+	}
+	
+	private func showAddImage(with type: PhotoInputManager.SourceType) {
+		let viewController = photoManager.makeViewController(with: type)
+		presenter.present(viewController, animated: true, completion: nil)
+	}
     
     func stop(story: Story?) {
         presenter.visibleViewController?.dismiss(animated: true, completion: { [weak self] in
             if let story = story {
-                self?.onShowStory?(story)
+				self?.showStorySubject.send(story)
             }
         })
-    }
-    
-    private func makeChooseImageController(with delegate: PHPickerViewControllerDelegate) -> UIViewController {
-        var config = PHPickerConfiguration()
-        config.filter = .images
-        config.selectionLimit = 1
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = delegate
-        return picker
-    }
-    
-    private func makePhotoCaptureController(with delegate: UIImagePickerControllerDelegate & UINavigationControllerDelegate) -> UIViewController {
-        let imagePicker = UIImagePickerController()
-        imagePicker.sourceType = .camera
-        imagePicker.delegate = delegate
-        return imagePicker
-    }
-    
-    private func makeViewController(with viewModel: AddStoryViewModelType, simplified: Bool) -> AddStoryViewControllerType {
-        var viewController: AddStoryViewControllerType
-        
-        if simplified {
-            viewController = AddStorySimplifiedViewController(viewModel: viewModel)
-			viewController.addChild(makePhotoCaptureController(with: viewController))
-        } else {
-            viewController = AddStoryViewController(viewModel: viewModel)
-            viewController.isModalInPresentation = true
-        }
-		
-        return viewController
     }
     
     private func makeMissingPermissionsAlert() -> AlertConfig {

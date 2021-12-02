@@ -11,12 +11,11 @@ import SwiftUI
 import Combine
 
 final class StoryListViewModel {
-
-    var onClose: (() -> Void)?
-    var onAddStory: ((Location) -> Void)?
-    var onOpenStory: ((Story) -> Void)?
     
     // MARK: - Public properties
+	
+	var addStorySubject = PassthroughSubject<Location, Never>()
+	var openStorySubject = PassthroughSubject<Story, Never>()
     
     @Published var stories: [Story] = []
     
@@ -31,44 +30,36 @@ final class StoryListViewModel {
 
     // MARK: - Private properties
     
-    private let realmDataProvider = RealmDataProvider.shared
-    private var results: Results<Story>?
-    private var notificationToken: NotificationToken? = nil
+    private let storyDataProvider = StoryDataProvider.shared
+	private var subscribers = Set<AnyCancellable>()
 
     init() {
-        setupObservers()
+        setupSubscribers()
     }
+	
+	deinit {
+		subscribers.forEach { $0.cancel() }
+		subscribers.removeAll()
+	}
 
     func openStory(with index: Int) {
         logger.info("StoryListVM: open Story \(index)")
-        onOpenStory?(stories[index])
+		openStorySubject.send(stories[index])
     }
 
     func addStory(with location: Location) {
         logger.info("StoryListVM: addStory")
-        onAddStory?(location)
+		addStorySubject.send(location)
     }
 
     // MARK: - Private methods
     
-    private func setupObservers() {
-        self.setupRealmObserver()
-    }
-
-    private func setupRealmObserver() {
-        results = realmDataProvider?.read(type: Story.self, with: nil)
-        
-        notificationToken = results?.observe(on: .main, { [weak self] changes in
-            switch changes {
-            case .update(let items, _, _, _):
-                self?.updateStories(with: items)
-                logger.info("StoryListVM: realm results observer updated")
-            case .initial(let items):
-                self?.updateStories(with: items)
-                logger.info("StoryListVM: realm results observer initial")
-            default: break
-            }
-        })
+    private func setupSubscribers() {
+		storyDataProvider.$stories
+			.sink { [weak self] data in
+				self?.stories = data
+			}
+			.store(in: &subscribers)
     }
     
     private func updateStories(with results: Results<Story>) {

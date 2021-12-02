@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import SnapKit
 import PhotosUI
+import Combine
 
 protocol AddStoryViewControllerType: UIViewController, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {}
 
@@ -16,7 +17,7 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
     
     // MARK: - Constants
     
-    private var viewModel: AddStoryViewModelType
+    private var viewModel: AddStoryViewModel
     
     private let titleStackView = UIStackView()
     private let titleTextFieldErrorLabel = UILabel()
@@ -28,8 +29,10 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
     
     private var titleTextField = UITextField()
     private var confirmButtonBottomConstraint: NSLayoutConstraint?
+	
+	private var subscribers = Set<AnyCancellable>()
     
-    init(viewModel: AddStoryViewModelType) {
+    init(viewModel: AddStoryViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -47,15 +50,36 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        subscribeToKeyboardNotifications()
+		setupSubscribers()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        unsubscribeFromKeyboardNotifications()
+        removeSubscribers()
     }
     
     // MARK: - Private methods
+	
+	private func setupSubscribers() {
+		subscribeToKeyboardNotifications()
+		
+		viewModel.$image
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] imageData in
+				guard let data = imageData else {
+					return
+				}
+				self?.updateUI()
+				self?.updatePickedImageView(with: UIImage(data: data))
+			}
+			.store(in: &subscribers)
+	}
+	
+	private func removeSubscribers() {
+		unsubscribeFromKeyboardNotifications()
+		subscribers.forEach { $0.cancel() }
+		subscribers.removeAll()
+	}
     
     private func setupUI() {
         view.backgroundColor = .white
@@ -157,7 +181,7 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
         }
     }
     
-    private func updatePickedImageView(with image: UIImage) {
+    private func updatePickedImageView(with image: UIImage?) {
         pickedImageView.image = image
         pickedImageView.contentMode = .scaleAspectFit
         pickedImageView.snp.makeConstraints { make in
@@ -293,7 +317,7 @@ extension AddStoryViewController: UIImagePickerControllerDelegate & UINavigation
         }
         
         dismiss(animated: true)
-        viewModel.image = image.jpegData(compressionQuality: 1)
+		viewModel.image = image.jpegData(compressionQuality: 0.0)
         updateUI()
         updatePickedImageView(with: image)
     }
@@ -309,7 +333,7 @@ extension AddStoryViewController: PHPickerViewControllerDelegate {
             if let image = image as? UIImage {
                 DispatchQueue.main.async { [weak self] in
                     self?.dismiss(animated: true)
-                    self?.viewModel.image = image.jpegData(compressionQuality: 1)
+					self?.viewModel.image = image.jpegData(compressionQuality: 0.0)
                     self?.updateUI()
                     self?.updatePickedImageView(with: image)
                 }

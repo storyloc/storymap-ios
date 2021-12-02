@@ -7,11 +7,6 @@
 
 import Foundation
 
-enum PhotoInputType {
-    case camera
-    case photoLibrary
-}
-
 protocol AddStoryViewModelType: AnyObject {
     var titlePlaceholder: String { get }
     var title: String? { get set }

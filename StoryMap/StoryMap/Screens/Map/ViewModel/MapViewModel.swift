@@ -13,17 +13,15 @@ import UIKit
 class MapViewModel: ObservableObject {
 	@Published var collectionData: [MapCollectionData] = []
     
-    var onAddStory: ((Location) -> Void)?
-    var onOpenStory: ((Story) -> Void)?
-    var onOpenStoryList: (() -> Void)?
+	let addStorySubject = PassthroughSubject<Location, Never>()
+	let openStorySubject = PassthroughSubject<Story, Never>()
+	let openStoryListSubject = PassthroughSubject<Void, Never>()
 	
 	@Published private var stories: [Story] = []
 	
 	private let audioRecorder = AudioRecorder()
 	
-	private var storiesObserver: AnyCancellable?
-	private var currentlyPlayingObserver: AnyCancellable?
-	private var recorderStateObserver: AnyCancellable?
+	private var subscribers = Set<AnyCancellable>()
 	
 	private var currentlyPlaying: Story? {
 		didSet {
@@ -33,14 +31,8 @@ class MapViewModel: ObservableObject {
 		}
 	}
 	
-	lazy var storyDeleted: (Story) -> Void = { [weak self] story in
-		guard let index = self?.stories.firstIndex(where: { $0 == story }) else {
-			return
-		}
-		
-		self?.stories.remove(at: index)
-	}
-	
+	var storyDeletedSubject = PassthroughSubject<Story, Never>()
+
     var location: Location? {
         didSet {
             guard oldValue == nil else {
@@ -59,33 +51,34 @@ class MapViewModel: ObservableObject {
     private let realmDataProvider = RealmDataProvider.shared
     
     init() {
-		setupObservers()
+		setupSubscribers()
     }
     
     func openStory(with index: Int) {
 		audioRecorder.stopPlaying()
-        onOpenStory?(stories[index])
+		openStorySubject.send(stories[index])
     }
     
     func addStory(with location: Location) {
-		Configuration.isSimulator ? addTestStory() : onAddStory?(location)
+		Configuration.isSimulator ? addTestStory() : addStorySubject.send(location)
 		audioRecorder.stopPlaying()
     }
 
     func openStoryList() {
 		audioRecorder.stopPlaying()
-        onOpenStoryList?()
+		openStoryListSubject.send()
     }
 	
-	private func setupObservers() {
+	private func setupSubscribers() {
 		setupRealmObserver()
 		
-		storiesObserver = $stories
+		$stories
 			.sink { [weak self] stories in
 				self?.collectionData = self?.makeCollectionData(from: stories) ?? []
 			}
+			.store(in: &subscribers)
 		
-		currentlyPlayingObserver = audioRecorder.$currentlyPlaying
+		audioRecorder.$currentlyPlaying
 			.sink { [weak self] rec in
 				guard let rec = rec else {
 					self?.currentlyPlaying = nil
@@ -100,6 +93,17 @@ class MapViewModel: ObservableObject {
 				
 				self?.currentlyPlaying = filteredStories?.first
 			}
+			.store(in: &subscribers)
+		
+		storyDeletedSubject
+			.sink { [weak self] story in
+				guard let index = self?.stories.firstIndex(where: { $0 == story }) else {
+					return
+				}
+		
+				self?.stories.remove(at: index)
+			}
+			.store(in: &subscribers)
 	}
 	
 	private func setupRealmObserver() {
@@ -174,7 +178,7 @@ class MapViewModel: ObservableObject {
     }
     
     private func addTestStory() {
-        guard let imageData = StyleKit.image.make(from: StyleKit.image.examples.random())?.jpegData(compressionQuality: 1) else {
+		guard let imageData = StyleKit.image.make(from: StyleKit.image.examples.random())?.jpegData(compressionQuality: 0.0) else {
             return
         }
         let n = collectionData.count
