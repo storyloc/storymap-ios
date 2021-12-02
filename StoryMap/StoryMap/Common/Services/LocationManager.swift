@@ -10,7 +10,7 @@ import MapKit
 import CoreLocation
 import Combine
 
-typealias IndexLocation = (cid: String, location: Location)
+typealias IndexLocation = (cid: String, title: String, location: Location)
 
 protocol LocationManagerType: CLLocationManagerDelegate, MKMapViewDelegate {
     var mapView: MKMapView { get }
@@ -75,7 +75,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
             }
 		}
     }
-    
+
     func addMarkers(to locations: [IndexLocation]) {
         pinLocations = locations
         
@@ -89,18 +89,10 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         }
         
         pinLocations.forEach { loc in
-			guard let center = userLocation else {
-				return
-			}
-			
-            let distance = Int(loc.location.distance(from: center))
-            let distanceString = distance > 1000
-                ? "\(Double(round(Double(distance/100))/10))km"
-                : "\(distance)m"
-
 			let annotation = MapAnnotation(
 				cid: loc.cid,
-				title: distanceString,
+                title: loc.title,
+                subtitle: "",
 				coordinate: CLLocationCoordinate2D(
 					latitude: loc.location.latitude,
 					longitude: loc.location.longitude
@@ -120,6 +112,19 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
         
         selectMarker(at: selectedPinIndex)
     }
+
+    func updateSelectedMarker(_ center: Location) {
+        if annotations.count > selectedPinIndex {
+            let marker = annotations[selectedPinIndex]
+            let distance = center.distance(from: marker.coordinate).rounded()
+            let distanceString = distance > 1000
+                ? "\(Double(round(Double(distance/100))/10))km"
+                : "\(distance)m"
+            marker.willChangeValue(forKey: "subtitle")
+            marker.subtitle = "\(distanceString)"
+            marker.didChangeValue(forKey: "subtitle")
+        }
+    }
 }
 
 // MARK: MKMapViewDelegate
@@ -135,6 +140,10 @@ extension LocationManager: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         mapRegionChanging = false
         centeringMap = false
+        mapCenterLocation = Location(
+            latitude: mapView.centerCoordinate.latitude,
+            longitude: mapView.centerCoordinate.longitude
+        )
         logger.info("LocManager: regionDidChangeAnimated, isMapCentered: \(self.isMapCentered)")
     }
     
@@ -169,14 +178,15 @@ extension LocationManager: CLLocationManagerDelegate {
 			userLocation = Location(location: location)
 			
 			guard let userLocation = userLocation else { return }
-			
+            updateSelectedMarker(userLocation)
+
 			if !userLocationAvailable {
 				userLocationAvailable = true
                 centeringMap = true
 				mapView.setRegion(userLocation.region(), animated: true)
 				logger.info("LocManager: didUpdateLocations location init")
 			}
-			
+
 			if isMapCentered, !mapRegionChanging {
                 // reducing the amount of region changes, only if there is relevant change
                 // could cache this when setting mapCenterLocation
@@ -192,10 +202,7 @@ extension LocationManager: CLLocationManagerDelegate {
                 let distance = mapCenterLocation.distance(from: userLocation).rounded()
                 if distance > mapDelta / 100 {
                     centeringMap = true
-                    mapCenterLocation = Location(
-                        latitude: mapView.centerCoordinate.latitude,
-                        longitude: mapView.centerCoordinate.longitude
-                    )
+                    mapCenterLocation = userLocation
                     mapView.setRegion(userLocation.region(span: mapView.region.span), animated: true)
                 }
 				logger.info("LocManager: didUpdateLocations center region \(distance)")

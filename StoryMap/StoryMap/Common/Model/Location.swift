@@ -40,6 +40,15 @@ class Location: EmbeddedObject {
     func distance(from location: Location) -> Double {
         return clLocation.distance(from: location.clLocation)
     }
+
+    func distance(from location: CLLocationCoordinate2D) -> Double {
+        return clLocation.distance(
+            from: CLLocation(
+                latitude: location.latitude,
+                longitude: location.longitude
+            )
+        )
+    }
     
     func randomize() -> Location {
         return Location(
