@@ -178,8 +178,19 @@ extension LocationManager: CLLocationManagerDelegate {
 			}
 			
 			if isMapCentered, !mapRegionChanging {
+                // reducing the amount of region changes, only if there is relevant change
+                // could cache this when setting mapCenterLocation
+                let mapDelta = mapCenterLocation.distance(
+                    from: Location(
+                        latitude: mapCenterLocation.latitude + mapView.region.span.latitudeDelta,
+                        longitude: mapCenterLocation.longitude + mapView.region.span.longitudeDelta
+                    )
+                )
+                // logger.info("LocManager: delta \(distance) \(mapDelta)")
+                // mapDelta is about screen diagonal in meters
+
                 let distance = mapCenterLocation.distance(from: userLocation).rounded()
-                if distance > 1 {
+                if distance > mapDelta / 100 {
                     centeringMap = true
                     mapCenterLocation = Location(
                         latitude: mapView.centerCoordinate.latitude,
