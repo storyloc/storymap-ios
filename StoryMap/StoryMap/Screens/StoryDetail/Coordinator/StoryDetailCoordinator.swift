@@ -9,19 +9,19 @@ import UIKit
 import Combine
 
 class StoryDetailCoordinator: CoordinatorType {
-    var presenter = UINavigationController()
+	var presenter: UINavigationController
+	var story: Story
 	
 	var deleteStorySubject = PassthroughSubject<Story, Never>()
 	
-    var story: Story
-	
 	private var subscribers = Set<AnyCancellable>()
     
-    init(story: Story) {
+    init(presenter: UINavigationController, story: Story) {
+		self.presenter = presenter
         self.story = story
     }
     
-    func start(_ presentFrom: UIViewController?) {
+    func start() {
         let viewModel = StoryDetailViewModel(story: story)
 		
 		viewModel.deleteStorySubject

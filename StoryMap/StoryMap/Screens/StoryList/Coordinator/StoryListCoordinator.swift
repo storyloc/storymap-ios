@@ -12,11 +12,15 @@ class StoryListCoordinator: CoordinatorType {
     var addStoryCoordinator: AddStoryCoordinator?
     var storyDetailCoordinator: StoryDetailCoordinator?
 
-    var presenter = UINavigationController()
+	var presenter: UINavigationController
 	
 	private var subscribers = Set<AnyCancellable>()
+	
+	init(presenter: UINavigationController) {
+		self.presenter = presenter
+	}
 
-    func start(_ presentFrom: UIViewController?) {
+    func start() {
         let viewModel = StoryListViewModel()
         let viewController = StoryListViewController(
             viewModel: viewModel,
@@ -43,20 +47,19 @@ class StoryListCoordinator: CoordinatorType {
     }
 
     private func showAddStory(with location: Location) {
-        addStoryCoordinator = AddStoryCoordinator(location: location)
+		addStoryCoordinator = AddStoryCoordinator(presenter: presenter, location: location)
 		addStoryCoordinator?.showStorySubject
 			.sink { [weak self] story in
 				self?.showStoryDetail(with: story)
 			}
 			.store(in: &subscribers)
         
-        addStoryCoordinator?.start(presenter.topViewController)
+        addStoryCoordinator?.start()
     }
 
     private func showStoryDetail(with story: Story) {
-        storyDetailCoordinator = StoryDetailCoordinator(story: story)
-        storyDetailCoordinator?.presenter = presenter
-        storyDetailCoordinator?.start(nil)
+		storyDetailCoordinator = StoryDetailCoordinator(presenter: presenter, story: story)
+        storyDetailCoordinator?.start()
     }
 }
     

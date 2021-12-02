@@ -10,27 +10,28 @@ import PhotosUI
 import Combine
 
 final class AddStoryCoordinator: CoordinatorType {
-    var presenter = UINavigationController()
-    
+	var presenter: UINavigationController
+
 	var showStorySubject = PassthroughSubject<Story, Never>()
-    
-    private var location: Location
+	
+	private var location: Location
+	
 	private let photoManager = PhotoInputManager()
 	private var subscribers = Set<AnyCancellable>()
     
-    init(location: Location) {
+    init(presenter: UINavigationController, location: Location) {
+		self.presenter = presenter
         self.location = location
     }
     
-    func start(_ presentFrom: UIViewController?) {
+    func start() {
         let viewModel = AddStoryViewModel(location: location)
 		let viewController = AddStoryViewController(viewModel: viewModel)
 		viewController.isModalInPresentation = true
 		
 		setupSubscribers(from: viewModel)
 	
-        presenter.viewControllers = [viewController]
-        presentFrom?.present(presenter, animated: true)
+		presenter.present(viewController, animated: true)
     }
     
     func stop() {
@@ -40,8 +41,8 @@ final class AddStoryCoordinator: CoordinatorType {
 	private func setupSubscribers(from viewModel: AddStoryViewModel) {
 		viewModel.showAlertSubject
 			.receive(on: DispatchQueue.main)
-			.sink { [weak self] alert in
-				self?.presenter.present(alert.controller, animated: true)
+			.sink { [weak self] config in
+				self?.showAlert(with: config)
 			}
 			.store(in: &subscribers)
 		
@@ -87,20 +88,5 @@ final class AddStoryCoordinator: CoordinatorType {
 				self?.showStorySubject.send(story)
             }
         })
-    }
-    
-    private func makeMissingPermissionsAlert() -> AlertConfig {
-        return AlertConfig(
-            title: LocalizationKit.addStory.missingPermissionsTitle,
-            message: LocalizationKit.addStory.missingPermissionsMessage,
-            style: .alert,
-            actions: [
-                AlertAction(
-                    title: LocalizationKit.general.ok,
-                    style: .cancel,
-                    handler: nil
-                )
-            ]
-        )
     }
 }

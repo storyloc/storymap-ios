@@ -10,7 +10,7 @@ import UIKit
 import Combine
 
 class MapCoordinator: CoordinatorType {
-    var presenter = UINavigationController()
+	var presenter: UINavigationController
     
     var storyDetailCoordinator: StoryDetailCoordinator?
     var storyListCoordinator: StoryListCoordinator?
@@ -21,8 +21,12 @@ class MapCoordinator: CoordinatorType {
 	private var subscribers = Set<AnyCancellable>()
 	
 	private var photoManagerSubscriber: AnyCancellable?
+	
+	init(presenter: UINavigationController) {
+		self.presenter = presenter
+	}
     
-    func start(_ presentFrom: UIViewController?) {
+    func start() {
         let viewModel = MapViewModel()
         let viewController = MapViewController(
             viewModel: viewModel,
@@ -74,14 +78,14 @@ class MapCoordinator: CoordinatorType {
 			storyDetailCoordinator = nil
 		}
 		
-        storyDetailCoordinator = StoryDetailCoordinator(story: story)
+		storyDetailCoordinator = StoryDetailCoordinator(presenter: presenter, story: story)
 		storyDetailCoordinator?.deleteStorySubject
 			.sink { [weak self] story in
 				self?.deleteStorySubject?.send(story)
 			}
 			.store(in: &subscribers)
-        storyDetailCoordinator?.presenter = presenter
-        storyDetailCoordinator?.start(nil)
+		
+        storyDetailCoordinator?.start()
     }
 
     private func showStoryList() {
@@ -89,8 +93,7 @@ class MapCoordinator: CoordinatorType {
 			storyListCoordinator = nil
 		}
 		
-        storyListCoordinator = StoryListCoordinator()
-        storyListCoordinator?.presenter = presenter
-        storyListCoordinator?.start(nil)
+        storyListCoordinator = StoryListCoordinator(presenter: presenter)
+        storyListCoordinator?.start()
     }
 }
