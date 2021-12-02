@@ -66,6 +66,9 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
 			selectedPinIndex = index
             if annotations.count > index {
                 mapView.selectAnnotation(annotations[index], animated: true)
+                if !isMapCentered, !mapRegionChanging {
+                    mapView.setCenter(annotations[index].coordinate, animated: true)
+                }
                 logger.info("LocManager: selectedMarker, \(index)")
             } else {
                 logger.info("LocManager: selectedMarker, \(index) Out of Bound")
