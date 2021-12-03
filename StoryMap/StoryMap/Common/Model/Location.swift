@@ -33,7 +33,7 @@ class Location: EmbeddedObject {
         self.longitude = location.coordinate.longitude
     }
     
-    func region(span: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)) -> MKCoordinateRegion {
+    func region(span: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)) -> MKCoordinateRegion {
         return MKCoordinateRegion(center: clLocation2D, span: span)
     }
     
