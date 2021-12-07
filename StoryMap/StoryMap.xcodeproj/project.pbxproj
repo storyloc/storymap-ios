@@ -38,6 +38,10 @@
 		8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02D2746941F00970FE9 /* AudioRecording.swift */; };
 		8A6EE241273E97A300C5580F /* AddStorySimplifiedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */; };
 		8A6EE243273EB13400C5580F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE242273EB13400C5580F /* LocationManager.swift */; };
+		8A96E0C6275FB9BF00A84AE5 /* schema.json in Resources */ = {isa = PBXBuildFile; fileRef = 8A96E0C5275FB9BF00A84AE5 /* schema.json */; };
+		8A96E0CA275FBB3C00A84AE5 /* Profile.graphql in Resources */ = {isa = PBXBuildFile; fileRef = 8A96E0C9275FBB3C00A84AE5 /* Profile.graphql */; };
+		8A96E0CC275FBF9B00A84AE5 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A96E0CB275FBF9B00A84AE5 /* API.swift */; };
+		8A96E0CE275FC09A00A84AE5 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A96E0CD275FC09A00A84AE5 /* Network.swift */; };
 		8AFAE47327316C5400BFC249 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47227316C5400BFC249 /* Story.swift */; };
 		8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE475273170C800BFC249 /* RealmDataProvider.swift */; };
 		8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */; };
@@ -110,6 +114,10 @@
 		8A6DB02D2746941F00970FE9 /* AudioRecording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecording.swift; sourceTree = "<group>"; };
 		8A6EE240273E97A300C5580F /* AddStorySimplifiedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStorySimplifiedViewController.swift; sourceTree = "<group>"; };
 		8A6EE242273EB13400C5580F /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		8A96E0C5275FB9BF00A84AE5 /* schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
+		8A96E0C9275FBB3C00A84AE5 /* Profile.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = Profile.graphql; sourceTree = "<group>"; };
+		8A96E0CB275FBF9B00A84AE5 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		8A96E0CD275FC09A00A84AE5 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		8AFAE47227316C5400BFC249 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		8AFAE475273170C800BFC249 /* RealmDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmDataProvider.swift; sourceTree = "<group>"; };
 		8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryViewModelType.swift; sourceTree = "<group>"; };
@@ -218,6 +226,7 @@
 		8A4A86E4271D882600F17B4E /* StoryMap */ = {
 			isa = PBXGroup;
 			children = (
+				8A96E0C4275FB9B100A84AE5 /* GraphQL */,
 				8A4A86FB271D8A4A00F17B4E /* App */,
 				8A4A86FD271D8A7200F17B4E /* Screens */,
 				8A639E4127219F69003D0CE9 /* Common */,
@@ -317,6 +326,25 @@
 				8A6DB02B27467D8300970FE9 /* AudioRecorder.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		8A96E0C4275FB9B100A84AE5 /* GraphQL */ = {
+			isa = PBXGroup;
+			children = (
+				8A96E0C8275FBB0900A84AE5 /* Queries */,
+				8A96E0C5275FB9BF00A84AE5 /* schema.json */,
+				8A96E0CB275FBF9B00A84AE5 /* API.swift */,
+				8A96E0CD275FC09A00A84AE5 /* Network.swift */,
+			);
+			path = GraphQL;
+			sourceTree = "<group>";
+		};
+		8A96E0C8275FBB0900A84AE5 /* Queries */ = {
+			isa = PBXGroup;
+			children = (
+				8A96E0C9275FBB3C00A84AE5 /* Profile.graphql */,
+			);
+			path = Queries;
 			sourceTree = "<group>";
 		};
 		8AFAE470273167F800BFC249 /* Coordinators */ = {
@@ -538,6 +566,7 @@
 			buildConfigurationList = 8A4A86F6271D883200F17B4E /* Build configuration list for PBXNativeTarget "StoryMap" */;
 			buildPhases = (
 				BAEC7FBADC7FDF0BE812463D /* [CP] Check Pods Manifest.lock */,
+				8A96E0C7275FBA1C00A84AE5 /* Generate Apollo GraphQL API */,
 				8A4A86DE271D882600F17B4E /* Sources */,
 				8A4A86DF271D882600F17B4E /* Frameworks */,
 				8A4A86E0271D882600F17B4E /* Resources */,
@@ -613,7 +642,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A96E0C6275FB9BF00A84AE5 /* schema.json in Resources */,
 				8A4A86F2271D883200F17B4E /* LaunchScreen.storyboard in Resources */,
+				8A96E0CA275FBB3C00A84AE5 /* Profile.graphql in Resources */,
 				8AFAE4952731B10C00BFC249 /* Localizable.strings in Resources */,
 				8A4A86EF271D883200F17B4E /* Assets.xcassets in Resources */,
 			);
@@ -678,6 +709,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StoryMap/Pods-StoryMap-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		8A96E0C7275FBA1C00A84AE5 /* Generate Apollo GraphQL API */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Generate Apollo GraphQL API";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Don't run this during index builds\nif [ $ACTION = \"indexbuild\" ]; then exit 0; fi\n\nSCRIPT_PATH=\"${PODS_ROOT}/Apollo/scripts\"\ncd \"${SRCROOT}/${TARGET_NAME}/GraphQL\"\n\"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.json\" API.swift\n";
+		};
 		BAEC7FBADC7FDF0BE812463D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -738,6 +787,7 @@
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
 				8A46373D2756BB800088AD92 /* StoryListViewModel.swift in Sources */,
 				8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */,
+				8A96E0CE275FC09A00A84AE5 /* Network.swift in Sources */,
 				8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */,
 				8A6DB02C27467D8300970FE9 /* AudioRecorder.swift in Sources */,
 				8A4A86E6271D882600F17B4E /* AppDelegate.swift in Sources */,
@@ -758,6 +808,7 @@
 				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,
 				8AFAE4A42731F09700BFC249 /* MapCoordinator.swift in Sources */,
 				8A6EE243273EB13400C5580F /* LocationManager.swift in Sources */,
+				8A96E0CC275FBF9B00A84AE5 /* API.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

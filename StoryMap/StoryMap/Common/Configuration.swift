@@ -23,4 +23,8 @@ struct Configuration {
 		return false
 		#endif
 	}
+	
+	static var serverURL: URL {
+		URL(string: "http://localhost:3000/graphql")!
+	}
 }
