@@ -20,6 +20,7 @@ final class PhotoInputManager: NSObject {
 	// MARK: - Public properties
 	
 	var resultSubject = PassthroughSubject<Result, Never>()
+	var cancelSubject = PassthroughSubject<Void, Never>()
 	
 	// MARK: - Public methods
 	
@@ -51,7 +52,10 @@ final class PhotoInputManager: NSObject {
 
 extension PhotoInputManager: PHPickerViewControllerDelegate {
 	func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-		guard let result = results.first else { return }
+		guard let result = results.first else {
+			cancelSubject.send()
+			return
+		}
 		
 		var location: Location?
 		
@@ -78,8 +82,15 @@ extension PhotoInputManager: PHPickerViewControllerDelegate {
 extension PhotoInputManager: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 	func imagePickerController (_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
 		if let pickedImage = info[.originalImage] as? UIImage {
-			UIImageWriteToSavedPhotosAlbum(pickedImage, nil, nil, nil)
+			if !Configuration.isDebug {
+				UIImageWriteToSavedPhotosAlbum(pickedImage, nil, nil, nil)
+			}
+			
 			resultSubject.send(Result(image: pickedImage, location: nil))
 		}
+	}
+	
+	func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+		cancelSubject.send()
 	}
 }

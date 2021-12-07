@@ -80,11 +80,17 @@ final class AddStoryCoordinator: CoordinatorType {
 				self?.presentedViewController.dismiss(animated: true)
 			}
 			.store(in: &subscribers)
+		
+		photoManager.cancelSubject
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] in
+				self?.presentedViewController.dismiss(animated: true)
+			}
+			.store(in: &subscribers)
 	}
 	
 	private func showAddImage(with type: PhotoInputManager.SourceType) {
 		let viewController = photoManager.makeViewController(with: type)
-		viewController.isModalInPresentation = true
 		presentedViewController.present(viewController, animated: true)
 	}
 	
