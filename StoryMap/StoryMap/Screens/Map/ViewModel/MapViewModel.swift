@@ -44,9 +44,6 @@ class MapViewModel: ObservableObject {
 		}
 	}
 	
-	private var results: Results<Story>?
-	private var notificationToken: NotificationToken? = nil
-	
 	private let storyDataProvider = StoryDataProvider.shared
 	
 	init() {

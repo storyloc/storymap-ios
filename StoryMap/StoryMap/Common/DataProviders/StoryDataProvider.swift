@@ -27,7 +27,7 @@ final class StoryDataProvider {
 	
 	private var results: Results<Story>?
 	private let realm = RealmDataProvider.shared
-	private var notificationToken: NotificationToken? = nil
+	private var notificationToken: NotificationToken?
 	
 	// MARK: - Initializer
 	

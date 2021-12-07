@@ -33,6 +33,9 @@ class StoryDetailCoordinator: CoordinatorType {
     }
     
     func stop() {
+		subscribers.forEach { $0.cancel() }
+		subscribers.removeAll()
+		
         presenter.popViewController(animated: true)
     }
 }
