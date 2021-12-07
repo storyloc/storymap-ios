@@ -1,0 +1,14 @@
+query getProfile($id: String) {
+  profile(id: $id) {
+    name
+    createdAt
+  }
+}
+
+mutation createProfile($name: String!) {
+  createProfile(name: $name) {
+	id
+    name
+	createdAt
+  }
+}

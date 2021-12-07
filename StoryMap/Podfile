@@ -10,7 +10,7 @@ target 'StoryMap' do
 
   pod 'SnapKit', '~> 5.0.0'
   pod 'RealmSwift', '~> 10'
-  # pod 'EarlGreyApp'
+	pod 'Apollo'
 
 end
 

@@ -7,29 +7,29 @@
 
 import UIKit
 import OSLog
+import Apollo
 
 public let logger = Logger()
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-          return true
+		if Configuration.isDebug {
+			tryGraphQL()
+		}
+		
+		return true
     }
-
-    // MARK: UISceneSession Lifecycle
-
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        // Called when a new scene session is being created.
-        // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
-
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
-
-
+	
+	private func tryGraphQL() {
+		Network.shared.apollo.perform(mutation: CreateProfileMutation(name: "Dory")) { result in
+			switch result {
+			case .success(let graphQLResult):
+				logger.info("Success! Result: \(String(describing: graphQLResult.data?.createProfile))")
+			case .failure(let error):
+				logger.warning("Failure! Error: \(error.localizedDescription)")
+			}
+		}
+	}
 }
 
