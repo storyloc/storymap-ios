@@ -146,6 +146,7 @@ class MapViewModel: ObservableObject {
 			),
 			location: IndexLocation(
 				cid: story.id.stringValue,
+                title: story.title,
 				location: story.loc
 			)
 		)
