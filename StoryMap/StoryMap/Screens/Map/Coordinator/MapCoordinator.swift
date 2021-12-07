@@ -15,8 +15,6 @@ class MapCoordinator: CoordinatorType {
     var storyDetailCoordinator: StoryDetailCoordinator?
     var storyListCoordinator: StoryListCoordinator?
 	
-	private var deleteStorySubject: PassthroughSubject<Story, Never>?
-	
 	private let photoManager = PhotoInputManager()
 	private var subscribers = Set<AnyCancellable>()
 	
@@ -49,24 +47,21 @@ class MapCoordinator: CoordinatorType {
 			}
 			.store(in: &subscribers)
 		
-		deleteStorySubject = viewModel.storyDeletedSubject
         presenter.pushViewController(viewController, animated: true)
     }
     
     private func showAddStory(with location: Location) {
-		if photoManagerSubscriber != nil {
-			photoManagerSubscriber?.cancel()
-			photoManagerSubscriber = nil
-		}
-		
-		photoManagerSubscriber = photoManager.imageSubject
+		photoManagerSubscriber = photoManager.resultSubject
 			.receive(on: DispatchQueue.main)
-			.sink { [weak self] image in
+			.sink { [weak self] result in
 				StoryDataProvider.shared.createStory(
-					from: image,
+					from: result.image,
 					and: location
 				)
 				self?.presenter.dismiss(animated: true)
+				
+				self?.photoManagerSubscriber?.cancel()
+				self?.photoManagerSubscriber = nil
 			}
 		
 		let viewController = photoManager.makeViewController(with: .camera)
@@ -79,12 +74,6 @@ class MapCoordinator: CoordinatorType {
 		}
 		
 		storyDetailCoordinator = StoryDetailCoordinator(presenter: presenter, story: story)
-		storyDetailCoordinator?.deleteStorySubject
-			.sink { [weak self] story in
-				self?.deleteStorySubject?.send(story)
-			}
-			.store(in: &subscribers)
-		
         storyDetailCoordinator?.start()
     }
 

@@ -121,7 +121,10 @@ final class AddStoryViewModel {
 			image: image,
 			location: Configuration.isSimulator
 				? location.randomize()
-				: location
+				: Location(
+					latitude: location.latitude,
+					longitude: location.longitude
+				)
 		)
 		
 		storyDataProvider.save(story: story)

@@ -10,6 +10,8 @@ import PhotosUI
 import Combine
 
 final class PhotoInputManager: NSObject {
+	public typealias Result = (image: UIImage, location: Location?)
+	
 	public enum SourceType {
 		case camera
 		case photoLibrary
@@ -17,7 +19,7 @@ final class PhotoInputManager: NSObject {
 	
 	// MARK: - Public properties
 	
-	var imageSubject = PassthroughSubject<UIImage, Never>()
+	var resultSubject = PassthroughSubject<Result, Never>()
 	
 	// MARK: - Public methods
 	
@@ -28,7 +30,8 @@ final class PhotoInputManager: NSObject {
 	// MARK: - Private methods
 	
 	private func makeChooseImageController() -> UIViewController {
-		var config = PHPickerConfiguration()
+		let photoLibrary = PHPhotoLibrary.shared()
+		var config = PHPickerConfiguration(photoLibrary: photoLibrary)
 		config.filter = .images
 		config.selectionLimit = 1
 		let picker = PHPickerViewController(configuration: config)
@@ -49,11 +52,22 @@ final class PhotoInputManager: NSObject {
 extension PhotoInputManager: PHPickerViewControllerDelegate {
 	func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
 		guard let result = results.first else { return }
+		
+		var location: Location?
+		
+		if let identifier = result.assetIdentifier {
+			if let asset = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil).firstObject, let loc = asset.location {
+				location = Location(location: loc)
+			}
+		} else {
+			logger.warning("PhotoManager: getLocationFromAsset failed: missing identifier")
+		}
+		
 		let provider = result.itemProvider
 		
 		provider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
 			if let pickedImage = image as? UIImage {
-				self?.imageSubject.send(pickedImage)
+				self?.resultSubject.send(Result(image: pickedImage, location: location))
 			}
 		}
 	}
@@ -64,7 +78,8 @@ extension PhotoInputManager: PHPickerViewControllerDelegate {
 extension PhotoInputManager: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 	func imagePickerController (_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
 		if let pickedImage = info[.originalImage] as? UIImage {
-			imageSubject.send(pickedImage)
+			UIImageWriteToSavedPhotosAlbum(pickedImage, nil, nil, nil)
+			resultSubject.send(Result(image: pickedImage, location: nil))
 		}
 	}
 }

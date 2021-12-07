@@ -11,32 +11,32 @@ import Combine
 
 final class AddStoryCoordinator: CoordinatorType {
 	var presenter: UINavigationController
-
+	
 	var showStorySubject = PassthroughSubject<Story, Never>()
 	
 	private var location: Location
 	
 	private let photoManager = PhotoInputManager()
 	private var subscribers = Set<AnyCancellable>()
-    
-    init(presenter: UINavigationController, location: Location) {
+	
+	init(presenter: UINavigationController, location: Location) {
 		self.presenter = presenter
-        self.location = location
-    }
-    
-    func start() {
-        let viewModel = AddStoryViewModel(location: location)
+		self.location = location
+	}
+	
+	func start() {
+		let viewModel = AddStoryViewModel(location: location)
 		let viewController = AddStoryViewController(viewModel: viewModel)
 		viewController.isModalInPresentation = true
 		
 		setupSubscribers(from: viewModel)
-	
+		
 		presenter.present(viewController, animated: true)
-    }
-    
-    func stop() {
-        presenter.visibleViewController?.dismiss(animated: true, completion: nil)
-    }
+	}
+	
+	func stop() {
+		presenter.visibleViewController?.dismiss(animated: true, completion: nil)
+	}
 	
 	private func setupSubscribers(from viewModel: AddStoryViewModel) {
 		viewModel.showAlertSubject
@@ -68,25 +68,31 @@ final class AddStoryCoordinator: CoordinatorType {
 			}
 			.store(in: &subscribers)
 		
-		photoManager.imageSubject
+		photoManager.resultSubject
 			.receive(on: DispatchQueue.main)
-			.sink { [weak self, weak viewModel] image in
-				self?.presenter.dismiss(animated: true)
-				viewModel?.image = image.jpegData(compressionQuality: 0.0)
+			.sink { [weak self, weak viewModel] result in
+				viewModel?.image = result.image.jpegData(compressionQuality: 0.0)
+				
+				if let location = result.location {
+					viewModel?.location = location
+				}
+				
+				self?.presentedViewController.dismiss(animated: true)
 			}
 			.store(in: &subscribers)
 	}
 	
 	private func showAddImage(with type: PhotoInputManager.SourceType) {
 		let viewController = photoManager.makeViewController(with: type)
-		presenter.present(viewController, animated: true, completion: nil)
+		viewController.isModalInPresentation = true
+		presentedViewController.present(viewController, animated: true)
 	}
-    
-    func stop(story: Story?) {
-        presenter.visibleViewController?.dismiss(animated: true, completion: { [weak self] in
-            if let story = story {
+	
+	func stop(story: Story?) {
+		presenter.visibleViewController?.dismiss(animated: true, completion: { [weak self] in
+			if let story = story {
 				self?.showStorySubject.send(story)
-            }
-        })
-    }
+			}
+		})
+	}
 }

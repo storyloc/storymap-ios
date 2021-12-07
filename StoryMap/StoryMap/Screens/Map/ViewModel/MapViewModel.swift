@@ -12,12 +12,11 @@ import UIKit
 
 class MapViewModel: ObservableObject {
 	@Published var collectionData: [MapCollectionData] = []
-    
+	
 	let addStorySubject = PassthroughSubject<Location, Never>()
 	let openStorySubject = PassthroughSubject<Story, Never>()
 	let openStoryListSubject = PassthroughSubject<Void, Never>()
 	
-	var storyDeletedSubject = PassthroughSubject<Story, Never>()
 	var storyInsertedSubject = PassthroughSubject<Story?, Never>()
 	
 	@Published private var stories: [Story] = []
@@ -32,42 +31,42 @@ class MapViewModel: ObservableObject {
 			}
 		}
 	}
-
-    var location: Location? {
-        didSet {
-            guard oldValue == nil else {
-                return
-            }
-            
-            stories = sortStoriesByLocation(stories: stories)
-            
-            logger.info("MapVM:location didSet, start sorting")
-        }
-    }
-    
-    private var results: Results<Story>?
-    private var notificationToken: NotificationToken? = nil
-    
-    private let storyDataProvider = StoryDataProvider.shared
-    
-    init() {
+	
+	var location: Location? {
+		didSet {
+			guard oldValue == nil else {
+				return
+			}
+			
+			updateStories(with: stories)
+			
+			logger.info("MapVM:location didSet, start sorting")
+		}
+	}
+	
+	private var results: Results<Story>?
+	private var notificationToken: NotificationToken? = nil
+	
+	private let storyDataProvider = StoryDataProvider.shared
+	
+	init() {
 		setupSubscribers()
-    }
-    
-    func openStory(with index: Int) {
+	}
+	
+	func openStory(with index: Int) {
 		audioRecorder.stopPlaying()
 		openStorySubject.send(stories[index])
-    }
-    
-    func addStory(with location: Location) {
+	}
+	
+	func addStory(with location: Location) {
 		Configuration.isSimulator ? addTestStory() : addStorySubject.send(location)
 		audioRecorder.stopPlaying()
-    }
-
-    func openStoryList() {
+	}
+	
+	func openStoryList() {
 		audioRecorder.stopPlaying()
 		openStoryListSubject.send()
-    }
+	}
 	
 	private func setupSubscribers() {
 		$stories
@@ -90,16 +89,6 @@ class MapViewModel: ObservableObject {
 				}
 				
 				self?.currentlyPlaying = filteredStories?.first
-			}
-			.store(in: &subscribers)
-		
-		storyDeletedSubject
-			.sink { [weak self] story in
-				guard let index = self?.stories.firstIndex(where: { $0 == story }) else {
-					return
-				}
-		
-				self?.stories.remove(at: index)
 			}
 			.store(in: &subscribers)
 		
@@ -129,8 +118,8 @@ class MapViewModel: ObservableObject {
 				guard let self = self else { return }
 				
 				self.audioRecorder.currentlyPlaying == nil
-					? self.audioRecorder.play(recordings: Array(story.audioRecordings))
-					: self.audioRecorder.stopPlaying()
+				? self.audioRecorder.play(recordings: Array(story.audioRecordings))
+				: self.audioRecorder.stopPlaying()
 				
 				if let index = self.collectionData.firstIndex(where: { $0.location.cid == story.id.stringValue }) {
 					self.collectionData[index].cell.isPlaying = self.currentlyPlaying == story
@@ -150,35 +139,35 @@ class MapViewModel: ObservableObject {
 			)
 		)
 	}
-    
-    private func sortStoriesByLocation(stories: [Story]) -> [Story] {
-        guard let location = location else {
-            return stories
-        }
-
-        let result = stories.sorted(by: { story1, story2 in
-            story1.loc.distance(from: location) < story2.loc.distance(from: location)
-        })
-        
-        logger.info("MapVM sortStories: \(result.map{ $0.id })")
-        return result
-    }
+	
+	private func sortStoriesByLocation(stories: [Story]) -> [Story] {
+		guard let location = location else {
+			return stories
+		}
+		
+		let result = stories.sorted(by: { story1, story2 in
+			story1.loc.distance(from: location) < story2.loc.distance(from: location)
+		})
+		
+		logger.info("MapVM sortStories: \(result.map{ $0.id })")
+		return result
+	}
 	
 	private func updateStories(with data: [Story]) {
 		stories = sortStoriesByLocation(stories: data)
 	}
-    
-    private func addTestStory() {
+	
+	private func addTestStory() {
 		guard let imageData = StyleKit.image.make(from: StyleKit.image.examples.random())?.jpegData(compressionQuality: 0.0) else {
-            return
-        }
-        let n = collectionData.count
-        let story = Story(
-            title: "Story \(n)",
-            image: imageData,
-            location: location!.randomize()
-        )
-        
+			return
+		}
+		let n = collectionData.count
+		let story = Story(
+			title: "Story \(n)",
+			image: imageData,
+			location: location!.randomize()
+		)
+		
 		storyDataProvider.save(story: story)
-    }
+	}
 }

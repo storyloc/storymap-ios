@@ -41,7 +41,6 @@
 		8A6EE243273EB13400C5580F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6EE242273EB13400C5580F /* LocationManager.swift */; };
 		8AFAE47327316C5400BFC249 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47227316C5400BFC249 /* Story.swift */; };
 		8AFAE476273170C800BFC249 /* RealmDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE475273170C800BFC249 /* RealmDataProvider.swift */; };
-		8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */; };
 		8AFAE47D27317E8C00BFC249 /* AlertConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */; };
 		8AFAE48327319B1400BFC249 /* StoryDetailCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE48227319B1400BFC249 /* StoryDetailCoordinator.swift */; };
 		8AFAE48527319B2900BFC249 /* StoryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFAE48427319B2900BFC249 /* StoryDetailViewController.swift */; };
@@ -114,7 +113,6 @@
 		8A6EE242273EB13400C5580F /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		8AFAE47227316C5400BFC249 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		8AFAE475273170C800BFC249 /* RealmDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmDataProvider.swift; sourceTree = "<group>"; };
-		8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryViewModelType.swift; sourceTree = "<group>"; };
 		8AFAE47C27317E8C00BFC249 /* AlertConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertConfig.swift; sourceTree = "<group>"; };
 		8AFAE48227319B1400BFC249 /* StoryDetailCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryDetailCoordinator.swift; sourceTree = "<group>"; };
 		8AFAE48427319B2900BFC249 /* StoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryDetailViewController.swift; sourceTree = "<group>"; };
@@ -362,7 +360,6 @@
 		8AFAE47827317D9D00BFC249 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				8AFAE47A27317DD800BFC249 /* AddStoryViewModelType.swift */,
 				8A639E3D27217D66003D0CE9 /* AddStoryViewModel.swift */,
 			);
 			path = ViewModel;
@@ -756,7 +753,6 @@
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,
 				8A6DB02A27467CF500970FE9 /* MapStoryThumbnailCell.swift in Sources */,
-				8AFAE47B27317DD800BFC249 /* AddStoryViewModelType.swift in Sources */,
 				8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */,
 				8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */,
 				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,

@@ -51,7 +51,10 @@ final class StoryDataProvider {
 			image: data,
 			location: Configuration.isSimulator
 				? location.randomize()
-				: location
+				: Location(
+					latitude: location.latitude,
+					longitude: location.longitude
+				)
 		)
 		realm?.write(object: story)
 	}

@@ -31,7 +31,6 @@ final class StoryDetailViewModel {
     @Published var state: RecordingState = .initial
 	
 	let recordingsSubject = PassthroughSubject<RecordingsUpdate, Never>()
-	let deleteStorySubject = PassthroughSubject<Story, Never>()
 	let closeSubject = PassthroughSubject<Void, Never>()
     
     // MARK: - Private properties
@@ -66,7 +65,7 @@ final class StoryDetailViewModel {
 		logger.info("DetailVM: deleteStory: \(self.story)")
         
 		storyDataProvider.delete(story: story)
-		deleteStorySubject.send(story)
+		closeSubject.send()
     }
 	
 	func deleteRecording(at index: Int) {

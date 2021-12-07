@@ -11,12 +11,14 @@ import CoreLocation
 import RealmSwift
 
 class Location: EmbeddedObject {
+	@Persisted var id: ObjectId
     @Persisted var latitude: Double
     @Persisted var longitude: Double
     
     var clLocation: CLLocation {
         CLLocation(latitude: latitude, longitude: longitude)
     }
+	
     var clLocation2D: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }

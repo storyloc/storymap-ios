@@ -17,6 +17,10 @@ protocol CoordinatorType {
 }
 
 extension CoordinatorType {
+	var presentedViewController: UIViewController {
+		presenter.viewControllers.last?.presentedViewController ?? presenter
+	}
+	
 	func showAlert(with config: AlertConfig) {
 		let alertController = config.controller
 		
