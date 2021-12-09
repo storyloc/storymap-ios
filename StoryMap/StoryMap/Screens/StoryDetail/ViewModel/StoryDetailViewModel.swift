@@ -37,7 +37,7 @@ final class StoryDetailViewModel {
     
     private let storyDataProvider = StoryDataProvider.shared
     
-    @ObservedObject private var audioRecorder = AudioRecorder()
+    @ObservedObject private var audioRecorder = AudioRecorder.shared
 	
 	private var recordings: [AudioRecordingInfo]
     
@@ -46,7 +46,6 @@ final class StoryDetailViewModel {
     init(story: Story) {
         self.story = story
         self.recordings = story.audioRecordings.map { AudioRecordingInfo(recording: $0, isPlaying: false) }
-        
         setupSubscribers()
     }
 	
@@ -74,7 +73,7 @@ final class StoryDetailViewModel {
 		recordings.remove(at: index)
 		recordingsSubject.send(.delete(index))
 		
-		storyDataProvider.delete(recording: story.audioRecordings[index], from: story)
+		storyDataProvider.delete(recording: story.audioRecordings[index])
 	}
     
     func startRecording() {
@@ -116,14 +115,6 @@ final class StoryDetailViewModel {
 				self?.updateState(with: recState)
 			}
 			.store(in: &subscribers)
-        
-        audioRecorder.$currentlyPlaying
-			.sink { [weak self] recording in
-				logger.info("DetailVM: currentlyPlayingObserver: \(recording?.createdAt ?? "nil")")
-            
-				self?.updateRecordings(with: recording)
-			}
-			.store(in: &subscribers)
     }
 	
 	private func updateState(with recState: AudioRecorder.State) {
@@ -131,12 +122,14 @@ final class StoryDetailViewModel {
 			
 		case .initial:
 			state = .initial
+            updateRecordings()
 		case .recording:
 			state = .inProgress
 		case .recorded(let recording):
 			saveRecording(recording)
 			state = .done
 		case .playing:
+            updateRecordings()
 			break
 		case .error(let error):
 			if case .permissionDenied = error {
@@ -145,11 +138,14 @@ final class StoryDetailViewModel {
 		}
 	}
 	
-	private func updateRecordings(with currentlyPlaying: AudioRecording?) {
-		recordings = recordings.map { rec in
-			AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording == currentlyPlaying)
-		}
-		
+	private func updateRecordings() {
+        var id = ""
+        if let currentlyPlaying = audioRecorder.playQueue.first  {
+            id = currentlyPlaying.id.stringValue
+        }
+        recordings = recordings.map { rec in
+            AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording.id.stringValue == id)
+        }
 		recordingsSubject.send(.update(recordings))
 	}
     

@@ -87,15 +87,14 @@ class StoryDetailViewController: UIViewController {
 		viewModel.$state
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] state in
-				self?.updateRecordButton(with: state)
 				logger.info("DetailVC: stateObserver changed: \(state.rawValue)")
+                self?.updateRecordButton(with: state)
 			}
 			.store(in: &subscribers)
 		viewModel.recordingsSubject
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] update in
 				logger.info("DetailVC: recordingsObserver changed")
-				
 				self?.updateRecordings(update)
 			}
 			.store(in: &subscribers)
@@ -106,8 +105,7 @@ class StoryDetailViewController: UIViewController {
 		case .update(let data):
 			recordings = data
 			tableView.reloadData()
-			
-			logger.info("DetailVC: recordingsUpdated: \(data)")
+			logger.info("DetailVC: recordingsUpdated")
 		case .delete(let index):
 			recordings.remove(at: index)
 			tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)

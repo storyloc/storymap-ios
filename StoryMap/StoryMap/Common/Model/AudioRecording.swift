@@ -13,6 +13,7 @@ class AudioRecording: Object {
     @Persisted var fileName: String
     @Persisted var length: Double
     @Persisted var createdAt: String
+    let story = LinkingObjects(fromType: Story.self, property: "audioRecordings")
     
     convenience init(fileName: String, length: Double) {
         self.init()

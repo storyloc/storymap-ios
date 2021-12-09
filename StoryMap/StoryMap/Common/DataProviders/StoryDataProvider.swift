@@ -72,14 +72,8 @@ final class StoryDataProvider {
 		})
 	}
 	
-	func delete(recording: AudioRecording, from story: Story) {
-		guard let index = story.audioRecordings.firstIndex(of: recording) else {
-			return
-		}
-		
-		realm?.update(with: {
-			story.audioRecordings.remove(at: index)
-		})
+	func delete(recording: AudioRecording) {
+        realm?.delete(object: recording)
 	}
 	
 	// MARK: - Private methods
