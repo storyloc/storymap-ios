@@ -72,8 +72,11 @@ class MapViewModel: ObservableObject {
 		
 		audioRecorder.$state
 			.sink { [weak self] update in
+                logger.info("MapVM: audioRecorder state update: \(String(describing: update))")
                 if let playing = self?.audioRecorder.playQueue.first {
                     self?.currentlyPlaying = playing.story.first
+                } else {
+                    self?.currentlyPlaying = nil
                 }
 			}
 			.store(in: &subscribers)
@@ -104,15 +107,15 @@ class MapViewModel: ObservableObject {
 		if !story.audioRecordings.isEmpty {
 			action = { [weak self] in
 				guard let self = self else { return }
-                if let playing = self.audioRecorder.playQueue.first {
-                    self.currentlyPlaying = playing.story.first
+                if self.currentlyPlaying?.id.stringValue != self.collectionData[index].location.cid {
+                    self.audioRecorder.play(recordings: Array(story.audioRecordings))
+                    self.collectionData[index].cell.isPlaying = true
+                    self.currentlyPlaying = story
                 }
-                if self.currentlyPlaying?.id.stringValue == self.collectionData[index].location.cid {
-                    self.audioRecorder.play(recordings: Array(story.audioRecordings))
-                    //self.collectionData[index].cell.isPlaying = true
-                } else {
-                    self.audioRecorder.play(recordings: Array(story.audioRecordings))
-                    //self.collectionData[index].cell.isPlaying = false
+                else {
+                    self.audioRecorder.stopPlaying()
+                    self.collectionData[index].cell.isPlaying = false
+                    self.currentlyPlaying = nil
                 }
 			}
 		}
