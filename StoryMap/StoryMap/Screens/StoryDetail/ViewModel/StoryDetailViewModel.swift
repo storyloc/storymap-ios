@@ -148,7 +148,7 @@ final class StoryDetailViewModel {
 	}
 	
 	private func updateRecordings() {
-        currentlyPlaying = audioRecorder.currentlyPlaying
+        let currentlyPlaying = audioRecorder.currentlyPlaying
 		recordings = recordings.map { rec in
 			AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording == currentlyPlaying)
 		}
