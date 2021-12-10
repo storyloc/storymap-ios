@@ -21,12 +21,11 @@ class MapViewModel: ObservableObject {
 	
 	@Published private var stories: [Story] = []
 	
-    private let audioRecorder = AudioRecorder.shared
+	private let audioRecorder = AudioRecorder.shared
 	private var subscribers = Set<AnyCancellable>()
 	
 	private var currentlyPlaying: Story? {
 		didSet {
-            logger.info("MapVM: currentlyPlaying didSet")
 			for (i, cell) in collectionData.enumerated() {
 				collectionData[i].cell.isPlaying = currentlyPlaying?.id.stringValue == cell.location.cid
 			}
@@ -70,14 +69,20 @@ class MapViewModel: ObservableObject {
 			}
 			.store(in: &subscribers)
 		
-		audioRecorder.$state
-			.sink { [weak self] update in
-                logger.info("MapVM: audioRecorder state update: \(String(describing: update))")
-                if let playing = self?.audioRecorder.playQueue.first {
-                    self?.currentlyPlaying = playing.story.first
-                } else {
-                    self?.currentlyPlaying = nil
-                }
+		audioRecorder.$currentlyPlaying
+			.sink { [weak self] rec in
+				guard let rec = rec else {
+					self?.currentlyPlaying = nil
+					return
+				}
+				
+				let filteredStories = self?.stories.filter { story in
+					story.audioRecordings.contains { recording in
+						recording.id.stringValue == rec.id.stringValue
+					}
+				}
+				
+				self?.currentlyPlaying = filteredStories?.first
 			}
 			.store(in: &subscribers)
 		
@@ -95,28 +100,24 @@ class MapViewModel: ObservableObject {
 	}
 	
 	private func makeCollectionData(from stories: [Story]) -> [MapCollectionData] {
-		return stories.enumerated().map { (index, story) in
-            makeCollectionData(for: story, at: index)
+		return stories.map { story in
+			makeCollectionData(for: story)
 		}
-        
 	}
 	
-    private func makeCollectionData(for story: Story, at index: Int) -> MapCollectionData {
+	private func makeCollectionData(for story: Story) -> MapCollectionData {
 		var action: (() -> Void)?
-
 		if !story.audioRecordings.isEmpty {
 			action = { [weak self] in
 				guard let self = self else { return }
-                if self.currentlyPlaying?.id.stringValue != self.collectionData[index].location.cid {
-                    self.audioRecorder.play(recordings: Array(story.audioRecordings))
-                    self.collectionData[index].cell.isPlaying = true
-                    self.currentlyPlaying = story
-                }
-                else {
-                    self.audioRecorder.stopPlaying()
-                    self.collectionData[index].cell.isPlaying = false
-                    self.currentlyPlaying = nil
-                }
+				
+				self.audioRecorder.currentlyPlaying == nil
+				? self.audioRecorder.play(recordings: Array(story.audioRecordings))
+				: self.audioRecorder.stopPlaying()
+				
+				if let index = self.collectionData.firstIndex(where: { $0.location.cid == story.id.stringValue }) {
+					self.collectionData[index].cell.isPlaying = self.currentlyPlaying == story
+				}
 			}
 		}
 		

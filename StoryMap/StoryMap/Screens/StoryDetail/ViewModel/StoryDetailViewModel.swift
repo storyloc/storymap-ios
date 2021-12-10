@@ -46,6 +46,7 @@ final class StoryDetailViewModel {
     init(story: Story) {
         self.story = story
         self.recordings = story.audioRecordings.map { AudioRecordingInfo(recording: $0, isPlaying: false) }
+        
         setupSubscribers()
     }
 	
@@ -73,7 +74,7 @@ final class StoryDetailViewModel {
 		recordings.remove(at: index)
 		recordingsSubject.send(.delete(index))
 		
-		storyDataProvider.delete(recording: story.audioRecordings[index])
+		storyDataProvider.delete(recording: story.audioRecordings[index], from: story)
 	}
     
     func startRecording() {
@@ -115,6 +116,14 @@ final class StoryDetailViewModel {
 				self?.updateState(with: recState)
 			}
 			.store(in: &subscribers)
+        
+        audioRecorder.$currentlyPlaying
+			.sink { [weak self] recording in
+				logger.info("DetailVM: currentlyPlayingObserver: \(recording?.createdAt ?? "nil")")
+            
+				self?.updateRecordings()
+			}
+			.store(in: &subscribers)
     }
 	
 	private func updateState(with recState: AudioRecorder.State) {
@@ -139,13 +148,11 @@ final class StoryDetailViewModel {
 	}
 	
 	private func updateRecordings() {
-        var id = ""
-        if let currentlyPlaying = audioRecorder.playQueue.first  {
-            id = currentlyPlaying.id.stringValue
-        }
-        recordings = recordings.map { rec in
-            AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording.id.stringValue == id)
-        }
+        currentlyPlaying = audioRecorder.currentlyPlaying
+		recordings = recordings.map { rec in
+			AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording == currentlyPlaying)
+		}
+		
 		recordingsSubject.send(.update(recordings))
 	}
     

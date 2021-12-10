@@ -30,6 +30,7 @@ final class AudioRecorder: NSObject, ObservableObject {
 
     @Published var recordingAllowed = false
     @Published var state: State = .initial
+    @Published var currentlyPlaying: AudioRecording? = nil
 
     var playQueue: [AudioRecording] = []
     
@@ -117,6 +118,7 @@ final class AudioRecorder: NSObject, ObservableObject {
             try recordingSession.setCategory(.ambient, options: [.duckOthers, .mixWithOthers])
             try recordingSession.setActive(true)
             audioPlayer?.play()
+            currentlyPlaying = recording
             state = .playing
             logger.info("AudioRecorder: playRecording: \(recording.createdAt)")
         } catch {
@@ -158,8 +160,9 @@ final class AudioRecorder: NSObject, ObservableObject {
                 logger.warning("AudioRecorder: stopPlaying failed: \(error.localizedDescription)")
             }
             logger.info("AudioRecorder: stopPlaying")
-			state = .initial
             self.playQueue = []
+            currentlyPlaying = nil
+			state = .initial
         }
     }
     
