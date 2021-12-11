@@ -50,10 +50,7 @@ final class AudioRecorder: NSObject, ObservableObject {
                                              options: [
                                                 .defaultToSpeaker,
                                                 .allowBluetooth,
-                                                .allowAirPlay,
-                                                .mixWithOthers,
-                                                .duckOthers,
-                                                //.interruptSpokenAudioAndMixWithOthers
+                                                .allowAirPlay
                                              ]
             )
         } catch {
@@ -88,7 +85,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         do {
             audioRecorder = try AVAudioRecorder(url: audioFileURL, settings: settings)
             audioRecorder?.delegate = self
-            try recordingSession.setActive(true)
+            try recordingSession.setActive(true, options: .notifyOthersOnDeactivation)
             audioRecorder?.record()
             state = .recording
             logger.error("AudioRecorder: startRecording success")
@@ -102,7 +99,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         do {
             audioRecorder?.stop()
             audioRecorder = nil
-            try recordingSession.setActive(false)
+            try recordingSession.setActive(false, options: .notifyOthersOnDeactivation)
         } catch {
             state = .error(.unknown(error))
             logger.error("AudioRecorder deactivate session failed: \(error.localizedDescription)")
@@ -149,10 +146,7 @@ final class AudioRecorder: NSObject, ObservableObject {
                     options: [
                         .defaultToSpeaker,
                         .allowBluetooth,
-                        .allowAirPlay,
-                        .mixWithOthers,
-                        .duckOthers,
-                        //.interruptSpokenAudioAndMixWithOthers
+                        .allowAirPlay
                      ]
                 )
             }
@@ -215,6 +209,7 @@ extension AudioRecorder: AVAudioRecorderDelegate {
             )
             state = .recorded(recording)
             logger.info("AudioRecorder: finishRecording success, length \(recording.length)s")
+            state = .initial
         } else {
 			state = .error(.unknown(nil))
             logger.error("AudioRecorder: finishRecording failed.")
