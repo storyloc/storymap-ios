@@ -32,11 +32,15 @@ final class StoryDataProvider {
 	// MARK: - Initializer
 	
 	private init() {
+        load()
 		subscribeToChanges()
 	}
 	
 	// MARK: - Public methods
-	
+    func load() {
+        results = realm?.read(type: Story.self)
+    }
+
 	func save(story: Story) {
 		realm?.write(object: story)
 	}
@@ -80,8 +84,6 @@ final class StoryDataProvider {
 	// MARK: - Private methods
 	
 	private func subscribeToChanges() {
-		results = realm?.read(type: Story.self)
-		
 		notificationToken = results?.observe(on: .main, { [weak self] changes in
 			switch changes {
 			case .update(let items, _, let insertions, _):

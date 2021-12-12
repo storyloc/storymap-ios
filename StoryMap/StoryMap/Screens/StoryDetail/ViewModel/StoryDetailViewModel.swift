@@ -63,7 +63,7 @@ final class StoryDetailViewModel {
     func delete() {
 		logger.info("DetailVM: deleteStory: \(self.story)")
         
-		storyDataProvider.delete(story: story)
+        storyDataProvider.delete(story: story)
 		closeSubject.send()
     }
 	

@@ -16,8 +16,9 @@ final class StoryListViewModel {
 	
 	var addStorySubject = PassthroughSubject<Location, Never>()
 	var openStorySubject = PassthroughSubject<Story, Never>()
+    var updateStorySubject = PassthroughSubject<Void, Never>()
     
-    @Published var stories: [Story] = []
+    let storyDataProvider = StoryDataProvider.shared
     
     var location: Location? {
         didSet {
@@ -29,8 +30,6 @@ final class StoryListViewModel {
     }
 
     // MARK: - Private properties
-    
-    private let storyDataProvider = StoryDataProvider.shared
 	private var subscribers = Set<AnyCancellable>()
 
     init() {
@@ -44,7 +43,7 @@ final class StoryListViewModel {
 
     func openStory(with index: Int) {
         logger.info("StoryListVM: open Story \(index)")
-		openStorySubject.send(stories[index])
+        openStorySubject.send(storyDataProvider.stories[index])
     }
 
     func addStory(with location: Location) {
@@ -57,12 +56,8 @@ final class StoryListViewModel {
     private func setupSubscribers() {
 		storyDataProvider.$stories
 			.sink { [weak self] data in
-				self?.stories = data
+                self?.updateStorySubject.send()
 			}
 			.store(in: &subscribers)
-    }
-    
-    private func updateStories(with results: Results<Story>) {
-        self.stories = results.toArray(ofType: Story.self)
     }
 }

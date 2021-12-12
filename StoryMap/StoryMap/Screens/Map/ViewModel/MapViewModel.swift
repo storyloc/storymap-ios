@@ -65,6 +65,7 @@ class MapViewModel: ObservableObject {
 	private func setupSubscribers() {
 		$stories
 			.sink { [weak self] stories in
+                logger.info("MapVM: stories changed: \(stories.map {$0.id.stringValue})")
 				self?.collectionData = self?.makeCollectionData(from: stories) ?? []
 			}
 			.store(in: &subscribers)

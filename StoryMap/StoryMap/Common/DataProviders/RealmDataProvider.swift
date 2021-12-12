@@ -24,6 +24,7 @@ class RealmDataProvider {
     private init?() {
         do {
             self.realm = try Realm(configuration: RealmDataProvider.config, queue: .main)
+            logger.info("Realm is located at: \(String(describing: self.realm.configuration))")
         } catch let error as NSError {
             logger.error("RealmDP: init failed: \(error.localizedDescription)")
             return nil

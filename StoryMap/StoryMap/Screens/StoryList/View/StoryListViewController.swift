@@ -41,8 +41,11 @@ class StoryListViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        viewModel.storyDataProvider.load()
+        tableView.reloadData()
 		setupSubscribers()
+        logger.info("\(String(describing: self.tableView))")
+        super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
 	
@@ -66,10 +69,10 @@ class StoryListViewController: UIViewController {
     }
     
     private func setupSubscribers() {
-        viewModel.$stories
+        viewModel.updateStorySubject
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] data in
-                logger.info("StoryListVC: Stories changed: \(data)")
+            .sink { [weak self] in
+                logger.info("StoryListVC: Stories changed")
                 self?.tableView.reloadData()
             }
             .store(in: &subscribers)
@@ -131,11 +134,11 @@ extension StoryListViewController: UITableViewDelegate {
 
 extension StoryListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.stories.count
+        viewModel.storyDataProvider.stories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cellData = viewModel.stories[indexPath.row]
+        let cellData = viewModel.storyDataProvider.stories[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) ?? UITableViewCell(style: .subtitle, reuseIdentifier: reuseIdentifier)
         
         var content = cell.defaultContentConfiguration()
