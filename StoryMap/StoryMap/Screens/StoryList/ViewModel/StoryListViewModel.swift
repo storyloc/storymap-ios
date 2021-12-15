@@ -57,6 +57,9 @@ final class StoryListViewModel {
 		addStorySubject.send(location)
     }
 
+    func updateStory() {
+        storyDataProvider.sortStories(by: .none)
+    }
     // MARK: - Private methods
     
     private func setupSubscribers() {

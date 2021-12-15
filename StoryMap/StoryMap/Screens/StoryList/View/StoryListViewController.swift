@@ -43,6 +43,7 @@ class StoryListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 		setupSubscribers()
+        viewModel.updateStory()
         tableView.reloadData()
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
