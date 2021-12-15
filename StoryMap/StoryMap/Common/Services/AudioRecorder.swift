@@ -10,7 +10,7 @@ import AVFoundation
 import SwiftUI
 import Combine
 
-final class AudioRecorder: NSObject, ObservableObject {
+final class AudioRecorder: NSObject {
     enum State {
         case initial
         case recording
@@ -41,7 +41,7 @@ final class AudioRecorder: NSObject, ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     private var audioURL: URL?
     
-    override init() {
+    private override init() {
         super.init()
         
         do {
@@ -154,7 +154,7 @@ final class AudioRecorder: NSObject, ObservableObject {
                 logger.warning("AudioRecorder: stopPlaying failed: \(error.localizedDescription)")
             }
             logger.info("AudioRecorder: stopPlaying")
-            self.playQueue = []
+            playQueue = []
             currentlyPlaying = nil
 			state = .initial
         }
@@ -180,11 +180,12 @@ final class AudioRecorder: NSObject, ObservableObject {
 
     private func setPreferedRecordingInput() {
         do {
-            let availableInputs = recordingSession.availableInputs
-            let input = availableInputs!.count > 1
-                ? availableInputs![1]
-                : availableInputs![0]
-            try recordingSession.setPreferredInput(input)
+            if let availableInputs = recordingSession.availableInputs {
+                let input = availableInputs.count > 1
+                    ? availableInputs[1]
+                    : availableInputs[0]
+                try recordingSession.setPreferredInput(input)
+            }
         }
         catch {
             logger.warning("AudioRecorder: preferedInput failed: \(error.localizedDescription)")

@@ -37,7 +37,7 @@ final class StoryDetailViewModel {
     
     private let storyDataProvider = StoryDataProvider.shared
     
-    @ObservedObject private var audioRecorder = AudioRecorder.shared
+    private var audioRecorder = AudioRecorder.shared
 	
 	private var recordings: [AudioRecordingInfo]
     

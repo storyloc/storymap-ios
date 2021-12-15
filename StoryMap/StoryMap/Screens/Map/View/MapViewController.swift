@@ -36,7 +36,7 @@ class MapViewController: UIViewController {
     private var collectionViewHeightConstraint: Constraint?
     private var collectionViewLayoutPadding: CGFloat = 0
     private var autoScrolling = false
-    private var centerButtonState = true
+    private var centerButtonSelected = true
 
 	private var selectedStoryIndex: Int = 0
     
@@ -130,7 +130,7 @@ class MapViewController: UIViewController {
         locationManager.$isMapCentered
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] centered in
-                self?.centerButtonState = centered
+                self?.centerButtonSelected = centered
 				self?.updateCenterButton()
 				logger.info("MapVC: Observer isMapCentered changed: \(centered)")
 			}
@@ -181,7 +181,6 @@ class MapViewController: UIViewController {
         addButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
 
         addButton.snp.makeConstraints { make in
-            make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
             make.bottom.equalTo(collectionView.snp.top).offset(-StyleKit.metrics.padding.small)
             make.trailing.equalToSuperview().inset(StyleKit.metrics.padding.small)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
@@ -287,7 +286,7 @@ class MapViewController: UIViewController {
     }
     
     private func updateCenterButton() {
-        let iconName = centerButtonState ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
+        let iconName = centerButtonSelected ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
         centerButton.setImage(StyleKit.image.make(from: iconName), for: .normal)
     }
 
@@ -306,14 +305,14 @@ class MapViewController: UIViewController {
     }
 
     @objc private func centerButtonTapped() {
-        centerButtonState = !centerButtonState
-        if centerButtonState {
+        centerButtonSelected.toggle()
+        if centerButtonSelected {
             locationManager.centerMap()
         } else {
             locationManager.isMapCentered = false
         }
         updateCenterButton()
-        logger.info("MapVC centerMap Button: \(self.centerButtonState)")
+        logger.info("MapVC centerMap Button: \(self.centerButtonSelected)")
     }
     
     @objc private func addButtonTapped() {
