@@ -107,7 +107,7 @@ class MapViewController: UIViewController {
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] data in
 				self?.updateCollectionView(with: data)
-				logger.info("MapVC: Observer collectionData changed: \(data)")
+                logger.info("MapVC: Observer collectionData changed: \(data.map{$0.cell.isPlaying})")
 			}
 			.store(in: &subscribers)
         
@@ -116,7 +116,9 @@ class MapViewController: UIViewController {
 			.sink { [weak self] available in
 				self?.updateAddButton(available)
 				self?.viewModel.location = self?.locationManager.userLocation
-                self?.locationManager.centerMap()
+                self?.centerButtonSelected = true
+                self?.updateCenterButton()
+                self?.viewModel.updateStories()
             
 				logger.info("MapVC: Observer userLocationAvailable changed: \(available)")
 			}

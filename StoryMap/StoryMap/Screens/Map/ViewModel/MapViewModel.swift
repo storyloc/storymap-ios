@@ -66,6 +66,15 @@ class MapViewModel: ObservableObject {
 		openStoryListSubject.send()
 	}
 	
+    func updateStories() {
+        guard let location = location else {
+            storyDataProvider.sortStories(by: .none)
+            return
+        }
+
+        storyDataProvider.sortStories(by: .distance(location: location))
+    }
+
 	private func setupSubscribers() {
         storyDataProvider.storyUpdateSubject
 			.sink { [weak self] _ in
@@ -115,15 +124,6 @@ class MapViewModel: ObservableObject {
 				location: story.loc
 			)
 		)
-	}
-	
-	private func updateStories() {
-        guard let location = location else {
-            storyDataProvider.sortStories(by: .none)
-            return
-        }
-
-        storyDataProvider.sortStories(by: .distance(location: location))
 	}
 	
 	private func addTestStory() {

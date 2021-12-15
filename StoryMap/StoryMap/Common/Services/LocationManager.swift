@@ -52,7 +52,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     }
     
     func centerMap() {
-        guard let userLocation = userLocation else {
+        guard let userLocation = userLocation, userLocationAvailable else {
             return
         }
         

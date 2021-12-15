@@ -112,7 +112,9 @@ final class AudioRecorder: NSObject {
             audioPlayer = try AVAudioPlayer(contentsOf: getDocumentsDirectory().appendingPathComponent(recording.fileName))
             audioPlayer?.volume = 20.0 // higher value ducks background music more
             audioPlayer?.delegate = self
-            try recordingSession.setCategory(.ambient, options: [.duckOthers, .mixWithOthers])
+            try recordingSession.setCategory(.ambient,
+                mode: .default,
+                options: [.duckOthers, .mixWithOthers])
             try recordingSession.setActive(true)
             audioPlayer?.play()
             currentlyPlaying = recording
