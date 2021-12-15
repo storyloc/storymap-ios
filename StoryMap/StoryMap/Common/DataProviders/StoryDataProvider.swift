@@ -11,10 +11,15 @@ import UIKit
 
 final class StoryDataProvider {
 	enum Update {
-		case initial(stories: [Story])
-		case inserted(stories: [Story], insertedStory: Story)
+		case initial
+        case inserted
 	}
-	
+
+    enum Sorting {
+        case distance(location: Location)
+        case none
+    }
+
 	// MARK: - Public properties
 	
 	static var shared = StoryDataProvider()
@@ -32,11 +37,18 @@ final class StoryDataProvider {
 	// MARK: - Initializer
 	
 	private init() {
-		subscribeToChanges()
+        load(filter: "All")
 	}
 	
 	// MARK: - Public methods
-	
+
+    func load(filter: String) {
+        logger.info("StoryDataProvider: Loading, filter \(filter)")
+        results = realm?.read(type: Story.self)
+        subscribeToChanges()
+        sortStories(by: .none)
+    }
+
 	func save(story: Story) {
 		realm?.write(object: story)
 	}
@@ -76,30 +88,45 @@ final class StoryDataProvider {
         logger.info("Story Recording delete: \(recording.id.stringValue) story: \(recording.story.first?.id.stringValue ?? "none")")
         realm?.delete(object: recording)
 	}
-	
-	// MARK: - Private methods
-	
+
+    func sortStories(by sorting: Sorting) {
+        logger.info("StoryDataProvider: sortStories")
+        switch sorting {
+        case .distance(let location):
+            sortStoriesByDistance(from: location)
+        default:
+            stories = results?.toArray(ofType: Story.self) ?? []
+        }
+    }
+
+    // MARK: - Private methods
+
+    private func sortStoriesByDistance(from location: Location) {
+        let resultArray = results?.toArray(ofType: Story.self) ?? []
+        stories = resultArray.sorted(by: { story1, story2 in
+            story1.loc.distance(from: location) < story2.loc.distance(from: location)
+        })
+    }
+
 	private func subscribeToChanges() {
-		results = realm?.read(type: Story.self)
-		
 		notificationToken = results?.observe(on: .main, { [weak self] changes in
+
 			switch changes {
-			case .update(let items, _, let insertions, _):
+			case .update(_, _, let insertions, _):
 				guard let self = self else { return }
 				logger.info("StoryDP: realm results observer updated")
-				
-				self.stories = items.toArray(ofType: Story.self)
-				
-				guard let i = insertions.first else {
-					self.storyUpdateSubject.send(.initial(stories: self.stories))
+
+                guard let i = insertions.first else {
+					self.storyUpdateSubject.send(.initial)
 					return
 				}
-				
-				self.storyUpdateSubject.send(.inserted(stories: self.stories, insertedStory: self.stories[i]))
-			case .initial(let items):
-				self?.stories = items.toArray(ofType: Story.self)
-				self?.storyUpdateSubject.send(.initial(stories: self?.stories ?? []))
-				logger.info("StoryDP: realm results observer initial")
+
+                self.storyUpdateSubject.send(.inserted)
+
+			case .initial(_):
+                logger.info("StoryDP: realm results observer initial")
+                self?.storyUpdateSubject.send(.initial)
+
 			default: break
 			}
 		})

@@ -43,6 +43,7 @@ class StoryListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 		setupSubscribers()
+        tableView.reloadData()
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
 	
@@ -66,10 +67,10 @@ class StoryListViewController: UIViewController {
     }
     
     private func setupSubscribers() {
-        viewModel.$stories
+        viewModel.storiesChangedSubject
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] data in
-                logger.info("StoryListVC: Stories changed: \(data)")
+            .sink { [weak self] in
+                logger.info("StoryListVC: Stories changed")
                 self?.tableView.reloadData()
             }
             .store(in: &subscribers)
@@ -124,6 +125,7 @@ extension StoryListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         logger.info("StoryListVC: Table didSelectRow \(indexPath)")
         viewModel.openStory(with: indexPath.row)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
 

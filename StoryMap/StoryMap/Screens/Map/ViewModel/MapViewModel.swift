@@ -18,8 +18,12 @@ class MapViewModel: ObservableObject {
 	let openStoryListSubject = PassthroughSubject<Void, Never>()
 	
 	var storyInsertedSubject = PassthroughSubject<Story?, Never>()
-	
-	@Published private var stories: [Story] = []
+
+    var stories: [Story] {
+        get {
+            storyDataProvider.stories
+        }
+    }
 	
 	private let audioRecorder = AudioRecorder.shared
 	private var subscribers = Set<AnyCancellable>()
@@ -38,7 +42,7 @@ class MapViewModel: ObservableObject {
 				return
 			}
 			
-			updateStories(with: stories)
+			updateStories()
 			
 			logger.info("MapVM:location didSet, start sorting")
 		}
@@ -63,44 +67,22 @@ class MapViewModel: ObservableObject {
 	}
 	
 	private func setupSubscribers() {
-		$stories
-			.sink { [weak self] stories in
-				self?.collectionData = self?.makeCollectionData(from: stories) ?? []
+        storyDataProvider.storyUpdateSubject
+			.sink { [weak self] _ in
+                self?.updateStories()
+                self?.makeCollectionData()
 			}
 			.store(in: &subscribers)
 		
 		audioRecorder.$currentlyPlaying
 			.sink { [weak self] rec in
-				guard let rec = rec else {
-					self?.currentlyPlaying = nil
-					return
-				}
-				
-				let filteredStories = self?.stories.filter { story in
-					story.audioRecordings.contains { recording in
-						recording.id.stringValue == rec.id.stringValue
-					}
-				}
-				
-				self?.currentlyPlaying = filteredStories?.first
-			}
-			.store(in: &subscribers)
-		
-		storyDataProvider.storyUpdateSubject
-			.sink { [weak self] update in
-				switch update {
-				case .initial(stories: let stories):
-					self?.updateStories(with: stories)
-				case .inserted(stories: let stories, insertedStory: let story):
-					self?.updateStories(with: stories)
-					self?.storyInsertedSubject.send(story)
-				}
+                self?.currentlyPlaying = rec?.story.first
 			}
 			.store(in: &subscribers)
 	}
 	
-	private func makeCollectionData(from stories: [Story]) -> [MapCollectionData] {
-		return stories.map { story in
+	private func makeCollectionData() {
+        collectionData = stories.map { story in
 			makeCollectionData(for: story)
 		}
 	}
@@ -135,21 +117,13 @@ class MapViewModel: ObservableObject {
 		)
 	}
 	
-	private func sortStoriesByLocation(stories: [Story]) -> [Story] {
-		guard let location = location else {
-			return stories
-		}
-		
-		let result = stories.sorted(by: { story1, story2 in
-			story1.loc.distance(from: location) < story2.loc.distance(from: location)
-		})
-		
-		logger.info("MapVM sortStories: \(result.map{ $0.id })")
-		return result
-	}
-	
-	private func updateStories(with data: [Story]) {
-		stories = sortStoriesByLocation(stories: data)
+	private func updateStories() {
+        guard let location = location else {
+            storyDataProvider.sortStories(by: .none)
+            return
+        }
+
+        storyDataProvider.sortStories(by: .distance(location: location))
 	}
 	
 	private func addTestStory() {

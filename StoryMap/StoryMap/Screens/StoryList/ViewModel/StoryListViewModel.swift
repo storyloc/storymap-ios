@@ -16,8 +16,13 @@ final class StoryListViewModel {
 	
 	var addStorySubject = PassthroughSubject<Location, Never>()
 	var openStorySubject = PassthroughSubject<Story, Never>()
+    var storiesChangedSubject = PassthroughSubject<Void, Never>()
     
-    @Published var stories: [Story] = []
+    var stories: [Story] {
+        get {
+            storyDataProvider.stories
+        }
+    }
     
     var location: Location? {
         didSet {
@@ -55,14 +60,10 @@ final class StoryListViewModel {
     // MARK: - Private methods
     
     private func setupSubscribers() {
-		storyDataProvider.$stories
-			.sink { [weak self] data in
-				self?.stories = data
+		storyDataProvider.storyUpdateSubject
+			.sink { [weak self] _ in
+                self?.storiesChangedSubject.send()
 			}
 			.store(in: &subscribers)
-    }
-    
-    private func updateStories(with results: Results<Story>) {
-        self.stories = results.toArray(ofType: Story.self)
     }
 }
