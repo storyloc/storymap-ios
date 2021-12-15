@@ -58,7 +58,7 @@ class MapStoryThumbnailCell: UICollectionViewCell {
 		imageView.clipsToBounds = true
 		imageView.layer.cornerRadius = StyleKit.metrics.cornerRadius
 		imageView.isUserInteractionEnabled = true
-		imageView.contentMode = .scaleToFill
+		imageView.contentMode = .scaleAspectFill
 		
 		imageView.snp.makeConstraints { make in
 			make.edges.equalToSuperview()

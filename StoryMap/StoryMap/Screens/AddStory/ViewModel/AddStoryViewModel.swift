@@ -6,14 +6,14 @@
 //
 
 import Foundation
+import Combine
 
-final class AddStoryViewModel: AddStoryViewModelType {
+final class AddStoryViewModel {
     let titlePlaceholder: String = LocalizationKit.addStory.titlePlaceholder
-    
     let confirmTitle: String = LocalizationKit.addStory.confirmButtonTitle
-    
-    var location: Location
-    
+
+	@Published var image: Data?
+	
     var title: String? = ""
     
     var titleError: String {
@@ -34,15 +34,15 @@ final class AddStoryViewModel: AddStoryViewModelType {
         }
     }
     
-    var image: Data?
-    
-    var onShowAlert: ((AlertConfig) -> Void)?
-    var onShowImagePicker: ((PhotoInputType) -> Void)?
-    var onConfirm: ((Story) -> Void)?
-    var onClose: (() -> Void)?
-    
-    private let realmDataProvider = RealmDataProvider.shared
-    
+	let showAlertSubject = PassthroughSubject<AlertConfig, Never>()
+	let addImageSubject = PassthroughSubject<PhotoInputManager.SourceType, Never>()
+    let confirmSubject = PassthroughSubject<Story, Never>()
+	let closeSubject = PassthroughSubject<Void, Never>()
+	
+	var location: Location
+	
+	private let storyDataProvider = StoryDataProvider.shared
+	
     init(location: Location) {
         self.location = location
     }
@@ -57,14 +57,14 @@ final class AddStoryViewModel: AddStoryViewModelType {
                     title: LocalizationKit.addStory.addPhotoCaptureAction,
                     style: .default,
                     handler: { [weak self] in
-                        self?.onShowImagePicker?(.camera)
+						self?.addImageSubject.send(.camera)
                     }
                 ),
                 AlertAction(
                     title: LocalizationKit.addStory.addPhotoChooseAction,
                     style: .default,
                     handler: { [weak self] in
-                        self?.onShowImagePicker?(.photoLibrary)
+						self?.addImageSubject.send(.photoLibrary)
                     }
                 ),
                 AlertAction(
@@ -75,7 +75,7 @@ final class AddStoryViewModel: AddStoryViewModelType {
             ]
         )
         
-        onShowAlert?(alert)
+		showAlertSubject.send(alert)
     }
     
     func showAreYouSureAlert() {
@@ -88,7 +88,7 @@ final class AddStoryViewModel: AddStoryViewModelType {
                     title: LocalizationKit.general.close,
                     style: .destructive,
                     handler: { [weak self] in
-                        self?.onClose?()
+						self?.closeSubject.send()
                     }
                 ),
                 AlertAction(
@@ -99,11 +99,11 @@ final class AddStoryViewModel: AddStoryViewModelType {
             ]
         )
         
-        onShowAlert?(alert)
+		showAlertSubject.send(alert)
     }
     
     func capturePhoto() {
-        onShowImagePicker?(.camera)
+		addImageSubject.send(.camera)
     }
     
 	func confirm() {
@@ -113,11 +113,7 @@ final class AddStoryViewModel: AddStoryViewModelType {
         }
         
         if title.isEmpty {
-            if let n = realmDataProvider?.count(type: Story.self) {
-                title = "Story \(n)"
-            } else {
-                title = "Story"
-            }
+			title = "Story \(storyDataProvider.stories.count)"
         }
 		
 		let story = Story(
@@ -125,11 +121,14 @@ final class AddStoryViewModel: AddStoryViewModelType {
 			image: image,
 			location: Configuration.isSimulator
 				? location.randomize()
-				: location
+				: Location(
+					latitude: location.latitude,
+					longitude: location.longitude
+				)
 		)
 		
-        realmDataProvider?.write(object: story)
-        onConfirm?(story)
+		storyDataProvider.save(story: story)
+		confirmSubject.send(story)
     }
     
     func close() {

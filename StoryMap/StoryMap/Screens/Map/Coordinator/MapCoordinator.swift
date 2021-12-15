@@ -7,62 +7,82 @@
 
 import Foundation
 import UIKit
+import Combine
 
 class MapCoordinator: CoordinatorType {
-    var presenter = UINavigationController()
+	var presenter: UINavigationController
     
-    var addStoryCoordinator: AddStoryCoordinator?
     var storyDetailCoordinator: StoryDetailCoordinator?
     var storyListCoordinator: StoryListCoordinator?
-    
-    var onDidStop: (() -> Void)?
 	
-	private var onDeleteStory: ((Story) -> Void)?
+	private let photoManager = PhotoInputManager()
+	private var subscribers = Set<AnyCancellable>()
+	
+	private var photoManagerSubscriber: AnyCancellable?
+	
+	init(presenter: UINavigationController) {
+		self.presenter = presenter
+	}
     
-    func start(_ presentFrom: UIViewController?) {
+    func start() {
         let viewModel = MapViewModel()
         let viewController = MapViewController(
             viewModel: viewModel,
             locationManager: LocationManager()
         )
         viewController.modalPresentationStyle = .fullScreen
-        viewModel.onAddStory = { [weak self] location in
-            self?.showAddStory(with: location)
-        }
-        viewModel.onOpenStory = { [weak self] story in
-            self?.showStoryDetail(with: story)
-        }
-        viewModel.onOpenStoryList = { [weak self] in
-            self?.showStoryList()
-        }
-		onDeleteStory = viewModel.storyDeleted
+        viewModel.addStorySubject
+			.sink { [weak self] location in
+				self?.showAddStory(with: location)
+			}
+			.store(in: &subscribers)
+        viewModel.openStorySubject
+			.sink { [weak self] story in
+				self?.showStoryDetail(with: story)
+			}
+			.store(in: &subscribers)
+        viewModel.openStoryListSubject
+			.sink { [weak self] in
+				self?.showStoryList()
+			}
+			.store(in: &subscribers)
+		
         presenter.pushViewController(viewController, animated: true)
     }
     
-    func stop() {
-        presenter.popViewController(animated: true)
-    }
-    
     private func showAddStory(with location: Location) {
-        addStoryCoordinator = AddStoryCoordinator(location: location, simple: true)
-        addStoryCoordinator?.onShowStory = { [weak self] story in
-            self?.showStoryDetail(with: story)
-        }
-        addStoryCoordinator?.start(presenter.topViewController)
+		photoManagerSubscriber = photoManager.resultSubject
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] result in
+				StoryDataProvider.shared.createStory(
+					from: result.image,
+					and: location
+				)
+				self?.presenter.dismiss(animated: true)
+				
+				self?.photoManagerSubscriber?.cancel()
+				self?.photoManagerSubscriber = nil
+			}
+		
+		let viewController = photoManager.makeViewController(with: .camera)
+		presenter.present(viewController, animated: true)
     }
     
     private func showStoryDetail(with story: Story) {
-        storyDetailCoordinator = StoryDetailCoordinator(story: story)
-		storyDetailCoordinator?.onDeleteStory = { [weak self] story in
-			self?.onDeleteStory?(story)
+		if storyDetailCoordinator != nil {
+			storyDetailCoordinator = nil
 		}
-        storyDetailCoordinator?.presenter = presenter
-        storyDetailCoordinator?.start(nil)
+		
+		storyDetailCoordinator = StoryDetailCoordinator(presenter: presenter, story: story)
+        storyDetailCoordinator?.start()
     }
 
     private func showStoryList() {
-        storyListCoordinator = StoryListCoordinator()
-        storyListCoordinator?.presenter = presenter
-        storyListCoordinator?.start(nil)
+		if storyListCoordinator != nil {
+			storyListCoordinator = nil
+		}
+		
+        storyListCoordinator = StoryListCoordinator(presenter: presenter)
+        storyListCoordinator?.start()
     }
 }

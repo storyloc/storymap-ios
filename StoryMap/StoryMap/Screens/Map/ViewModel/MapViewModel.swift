@@ -12,18 +12,17 @@ import UIKit
 
 class MapViewModel: ObservableObject {
 	@Published var collectionData: [MapCollectionData] = []
-    
-    var onAddStory: ((Location) -> Void)?
-    var onOpenStory: ((Story) -> Void)?
-    var onOpenStoryList: (() -> Void)?
+	
+	let addStorySubject = PassthroughSubject<Location, Never>()
+	let openStorySubject = PassthroughSubject<Story, Never>()
+	let openStoryListSubject = PassthroughSubject<Void, Never>()
+	
+	var storyInsertedSubject = PassthroughSubject<Story?, Never>()
 	
 	@Published private var stories: [Story] = []
 	
 	private let audioRecorder = AudioRecorder()
-	
-	private var storiesObserver: AnyCancellable?
-	private var currentlyPlayingObserver: AnyCancellable?
-	private var recorderStateObserver: AnyCancellable?
+	private var subscribers = Set<AnyCancellable>()
 	
 	private var currentlyPlaying: Story? {
 		didSet {
@@ -33,59 +32,47 @@ class MapViewModel: ObservableObject {
 		}
 	}
 	
-	lazy var storyDeleted: (Story) -> Void = { [weak self] story in
-		guard let index = self?.stories.firstIndex(where: { $0 == story }) else {
-			return
+	var location: Location? {
+		didSet {
+			guard oldValue == nil else {
+				return
+			}
+			
+			updateStories(with: stories)
+			
+			logger.info("MapVM:location didSet, start sorting")
 		}
-		
-		self?.stories.remove(at: index)
 	}
 	
-    var location: Location? {
-        didSet {
-            guard oldValue == nil else {
-                return
-            }
-            
-            stories = sortStoriesByLocation(stories: stories)
-            
-            logger.info("MapVM:location didSet, start sorting")
-        }
-    }
-    
-    private var results: Results<Story>?
-    private var notificationToken: NotificationToken? = nil
-    
-    private let realmDataProvider = RealmDataProvider.shared
-    
-    init() {
-		setupObservers()
-    }
-    
-    func openStory(with index: Int) {
-		audioRecorder.stopPlaying()
-        onOpenStory?(stories[index])
-    }
-    
-    func addStory(with location: Location) {
-		Configuration.isSimulator ? addTestStory() : onAddStory?(location)
-		audioRecorder.stopPlaying()
-    }
-
-    func openStoryList() {
-		audioRecorder.stopPlaying()
-        onOpenStoryList?()
-    }
+	private let storyDataProvider = StoryDataProvider.shared
 	
-	private func setupObservers() {
-		setupRealmObserver()
-		
-		storiesObserver = $stories
+	init() {
+		setupSubscribers()
+	}
+	
+	func openStory(with index: Int) {
+		audioRecorder.stopPlaying()
+		openStorySubject.send(stories[index])
+	}
+	
+	func addStory(with location: Location) {
+		Configuration.isSimulator ? addTestStory() : addStorySubject.send(location)
+		audioRecorder.stopPlaying()
+	}
+	
+	func openStoryList() {
+		audioRecorder.stopPlaying()
+		openStoryListSubject.send()
+	}
+	
+	private func setupSubscribers() {
+		$stories
 			.sink { [weak self] stories in
 				self?.collectionData = self?.makeCollectionData(from: stories) ?? []
 			}
+			.store(in: &subscribers)
 		
-		currentlyPlayingObserver = audioRecorder.$currentlyPlaying
+		audioRecorder.$currentlyPlaying
 			.sink { [weak self] rec in
 				guard let rec = rec else {
 					self?.currentlyPlaying = nil
@@ -100,30 +87,20 @@ class MapViewModel: ObservableObject {
 				
 				self?.currentlyPlaying = filteredStories?.first
 			}
-	}
-	
-	private func setupRealmObserver() {
-		results = realmDataProvider?.read(type: Story.self, with: nil)
+			.store(in: &subscribers)
 		
-		notificationToken = results?.observe(on: .main, { [weak self] changes in
-			switch changes {
-			case .update(let items, _, _, _):
-				self?.updateStories(with: items)
-				logger.info("MapVM: realm results observer updated")
-			case .initial(let items):
-				self?.updateStories(with: items)
-				logger.info("MapVM: realm results observer initial")
-			default: break
+		storyDataProvider.storyUpdateSubject
+			.sink { [weak self] update in
+				switch update {
+				case .initial(stories: let stories):
+					self?.updateStories(with: stories)
+				case .inserted(stories: let stories, insertedStory: let story):
+					self?.updateStories(with: stories)
+					self?.storyInsertedSubject.send(story)
+				}
 			}
-		})
+			.store(in: &subscribers)
 	}
-	
-    private func updateStories(with results: Results<Story>) {
-        let data = results.toArray(ofType: Story.self)
-        self.stories = self.sortStoriesByLocation(stories: data)
-        
-        logger.info("MapVM: collectionData updated")
-    }
 	
 	private func makeCollectionData(from stories: [Story]) -> [MapCollectionData] {
 		return stories.map { story in
@@ -138,8 +115,8 @@ class MapViewModel: ObservableObject {
 				guard let self = self else { return }
 				
 				self.audioRecorder.currentlyPlaying == nil
-					? self.audioRecorder.play(recordings: Array(story.audioRecordings))
-					: self.audioRecorder.stopPlaying()
+				? self.audioRecorder.play(recordings: Array(story.audioRecordings))
+				: self.audioRecorder.stopPlaying()
 				
 				if let index = self.collectionData.firstIndex(where: { $0.location.cid == story.id.stringValue }) {
 					self.collectionData[index].cell.isPlaying = self.currentlyPlaying == story
@@ -155,34 +132,40 @@ class MapViewModel: ObservableObject {
 			),
 			location: IndexLocation(
 				cid: story.id.stringValue,
+                title: story.title,
 				location: story.loc
 			)
 		)
 	}
-    
-    private func sortStoriesByLocation(stories: [Story]) -> [Story] {
-        guard let location = location else {
-            return stories
-        }
-
-        let result = stories.sorted(by: { story1, story2 in
-            story1.loc.distance(from: location) < story2.loc.distance(from: location)
-        })
-        
-        logger.info("MapVM sortStories: \(result.map{ $0.id })")
-        return result
-    }
-    
-    private func addTestStory() {
-        guard let imageData = StyleKit.image.make(from: StyleKit.image.examples.random())?.jpegData(compressionQuality: 1) else {
-            return
-        }
-        let n = collectionData.count
-        let story = Story(
-            title: "Story \(n)",
-            image: imageData,
-            location: location!.randomize()
-        )
-        realmDataProvider?.write(object: story)
-    }
+	
+	private func sortStoriesByLocation(stories: [Story]) -> [Story] {
+		guard let location = location else {
+			return stories
+		}
+		
+		let result = stories.sorted(by: { story1, story2 in
+			story1.loc.distance(from: location) < story2.loc.distance(from: location)
+		})
+		
+		logger.info("MapVM sortStories: \(result.map{ $0.id })")
+		return result
+	}
+	
+	private func updateStories(with data: [Story]) {
+		stories = sortStoriesByLocation(stories: data)
+	}
+	
+	private func addTestStory() {
+		guard let imageData = StyleKit.image.make(from: StyleKit.image.examples.random())?.jpegData(compressionQuality: 0.0) else {
+			return
+		}
+		let n = collectionData.count
+		let story = Story(
+			title: "Story \(n)",
+			image: imageData,
+			location: location!.randomize()
+		)
+		
+		storyDataProvider.save(story: story)
+	}
 }

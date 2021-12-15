@@ -29,33 +29,31 @@ final class StoryDetailViewModel {
     var story: Story
     
     @Published var state: RecordingState = .initial
-    @Published var recordButtonEnabled = false
 	
 	let recordingsSubject = PassthroughSubject<RecordingsUpdate, Never>()
-	
-	var onDeleteStory: ((Story) -> Void)?
-    var onClose: (() -> Void)?
+	let closeSubject = PassthroughSubject<Void, Never>()
     
     // MARK: - Private properties
     
-    private let realmDataProvider = RealmDataProvider.shared
+    private let storyDataProvider = StoryDataProvider.shared
     
     @ObservedObject private var audioRecorder = AudioRecorder()
 	
 	private var recordings: [AudioRecordingInfo]
     
-    // MARK: - Observers
-    
-    private var recorderStateObserver: AnyCancellable?
-    private var recordingAllowedObserver: AnyCancellable?
-    private var currentlyPlayingObserver: AnyCancellable?
+	private var subscribers = Set<AnyCancellable>()
     
     init(story: Story) {
         self.story = story
         self.recordings = story.audioRecordings.map { AudioRecordingInfo(recording: $0, isPlaying: false) }
         
-        setupObservers()
+        setupSubscribers()
     }
+	
+	deinit {
+		subscribers.forEach { $0.cancel() }
+		subscribers.removeAll()
+	}
     
     // MARK: - Public methods
     
@@ -64,10 +62,10 @@ final class StoryDetailViewModel {
 	}
 	
     func delete() {
-        logger.info("DetailVM: deleteStory: \(self.story)")
+		logger.info("DetailVM: deleteStory: \(self.story)")
         
-		self.realmDataProvider?.deleteCascading(object: story, associatedObjects: [Array(story.audioRecordings)])
-		onDeleteStory?(story)
+		storyDataProvider.delete(story: story)
+		closeSubject.send()
     }
 	
 	func deleteRecording(at index: Int) {
@@ -76,9 +74,7 @@ final class StoryDetailViewModel {
 		recordings.remove(at: index)
 		recordingsSubject.send(.delete(index))
 		
-		realmDataProvider?.update(with: { [weak self] in
-			self?.story.audioRecordings.remove(at: index)
-		})
+		storyDataProvider.delete(recording: story.audioRecordings[index], from: story)
 	}
     
     func startRecording() {
@@ -113,47 +109,54 @@ final class StoryDetailViewModel {
     
     // MARK: - Private methods
     
-    private func setupObservers() {
-        recordingAllowedObserver = audioRecorder.$recordingAllowed.assign(to: \.recordButtonEnabled, on: self)
+    private func setupSubscribers() {
+        audioRecorder.$state
+			.sink { [weak self] recState in
+				logger.info("DetailVM: recorderStateObserver: \(String(describing: recState))")
+				self?.updateState(with: recState)
+			}
+			.store(in: &subscribers)
         
-        recorderStateObserver = audioRecorder.$state.sink { [weak self] recState in
-            logger.info("DetailVM: recorderStateObserver: \(String(describing: recState))")
-            switch recState {
-                
-            case .initial:
-                self?.state = .initial
-            case .recording:
-                self?.state = .inProgress
-            case .recorded(let recording):
-                self?.saveRecording(recording)
-                self?.state = .done
-            case .playing:
-                break
-            case .error(let error):
-				if case .permissionDenied = error {
-					self?.state = .permissionDenied
-				}
-            }
-        }
-        
-        currentlyPlayingObserver = audioRecorder.$currentlyPlaying.sink { [weak self] recording in
-            guard let self = self else { return }
+        audioRecorder.$currentlyPlaying
+			.sink { [weak self] recording in
+				logger.info("DetailVM: currentlyPlayingObserver: \(recording?.createdAt ?? "nil")")
             
-            logger.info("DetailVM: currentlyPlayingObserver: \(recording?.createdAt ?? "nil")")
-            
-            self.recordings = self.recordings.map { rec in
-                AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording == recording)
-            }
-			self.recordingsSubject.send(.update(self.recordings))
-        }
+				self?.updateRecordings(with: recording)
+			}
+			.store(in: &subscribers)
     }
+	
+	private func updateState(with recState: AudioRecorder.State) {
+		switch recState {
+			
+		case .initial:
+			state = .initial
+		case .recording:
+			state = .inProgress
+		case .recorded(let recording):
+			saveRecording(recording)
+			state = .done
+		case .playing:
+			break
+		case .error(let error):
+			if case .permissionDenied = error {
+				state = .permissionDenied
+			}
+		}
+	}
+	
+	private func updateRecordings(with currentlyPlaying: AudioRecording?) {
+		recordings = recordings.map { rec in
+			AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording == currentlyPlaying)
+		}
+		
+		recordingsSubject.send(.update(recordings))
+	}
     
     private func saveRecording(_ recording: AudioRecording) {
         recordings.append(AudioRecordingInfo(recording: recording, isPlaying: false))
 		recordingsSubject.send(.update(recordings))
         
-        realmDataProvider?.update(with: { [weak self] in
-            self?.story.audioRecordings.append(recording)
-        })
+		storyDataProvider.add(recording: recording, to: story)
     }
 }

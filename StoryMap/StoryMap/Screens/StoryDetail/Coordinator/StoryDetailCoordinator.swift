@@ -5,36 +5,37 @@
 //  Created by Dory on 02/11/2021.
 //
 
-import Foundation
 import UIKit
+import Combine
 
 class StoryDetailCoordinator: CoordinatorType {
-    var presenter = UINavigationController()
-    var onDidStop: (() -> Void)?
-	var onDeleteStory: ((Story) -> Void)?
+	var presenter: UINavigationController
+	var story: Story
+	
+	private var subscribers = Set<AnyCancellable>()
     
-    var story: Story
-    
-    init(story: Story) {
+    init(presenter: UINavigationController, story: Story) {
+		self.presenter = presenter
         self.story = story
     }
     
-    func start(_ presentFrom: UIViewController?) {
+    func start() {
         let viewModel = StoryDetailViewModel(story: story)
 		
-		viewModel.onDeleteStory = { [weak self] story in
-			self?.onDeleteStory?(story)
-			self?.stop()
-		}
-        viewModel.onClose = { [weak self] in
-            self?.stop()
-        }
+		viewModel.closeSubject
+			.sink { [weak self] in
+				self?.stop()
+			}
+			.store(in: &subscribers)
         
         let viewController = StoryDetailViewController(viewModel: viewModel)
         presenter.pushViewController(viewController, animated: true)
     }
     
     func stop() {
+		subscribers.forEach { $0.cancel() }
+		subscribers.removeAll()
+		
         presenter.popViewController(animated: true)
     }
 }

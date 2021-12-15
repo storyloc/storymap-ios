@@ -10,8 +10,25 @@ import UIKit
 
 /// Protocol used for coordinator pattern implementation
 protocol CoordinatorType {
-    var presenter: UINavigationController { get set }
-    var onDidStop: (() -> Void)? { get set }
-    func start(_ presentFrom: UIViewController?)
-    func stop()
+	var presenter: UINavigationController { get set }
+	
+	func start()
+	func showAlert(with config: AlertConfig)
+}
+
+extension CoordinatorType {
+	var presentedViewController: UIViewController {
+		presenter.viewControllers.last?.presentedViewController ?? presenter
+	}
+	
+	func showAlert(with config: AlertConfig) {
+		let alertController = config.controller
+		
+		if let presentedController = presenter.viewControllers.last?.presentedViewController {
+			presentedController.present(alertController, animated: true)
+			return
+		}
+		
+		presenter.present(alertController, animated: true)
+	}
 }

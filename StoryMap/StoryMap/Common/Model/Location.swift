@@ -11,12 +11,14 @@ import CoreLocation
 import RealmSwift
 
 class Location: EmbeddedObject {
+	@Persisted var id: ObjectId
     @Persisted var latitude: Double
     @Persisted var longitude: Double
     
     var clLocation: CLLocation {
         CLLocation(latitude: latitude, longitude: longitude)
     }
+	
     var clLocation2D: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
@@ -33,12 +35,21 @@ class Location: EmbeddedObject {
         self.longitude = location.coordinate.longitude
     }
     
-    func region(span: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)) -> MKCoordinateRegion {
+    func region(span: MKCoordinateSpan = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)) -> MKCoordinateRegion {
         return MKCoordinateRegion(center: clLocation2D, span: span)
     }
     
     func distance(from location: Location) -> Double {
         return clLocation.distance(from: location.clLocation)
+    }
+
+    func distance(from location: CLLocationCoordinate2D) -> Double {
+        return clLocation.distance(
+            from: CLLocation(
+                latitude: location.latitude,
+                longitude: location.longitude
+            )
+        )
     }
     
     func randomize() -> Location {

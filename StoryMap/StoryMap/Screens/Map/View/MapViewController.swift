@@ -36,11 +36,13 @@ class MapViewController: UIViewController {
     private var collectionViewHeightConstraint: Constraint?
     private var collectionViewLayoutPadding: CGFloat = 0
     private var autoScrolling = false
-	private var collectionData: [MapCollectionData] = []
 	
 	private var selectedStoryIndex: Int = 0
     
 	private var subscribers = Set<AnyCancellable>()
+	private var storyInsertedSubscriber: AnyCancellable?
+	
+	private var storyToSelect: Story?
     
     // MARK: - Initializers
     
@@ -49,6 +51,11 @@ class MapViewController: UIViewController {
         self.locationManager = locationManager
         super.init(nibName: nil, bundle: nil)
     }
+	
+	deinit {
+		subscribers.forEach { $0.cancel() }
+		subscribers.removeAll()
+	}
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -59,7 +66,12 @@ class MapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-		setupObservers()
+		
+		storyInsertedSubscriber = viewModel.storyInsertedSubject
+			.receive(on: DispatchQueue.main)
+			.assign(to: \.storyToSelect, on: self)
+		
+		setupSubscribers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -72,7 +84,6 @@ class MapViewController: UIViewController {
         super.viewDidAppear(animated)
         
         locationManager.centerMap()
-		locationManager.selectMarker(at: 0)
     }
     
     // MARK: - Private methods
@@ -88,13 +99,11 @@ class MapViewController: UIViewController {
         setupCenterButton()
         setupMap()
 
-        setupObservers()
-
         updateAddButton(false)
         updateCenterButton(false)
     }
     
-    private func setupObservers() {
+    private func setupSubscribers() {
 		viewModel.$collectionData
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] data in
@@ -155,7 +164,7 @@ class MapViewController: UIViewController {
             make.leading.trailing.equalToSuperview()
         }
 		
-		collectionViewHeightConstraint?.isActive = !collectionData.isEmpty
+		collectionViewHeightConstraint?.isActive = !viewModel.collectionData.isEmpty
     }
 
     private func setupAddButton() {
@@ -242,7 +251,7 @@ class MapViewController: UIViewController {
 	// MARK: - UI updates
 	
 	private func selectStory(at index: Int) {
-		guard !collectionData.isEmpty else {
+		guard !viewModel.collectionData.isEmpty else {
 			return
 		}
 		
@@ -262,9 +271,14 @@ class MapViewController: UIViewController {
 	
 	private func updateCollectionView(with data: [MapCollectionData]) {
 		collectionViewHeightConstraint?.isActive = !data.isEmpty
-		collectionData = data
 		collectionView.reloadData()
 		addStoriesToMap()
+		
+		if let story = storyToSelect,
+		   let index = viewModel.collectionData.firstIndex(where: { $0.location.cid == story.id.stringValue }) {
+			locationManager.selectMarker(at: index)
+			storyToSelect = nil
+		}
 	}
     
     private func updateAddButton(_ enabled: Bool) {
@@ -277,8 +291,8 @@ class MapViewController: UIViewController {
     }
 
     func addStoriesToMap() {
-		guard !collectionData.isEmpty else { return }
-        let locations = collectionData.map { $0.location }
+		guard !viewModel.collectionData.isEmpty else { return }
+        let locations = viewModel.collectionData.map { $0.location }
 		locationManager.addMarkers(to: locations)
         
         logger.info("MapVC: addStoriesToMap")
@@ -309,11 +323,11 @@ class MapViewController: UIViewController {
 
 extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        collectionData.count
+		viewModel.collectionData.count
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		logger.info("MapVC: collectionView didSelectItem \(indexPath.row): \(self.collectionData[indexPath.row].location.cid)")
+		logger.info("MapVC: collectionView didSelectItem \(indexPath.row): \(self.viewModel.collectionData[indexPath.row].location.cid)")
         
         if locationManager.selectedPinIndex == indexPath.row {
             viewModel.openStory(with: indexPath.row)
@@ -325,7 +339,7 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ThumbnailCell", for: indexPath) as? MapStoryThumbnailCell ?? MapStoryThumbnailCell()
      
-		cell.update(with: collectionData[indexPath.row].cell)
+		cell.update(with: viewModel.collectionData[indexPath.row].cell)
         cell.select(indexPath.row == locationManager.selectedPinIndex)
         return cell
     }
@@ -347,8 +361,8 @@ extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSourc
 		
 		if id < 0 {
 			id = 0
-		} else if id >= collectionData.count {
-			id = collectionData.count - 1
+		} else if id >= viewModel.collectionData.count {
+			id = viewModel.collectionData.count - 1
 		}
 		
         logger.info("Did Scroll: \(pos) \(id)")

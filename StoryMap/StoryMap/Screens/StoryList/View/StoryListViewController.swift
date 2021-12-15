@@ -38,13 +38,20 @@ class StoryListViewController: UIViewController {
     
     override func viewDidLoad() {
         setupUI()
-        setupObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+		setupSubscribers()
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
+	
+	override func viewDidDisappear(_ animated: Bool) {
+		super.viewDidDisappear(animated)
+		
+		subscribers.forEach { $0.cancel() }
+		subscribers.removeAll()
+	}
     
     // MARK: - Private methods
     
@@ -58,7 +65,7 @@ class StoryListViewController: UIViewController {
         setupTableView()
     }
     
-    private func setupObservers() {
+    private func setupSubscribers() {
         viewModel.$stories
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
