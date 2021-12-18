@@ -291,7 +291,6 @@ class MapViewController: UIViewController {
     }
 
     func addStoriesToMap() {
-		guard !viewModel.collectionData.isEmpty else { return }
         let locations = viewModel.collectionData.map { $0.location }
 		locationManager.addMarkers(to: locations)
         
