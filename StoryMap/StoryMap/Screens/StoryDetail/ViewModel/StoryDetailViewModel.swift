@@ -27,6 +27,7 @@ final class StoryDetailViewModel {
     // MARK: - Public properties
     
     var story: Story
+	private lazy var storyPoint = story.collection.first
     
     @Published var state: RecordingState = .initial
 	
@@ -45,7 +46,13 @@ final class StoryDetailViewModel {
     
     init(story: Story) {
         self.story = story
-        self.recordings = story.audioRecordings.map { AudioRecordingInfo(recording: $0, isPlaying: false) }
+		self.recordings = []
+		
+		if let records = storyPoint?.audioRecordings {
+			self.recordings = Array(records).compactMap { rec in
+				AudioRecordingInfo(recording: rec, isPlaying: false)
+			}
+		}
         
         setupSubscribers()
     }
@@ -71,10 +78,15 @@ final class StoryDetailViewModel {
 	func deleteRecording(at index: Int) {
 		logger.info("DetailVM: deleteRecording at \(index)")
 		
+		guard let storyPoint = storyPoint else { return }
+		
 		recordings.remove(at: index)
 		recordingsSubject.send(.delete(index))
 		
-		storyDataProvider.delete(recording: story.audioRecordings[index], from: story)
+		storyDataProvider.delete(
+			recording: storyPoint.audioRecordings[index],
+			from: storyPoint
+		)
 	}
     
     func startRecording() {
@@ -154,9 +166,11 @@ final class StoryDetailViewModel {
 	}
     
     private func saveRecording(_ recording: AudioRecording) {
+		guard let storyPoint = storyPoint else { return }
+		
         recordings.append(AudioRecordingInfo(recording: recording, isPlaying: false))
 		recordingsSubject.send(.update(recordings))
         
-		storyDataProvider.add(recording: recording, to: story)
+		storyDataProvider.add(recording: recording, to: storyPoint)
     }
 }

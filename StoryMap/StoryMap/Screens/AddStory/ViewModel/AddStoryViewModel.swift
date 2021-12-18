@@ -116,15 +116,19 @@ final class AddStoryViewModel {
 			title = "Story \(storyDataProvider.stories.count)"
         }
 		
-		let story = Story(
-			title: title,
+		let item = StoryPoint(
 			image: image,
 			location: Configuration.isSimulator
 				? location.randomize()
 				: Location(
 					latitude: location.latitude,
 					longitude: location.longitude
-				)
+			)
+		)
+		
+		let story = Story(
+			title: title,
+			collection: [item]
 		)
 		
 		storyDataProvider.save(story: story)

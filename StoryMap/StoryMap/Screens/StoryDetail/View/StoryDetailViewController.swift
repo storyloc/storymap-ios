@@ -175,7 +175,7 @@ class StoryDetailViewController: UIViewController {
 	
 	private func setupImageView() {
 		imageView.contentMode = .scaleAspectFit
-		imageView.image = UIImage(data: viewModel.story.image)
+		imageView.image = viewModel.story.mainImage
 		
 		view.addSubview(imageView)
 		

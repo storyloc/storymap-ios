@@ -36,7 +36,7 @@ class LocationManager: NSObject, ObservableObject, LocationManagerType {
     private var pinLocations: [IndexLocation] = []
 	private var annotations: [MapAnnotation] = []
     
-    private var mapCenterLocation = Location(latitude: 21.282778, longitude: -157.829444) //Honululu
+	private var mapCenterLocation = Location.defaultLocation
     private var mapRegionChanging = false
     private var centeringMap = false
     

@@ -140,12 +140,12 @@ extension StoryListViewController: UITableViewDataSource {
         
         var content = cell.defaultContentConfiguration()
         
-        content.image = cellData.uiImage
+        content.image = cellData.mainImage
         content.imageProperties.maximumSize = CGSize(width: 50, height: 50)
         
         content.text = cellData.title
         let time = humanReadableTime(from: cellData.timestamp)
-        content.secondaryText = "\(time) - \(cellData.audioRecordings.count) Records"
+		content.secondaryText = "\(time) - \(cellData.collection.count) Story points"
         
         cell.contentConfiguration = content
         return cell

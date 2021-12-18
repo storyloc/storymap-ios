@@ -35,6 +35,7 @@
 		8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E4B2721A1B5003D0CE9 /* LocalizationKit.swift */; };
 		8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E502721A6B8003D0CE9 /* String+Localized.swift */; };
 		8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */; };
+		8A6CFD7B276E28EA0072452E /* StoryPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6CFD7A276E28EA0072452E /* StoryPoint.swift */; };
 		8A6DB02A27467CF500970FE9 /* MapStoryThumbnailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02927467CF500970FE9 /* MapStoryThumbnailCell.swift */; };
 		8A6DB02C27467D8300970FE9 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02B27467D8300970FE9 /* AudioRecorder.swift */; };
 		8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02D2746941F00970FE9 /* AudioRecording.swift */; };
@@ -106,6 +107,7 @@
 		8A639E532721CAE7003D0CE9 /* CoordinatorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoordinatorType.swift; path = ../Coordinators/CoordinatorType.swift; sourceTree = "<group>"; };
 		8A639E552721CB14003D0CE9 /* MapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
 		8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryCoordinator.swift; sourceTree = "<group>"; };
+		8A6CFD7A276E28EA0072452E /* StoryPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryPoint.swift; sourceTree = "<group>"; };
 		8A6DB02727456B4D00970FE9 /* MapStoryThumbnailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapStoryThumbnailCell.swift; sourceTree = "<group>"; };
 		8A6DB02927467CF500970FE9 /* MapStoryThumbnailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapStoryThumbnailCell.swift; sourceTree = "<group>"; };
 		8A6DB02B27467D8300970FE9 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 				8A4615D7273C4ECB00D25529 /* Location.swift */,
 				8A6DB02D2746941F00970FE9 /* AudioRecording.swift */,
 				8A019DEB27524D1D00E52DC7 /* MapMarker.swift */,
+				8A6CFD7A276E28EA0072452E /* StoryPoint.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -750,6 +753,7 @@
 				8AFAE49D2731E44400BFC249 /* MapViewModel.swift in Sources */,
 				8A4A8703271D8B0200F17B4E /* MapViewController.swift in Sources */,
 				8A019DEC27524D1D00E52DC7 /* MapMarker.swift in Sources */,
+				8A6CFD7B276E28EA0072452E /* StoryPoint.swift in Sources */,
 				8A639E4C2721A1B5003D0CE9 /* LocalizationKit.swift in Sources */,
 				8A4A86E8271D882600F17B4E /* SceneDelegate.swift in Sources */,
 				8A6DB02A27467CF500970FE9 /* MapStoryThumbnailCell.swift in Sources */,

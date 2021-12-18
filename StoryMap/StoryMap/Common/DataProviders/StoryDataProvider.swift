@@ -46,39 +46,48 @@ final class StoryDataProvider {
 			logger.warning("StoryDP: createStory failed, couldn't convert image to data")
 			return
 		}
-		let story = Story(
-			title: "Story \(stories.count)",
+		
+		let item = StoryPoint(
 			image: data,
 			location: Configuration.isSimulator
 				? location.randomize()
 				: Location(
 					latitude: location.latitude,
 					longitude: location.longitude
-				)
+			)
+		)
+		
+		let story = Story(
+			title: "Story \(stories.count)",
+			collection: [item]
 		)
 		realm?.write(object: story)
 	}
 	
 	func delete(story: Story) {
-		realm?.deleteCascading(
-			object: story,
-			associatedObjects: [Array(story.audioRecordings)]
-		)
+		story.collection.forEach { point in
+			realm?.deleteCascading(
+				object: point,
+				associatedObjects: [Array(point.audioRecordings)]
+			)
+		}
+		
+		realm?.deleteCascading(object: story, associatedObjects: [Array(story.collection)])
 	}
 	
-	func add(recording: AudioRecording, to story: Story) {
+	func add(recording: AudioRecording, to storyPoint: StoryPoint) {
 		realm?.update(with: {
-			story.audioRecordings.append(recording)
+			storyPoint.audioRecordings.append(recording)
 		})
 	}
 	
-	func delete(recording: AudioRecording, from story: Story) {
-		guard let index = story.audioRecordings.firstIndex(of: recording) else {
+	func delete(recording: AudioRecording, from storyPoint: StoryPoint) {
+		guard let index = storyPoint.audioRecordings.firstIndex(of: recording) else {
 			return
 		}
 		
 		realm?.update(with: {
-			story.audioRecordings.remove(at: index)
+			storyPoint.audioRecordings.remove(at: index)
 		})
 	}
 	

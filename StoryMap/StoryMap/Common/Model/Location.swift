@@ -59,3 +59,7 @@ class Location: EmbeddedObject {
         )
     }
 }
+
+extension Location {
+	static let defaultLocation = Location(latitude: 21.282778, longitude: -157.829444)
+}
