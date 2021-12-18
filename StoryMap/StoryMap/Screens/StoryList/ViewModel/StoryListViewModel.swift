@@ -17,7 +17,7 @@ final class StoryListViewModel {
 	var addStorySubject = PassthroughSubject<Location, Never>()
 	var openStorySubject = PassthroughSubject<Story, Never>()
     
-    @Published var stories: [Story] = []
+	@Published var tableContent: [StoryListCell.Content] = []
     
     var location: Location? {
         didSet {
@@ -35,6 +35,7 @@ final class StoryListViewModel {
 
     init() {
         setupSubscribers()
+		tableContent = makeContent(from: storyDataProvider.stories)
     }
 	
 	deinit {
@@ -44,7 +45,7 @@ final class StoryListViewModel {
 
     func openStory(with index: Int) {
         logger.info("StoryListVM: open Story \(index)")
-		openStorySubject.send(stories[index])
+		openStorySubject.send(storyDataProvider.stories[index])
     }
 
     func addStory(with location: Location) {
@@ -55,14 +56,31 @@ final class StoryListViewModel {
     // MARK: - Private methods
     
     private func setupSubscribers() {
-		storyDataProvider.$stories
-			.sink { [weak self] data in
-				self?.stories = data
+		storyDataProvider.storyUpdateSubject
+			.sink { [weak self] _ in
+				guard let self = self else { return }
+				self.tableContent = self.makeContent(from: self.storyDataProvider.stories)
 			}
 			.store(in: &subscribers)
     }
-    
-    private func updateStories(with results: Results<Story>) {
-        self.stories = results.toArray(ofType: Story.self)
-    }
+	
+	private func makeContent(from stories: [Story]) -> [StoryListCell.Content] {
+		stories.map { story in
+			StoryListCell.Content(
+				title: story.title,
+				image: story.mainImage,
+				tagContent: makeTagContent(for: story)
+			)
+		}
+	}
+	
+	private func makeTagContent(for story: Story) -> [TagButton.Content] {
+		story.allTags.map { tag in
+			TagButton.Content(
+				title: tag.localizedTitle,
+				isSelected: true,
+				action: nil
+			)
+		}
+	}
 }

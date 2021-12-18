@@ -31,3 +31,13 @@
 // MARK: - Story detail
 
 "storyDetail_playAll_buttonTitle" = "Play all";
+
+// MARK: - Tags
+
+"tag_shopping" = "Shopping";
+"tag_sightseeing" = "Sightseeing";
+"tag_hikes" = "Hikes";
+"tag_nature" = "Nature";
+"tag_food" = "Food";
+"tag_museum" = "Museum";
+"tag_coffee" = "Coffee";

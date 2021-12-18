@@ -12,6 +12,7 @@ import UIKit
 
 class MapViewModel: ObservableObject {
 	@Published var collectionData: [MapCollectionData] = []
+	@Published var filterContent: [TagButton.Content] = []
 	
 	let addStorySubject = PassthroughSubject<Location, Never>()
 	let openStorySubject = PassthroughSubject<Story, Never>()
@@ -20,9 +21,12 @@ class MapViewModel: ObservableObject {
 	var storyInsertedSubject = PassthroughSubject<Story?, Never>()
 	
 	@Published private var stories: [Story] = []
+	@Published private var activeFilters: [Tag] = []
 	
 	private let audioRecorder = AudioRecorder()
 	private var subscribers = Set<AnyCancellable>()
+	
+	private var allTags: [Tag] = []
 	
 	private var currentlyPlaying: Story? {
 		didSet {
@@ -69,6 +73,12 @@ class MapViewModel: ObservableObject {
 		$stories
 			.sink { [weak self] stories in
 				self?.collectionData = self?.makeCollectionData(from: stories) ?? []
+			}
+			.store(in: &subscribers)
+		
+		$activeFilters
+			.sink { [weak self] filters in
+				self?.filterStories(with: filters)
 			}
 			.store(in: &subscribers)
 		
@@ -122,7 +132,7 @@ class MapViewModel: ObservableObject {
 			),
 			location: IndexLocation(
 				cid: story.id.stringValue,
-                title: story.title,
+				title: story.title,
 				location: story.mainLocation
 			)
 		)
@@ -142,7 +152,9 @@ class MapViewModel: ObservableObject {
 	}
 	
 	private func updateStories(with data: [Story]) {
-		stories = sortStoriesByLocation(stories: data)
+		filterStories(with: activeFilters)
+		saveTags()
+		makeFilterContent()
 	}
 	
 	private func addTestStory() {
@@ -155,11 +167,69 @@ class MapViewModel: ObservableObject {
 			location: location!.randomize()
 		)
 		
+		item.tags.append(objectsIn: [Tag.food.rawValue, Tag.museum.rawValue, Tag.hikes.rawValue, Tag.nature.rawValue])
+		
 		let story = Story(
 			title: "Story \(storyDataProvider.stories.count)",
 			collection: [item]
 		)
 		
 		storyDataProvider.save(story: story)
+	}
+	
+	// MARK: - Filtering
+	
+	private func saveTags() {
+		var tags: [Tag] = []
+		
+		stories.forEach { story in
+			story.allTags.forEach { tag in
+				tags.append(tag)
+			}
+		}
+		
+		// Sort the tags by most occurencies
+		let occurences = tags.reduce(into: [Tag: Int](), { result, element in
+			result[element, default: 0] += 1
+		})
+		tags = tags.sorted(by: { occurences[$0] ?? 0 > occurences[$1] ?? 0 })
+		
+		allTags = tags.uniqueElements()
+	}
+	
+	private func makeFilterContent() {
+		filterContent = allTags.map { tag in
+			TagButton.Content(
+				title: tag.localizedTitle,
+				isSelected: activeFilters.contains(tag),
+				action: { [weak self] in
+					guard let self = self else {
+						return
+					}
+					
+					if self.activeFilters.contains(tag) {
+						self.activeFilters.removeAll { $0 == tag }
+					} else {
+						self.activeFilters.append(tag)
+					}
+					
+					self.makeFilterContent()
+				}
+			)
+		}
+	}
+	
+	private func filterStories(with tags: [Tag]) {
+		let sortedStories = sortStoriesByLocation(stories: storyDataProvider.stories)
+		
+		guard !tags.isEmpty else {
+			stories = sortedStories
+			return
+		}
+		
+		stories = sortedStories.filter { story in
+			let filters = Set(tags)
+			return filters.isSubset(of: Set(story.allTags))
+		}
 	}
 }

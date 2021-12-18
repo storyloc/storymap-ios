@@ -15,6 +15,7 @@ class StoryPoint: Object {
 	@Persisted var image: Data
 	@Persisted var location: Location?
 	@Persisted var audioRecordings: List<AudioRecording>
+	@Persisted var tags: List<String>
 	@Persisted var story = LinkingObjects(fromType: Story.self, property: "collection")
 	
 	var loc: Location {
@@ -23,6 +24,12 @@ class StoryPoint: Object {
 	
 	var uiImage: UIImage? {
 		UIImage(data: image)
+	}
+	
+	var tagArray: [Tag] {
+		Array(tags).compactMap { tag in
+			return Tag(rawValue: tag)
+		}
 	}
 	
 	convenience init(image: Data, location: Location) {

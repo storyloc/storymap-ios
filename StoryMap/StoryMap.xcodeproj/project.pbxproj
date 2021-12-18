@@ -36,6 +36,11 @@
 		8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E502721A6B8003D0CE9 /* String+Localized.swift */; };
 		8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */; };
 		8A6CFD7B276E28EA0072452E /* StoryPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6CFD7A276E28EA0072452E /* StoryPoint.swift */; };
+		8A6CFD7F276E40910072452E /* TagFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6CFD7E276E40910072452E /* TagFilterView.swift */; };
+		8A6CFD81276E40C10072452E /* TagButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6CFD80276E40C10072452E /* TagButton.swift */; };
+		8A6CFD83276E41040072452E /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6CFD82276E41040072452E /* Tag.swift */; };
+		8A6CFD85276E49E40072452E /* Array+UniqueElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6CFD84276E49E40072452E /* Array+UniqueElements.swift */; };
+		8A6CFD87276E5ACF0072452E /* StoryListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6CFD86276E5ACF0072452E /* StoryListCell.swift */; };
 		8A6DB02A27467CF500970FE9 /* MapStoryThumbnailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02927467CF500970FE9 /* MapStoryThumbnailCell.swift */; };
 		8A6DB02C27467D8300970FE9 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02B27467D8300970FE9 /* AudioRecorder.swift */; };
 		8A6DB02E2746941F00970FE9 /* AudioRecording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6DB02D2746941F00970FE9 /* AudioRecording.swift */; };
@@ -108,6 +113,11 @@
 		8A639E552721CB14003D0CE9 /* MapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapCoordinator.swift; sourceTree = "<group>"; };
 		8A639E572721CCF8003D0CE9 /* AddStoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStoryCoordinator.swift; sourceTree = "<group>"; };
 		8A6CFD7A276E28EA0072452E /* StoryPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryPoint.swift; sourceTree = "<group>"; };
+		8A6CFD7E276E40910072452E /* TagFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagFilterView.swift; sourceTree = "<group>"; };
+		8A6CFD80276E40C10072452E /* TagButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagButton.swift; sourceTree = "<group>"; };
+		8A6CFD82276E41040072452E /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		8A6CFD84276E49E40072452E /* Array+UniqueElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+UniqueElements.swift"; sourceTree = "<group>"; };
+		8A6CFD86276E5ACF0072452E /* StoryListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryListCell.swift; sourceTree = "<group>"; };
 		8A6DB02727456B4D00970FE9 /* MapStoryThumbnailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapStoryThumbnailCell.swift; sourceTree = "<group>"; };
 		8A6DB02927467CF500970FE9 /* MapStoryThumbnailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapStoryThumbnailCell.swift; sourceTree = "<group>"; };
 		8A6DB02B27467D8300970FE9 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
@@ -280,6 +290,7 @@
 		8A639E4127219F69003D0CE9 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				8A6CFD7C276E406A0072452E /* UI Components */,
 				8A6DB0242745346E00970FE9 /* Services */,
 				8AFAE474273170A300BFC249 /* DataProviders */,
 				8AFAE47127316C2E00BFC249 /* Model */,
@@ -308,8 +319,26 @@
 			children = (
 				8A639E502721A6B8003D0CE9 /* String+Localized.swift */,
 				8A4615D5273C260000D25529 /* Results+Array.swift */,
+				8A6CFD84276E49E40072452E /* Array+UniqueElements.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		8A6CFD7C276E406A0072452E /* UI Components */ = {
+			isa = PBXGroup;
+			children = (
+				8A6CFD7D276E40780072452E /* Tags */,
+			);
+			path = "UI Components";
+			sourceTree = "<group>";
+		};
+		8A6CFD7D276E40780072452E /* Tags */ = {
+			isa = PBXGroup;
+			children = (
+				8A6CFD7E276E40910072452E /* TagFilterView.swift */,
+				8A6CFD80276E40C10072452E /* TagButton.swift */,
+			);
+			path = Tags;
 			sourceTree = "<group>";
 		};
 		8A6DB0242745346E00970FE9 /* Services */ = {
@@ -339,6 +368,7 @@
 				8A6DB02D2746941F00970FE9 /* AudioRecording.swift */,
 				8A019DEB27524D1D00E52DC7 /* MapMarker.swift */,
 				8A6CFD7A276E28EA0072452E /* StoryPoint.swift */,
+				8A6CFD82276E41040072452E /* Tag.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -475,6 +505,7 @@
 			isa = PBXGroup;
 			children = (
 				8A46373A2756BB700088AD92 /* StoryListViewController.swift */,
+				8A6CFD86276E5ACF0072452E /* StoryListCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -736,7 +767,9 @@
 				8A344DB2271DA48C005A710B /* AddStoryViewController.swift in Sources */,
 				8A46373F2756BB8D0088AD92 /* StoryListCoordinator.swift in Sources */,
 				8A639E4A2721A0D2003D0CE9 /* ImageKit.swift in Sources */,
+				8A6CFD83276E41040072452E /* Tag.swift in Sources */,
 				8A4615D8273C4ECB00D25529 /* Location.swift in Sources */,
+				8A6CFD81276E40C10072452E /* TagButton.swift in Sources */,
 				8A3CF17427568E9600335E64 /* Configuration.swift in Sources */,
 				8A639E582721CCF8003D0CE9 /* AddStoryCoordinator.swift in Sources */,
 				8A46373D2756BB800088AD92 /* StoryListViewModel.swift in Sources */,
@@ -760,8 +793,11 @@
 				8A639E512721A6B8003D0CE9 /* String+Localized.swift in Sources */,
 				8A639E482721A0BA003D0CE9 /* FontKit.swift in Sources */,
 				8AFAE47327316C5400BFC249 /* Story.swift in Sources */,
+				8A6CFD87276E5ACF0072452E /* StoryListCell.swift in Sources */,
+				8A6CFD85276E49E40072452E /* Array+UniqueElements.swift in Sources */,
 				8AFAE4A42731F09700BFC249 /* MapCoordinator.swift in Sources */,
 				8A6EE243273EB13400C5580F /* LocationManager.swift in Sources */,
+				8A6CFD7F276E40910072452E /* TagFilterView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

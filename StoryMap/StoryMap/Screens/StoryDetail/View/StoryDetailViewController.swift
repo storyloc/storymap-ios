@@ -20,7 +20,7 @@ class StoryDetailViewController: UIViewController {
 	private let recordButton = UIButton(type: .custom)
 	private var recordButtonShadow = UIView()
 	private let tableView = UITableView(frame: .zero, style: .plain)
-	private let playAllButton = UIButton(type: .system)
+	private let tagView = TagFilterView()
 	
 	private var recordings: [AudioRecordingInfo] = []
 	
@@ -60,6 +60,12 @@ class StoryDetailViewController: UIViewController {
 		recordButton.layer.cornerRadius = recordButton.frame.height / 2
 	}
 	
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		
+		viewModel.saveTags()
+	}
+	
 	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
 		subscribers.forEach { $0.cancel() }
@@ -72,14 +78,14 @@ class StoryDetailViewController: UIViewController {
 		title = viewModel.story.title
 		view.backgroundColor = .white
 		
-		[imageView, tableView, recordButton, playAllButton].forEach(view.addSubview)
+		[imageView, tableView, recordButton, tagView].forEach(view.addSubview)
 		
 		setupNavBar()
 		setupImageView()
+		setupTagView()
 		setupRecordButton()
 		setupRecordButtonShadow()
 		setupTableView()
-		setupPlayAllButton()
 		setupGestureRecognizer()
 	}
 	
@@ -91,12 +97,20 @@ class StoryDetailViewController: UIViewController {
 				logger.info("DetailVC: stateObserver changed: \(state.rawValue)")
 			}
 			.store(in: &subscribers)
+		
 		viewModel.recordingsSubject
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] update in
 				logger.info("DetailVC: recordingsObserver changed")
 				
 				self?.updateRecordings(update)
+			}
+			.store(in: &subscribers)
+		
+		viewModel.$tagContent
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] content in
+				self?.tagView.update(with: content)
 			}
 			.store(in: &subscribers)
 	}
@@ -115,11 +129,9 @@ class StoryDetailViewController: UIViewController {
 		
 		guard !recordings.isEmpty else {
 			tableView.isHidden = true
-			playAllButton.isHidden = true
 			return
 		}
 		
-		playAllButton.isHidden = false
 		tableView.isHidden = false
 	}
 	
@@ -148,6 +160,21 @@ class StoryDetailViewController: UIViewController {
 		recordButton.layer.borderWidth = StyleKit.metrics.separator
 	}
 	
+	private func setupTagView() {
+		tagView.contentInset = UIEdgeInsets(
+			top: 0,
+			left: StyleKit.metrics.padding.small,
+			bottom: 0,
+			right: StyleKit.metrics.padding.small
+		)
+		
+		tagView.snp.makeConstraints { make in
+			make.top.equalTo(recordButton.snp.bottom).offset(StyleKit.metrics.padding.common)
+			make.leading.trailing.equalToSuperview()
+			make.height.equalTo(StyleKit.metrics.padding.medium)
+		}
+	}
+	
 	private func setupRecordButtonShadow() {
 		view.insertSubview(recordButtonShadow, belowSubview: recordButton)
 		recordButtonShadow.clipsToBounds = true
@@ -167,7 +194,7 @@ class StoryDetailViewController: UIViewController {
 		tableView.register(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
 		
 		tableView.snp.makeConstraints { make in
-			make.top.equalTo(recordButton.snp.bottom).offset(StyleKit.metrics.padding.common)
+			make.top.equalTo(tagView.snp.bottom).offset(StyleKit.metrics.padding.medium)
 			make.leading.trailing.equalToSuperview().inset(StyleKit.metrics.padding.common)
 			make.bottom.equalToSuperview()
 		}
@@ -183,20 +210,6 @@ class StoryDetailViewController: UIViewController {
 			make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(StyleKit.metrics.padding.verySmall)
 			make.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.4)
 			make.centerX.equalToSuperview()
-		}
-	}
-	
-	private func setupPlayAllButton() {
-		playAllButton.isHidden = recordings.isEmpty
-		
-		playAllButton.setTitle(LocalizationKit.storyDetail.playAllButtonTitle, for: .normal)
-		playAllButton.tintColor = .systemBlue
-		
-		playAllButton.addTarget(self, action: #selector(playAllTapped), for: .touchUpInside)
-		
-		playAllButton.snp.makeConstraints { make in
-			make.leading.equalTo(36)
-			make.bottom.equalTo(tableView.snp.top).offset(-StyleKit.metrics.padding.small)
 		}
 	}
 	

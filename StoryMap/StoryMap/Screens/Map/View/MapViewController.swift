@@ -23,6 +23,7 @@ class MapViewController: UIViewController {
     private let listButton = UIButton(type: .system)
     private let addButton = UIButton(type: .system)
     private let centerButton = UIButton(type: .system)
+	private let tagView = TagFilterView()
     
     // MARK: - Variables
     
@@ -94,6 +95,7 @@ class MapViewController: UIViewController {
         [mapView, collectionView, listButton, addButton, centerButton].forEach(view.addSubview)
         
         setupCollectionView()
+		setupTagView()
         setupListButton()
         setupAddButton()
         setupCenterButton()
@@ -109,6 +111,13 @@ class MapViewController: UIViewController {
 			.sink { [weak self] data in
 				self?.updateCollectionView(with: data)
 				logger.info("MapVC: Observer collectionData changed: \(data)")
+			}
+			.store(in: &subscribers)
+		
+		viewModel.$filterContent
+			.receive(on: DispatchQueue.main)
+			.sink { [weak self] content in
+				self?.tagView.update(with: content)
 			}
 			.store(in: &subscribers)
         
@@ -166,6 +175,22 @@ class MapViewController: UIViewController {
 		
 		collectionViewHeightConstraint?.isActive = !viewModel.collectionData.isEmpty
     }
+	
+	private func setupTagView() {
+		view.insertSubview(tagView, aboveSubview: mapView)
+		tagView.contentInset = UIEdgeInsets(
+			top: 0,
+			left: StyleKit.metrics.padding.small,
+			bottom: 0,
+			right: StyleKit.metrics.padding.small
+		)
+		
+		tagView.snp.makeConstraints { make in
+			make.height.equalTo(StyleKit.metrics.padding.medium)
+			make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+			make.leading.trailing.equalToSuperview()
+		}
+	}
 
     private func setupAddButton() {
         addButton.setImage(

@@ -16,7 +16,6 @@ class StoryListViewController: UIViewController {
     
     private var viewModel: StoryListViewModel
     private let tableView = UITableView(frame: .zero, style: .plain)
-    private let reuseIdentifier = "StoryListCell"
 
     @ObservedObject private var locationManager: LocationManager
 
@@ -66,7 +65,7 @@ class StoryListViewController: UIViewController {
     }
     
     private func setupSubscribers() {
-        viewModel.$stories
+        viewModel.$tableContent
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
                 logger.info("StoryListVC: Stories changed: \(data)")
@@ -93,8 +92,8 @@ class StoryListViewController: UIViewController {
     private func setupTableView() {
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.estimatedRowHeight = UITableView.automaticDimension
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: reuseIdentifier)
+		tableView.estimatedRowHeight = StoryListCell.estimatedHeight
+		tableView.register(StoryListCell.self, forCellReuseIdentifier: StoryListCell.reuseIdentifier)
         
         tableView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(StyleKit.metrics.padding.verySmall)
@@ -131,23 +130,13 @@ extension StoryListViewController: UITableViewDelegate {
 
 extension StoryListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.stories.count
+        viewModel.tableContent.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cellData = viewModel.stories[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) ?? UITableViewCell(style: .subtitle, reuseIdentifier: reuseIdentifier)
+		let cell = tableView.dequeueReusableCell(withIdentifier: StoryListCell.reuseIdentifier) as? StoryListCell ?? StoryListCell()
         
-        var content = cell.defaultContentConfiguration()
-        
-        content.image = cellData.mainImage
-        content.imageProperties.maximumSize = CGSize(width: 50, height: 50)
-        
-        content.text = cellData.title
-        let time = humanReadableTime(from: cellData.timestamp)
-		content.secondaryText = "\(time) - \(cellData.collection.count) Story points"
-        
-        cell.contentConfiguration = content
+		cell.update(with: viewModel.tableContent[indexPath.row])
         return cell
     }
 }

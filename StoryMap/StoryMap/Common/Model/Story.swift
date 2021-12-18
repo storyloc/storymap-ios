@@ -32,6 +32,14 @@ class Story: Object {
 		}
 		return recs
 	}
+	
+	var allTags: [Tag] {
+		var tags: [Tag] = []
+		collection.forEach { point in
+			tags.append(contentsOf: point.tagArray)
+		}
+		return tags
+	}
     
     convenience init(title: String, collection: [StoryPoint]) {
         self.init()

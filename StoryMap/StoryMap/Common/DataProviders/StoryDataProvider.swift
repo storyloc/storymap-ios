@@ -75,6 +75,8 @@ final class StoryDataProvider {
 		realm?.deleteCascading(object: story, associatedObjects: [Array(story.collection)])
 	}
 	
+	// MARK: - Recordings
+	
 	func add(recording: AudioRecording, to storyPoint: StoryPoint) {
 		realm?.update(with: {
 			storyPoint.audioRecordings.append(recording)
@@ -88,6 +90,15 @@ final class StoryDataProvider {
 		
 		realm?.update(with: {
 			storyPoint.audioRecordings.remove(at: index)
+		})
+	}
+	
+	// MARK: - Tags
+	
+	func add(tags: [Tag], to storyPoint: StoryPoint) {
+		realm?.update(with: {
+			storyPoint.tags.removeAll()
+			storyPoint.tags.append(objectsIn: tags.map { $0.rawValue })
 		})
 	}
 	

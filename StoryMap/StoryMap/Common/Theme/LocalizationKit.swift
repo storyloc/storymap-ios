@@ -11,6 +11,7 @@ struct LocalizationKit {
     static let general = General()
     static let addStory = AddStory()
 	static let storyDetail = StoryDetail()
+	static let tags = Tags()
 }
 
 extension LocalizationKit {
@@ -38,5 +39,15 @@ extension LocalizationKit {
 	
 	struct StoryDetail {
 		let playAllButtonTitle = "storyDetail_playAll_buttonTitle".localized
+	}
+	
+	struct Tags {
+		let shopping = "tag_shopping".localized
+		let sightseeing = "tag_sightseeing".localized
+		let hikes = "tag_hikes".localized
+		let nature = "tag_nature".localized
+		let food = "tag_food".localized
+		let museum = "tag_museum".localized
+		let coffee = "tag_coffee".localized
 	}
 }
