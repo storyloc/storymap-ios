@@ -14,18 +14,14 @@ final class AddStoryCoordinator: CoordinatorType {
 	
 	var showStorySubject = PassthroughSubject<Story, Never>()
 	
-	private var location: Location
-	
-	private let photoManager = PhotoInputManager()
 	private var subscribers = Set<AnyCancellable>()
 	
-	init(presenter: UINavigationController, location: Location) {
+	init(presenter: UINavigationController) {
 		self.presenter = presenter
-		self.location = location
 	}
 	
 	func start() {
-		let viewModel = AddStoryViewModel(location: location)
+		let viewModel = AddStoryViewModel()
 		let viewController = AddStoryViewController(viewModel: viewModel)
 		viewController.isModalInPresentation = true
 		
@@ -53,13 +49,6 @@ final class AddStoryCoordinator: CoordinatorType {
 			}
 			.store(in: &subscribers)
 		
-		viewModel.addImageSubject
-			.receive(on: DispatchQueue.main)
-			.sink { [weak self] type in
-				self?.showAddImage(with: type)
-			}
-			.store(in: &subscribers)
-		
 		viewModel.confirmSubject
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] story in
@@ -67,31 +56,6 @@ final class AddStoryCoordinator: CoordinatorType {
 				self.stop(story: story)
 			}
 			.store(in: &subscribers)
-		
-		photoManager.resultSubject
-			.receive(on: DispatchQueue.main)
-			.sink { [weak self, weak viewModel] result in
-				viewModel?.image = result.image.jpegData(compressionQuality: 0.0)
-				
-				if let location = result.location {
-					viewModel?.location = location
-				}
-				
-				self?.presentedViewController.dismiss(animated: true)
-			}
-			.store(in: &subscribers)
-		
-		photoManager.cancelSubject
-			.receive(on: DispatchQueue.main)
-			.sink { [weak self] in
-				self?.presentedViewController.dismiss(animated: true)
-			}
-			.store(in: &subscribers)
-	}
-	
-	private func showAddImage(with type: PhotoInputManager.SourceType) {
-		let viewController = photoManager.makeViewController(with: type)
-		presentedViewController.present(viewController, animated: true)
 	}
 	
 	func stop(story: Story?) {

@@ -2,215 +2,121 @@
 //  StoryDetailViewModel.swift
 //  StoryMap
 //
-//  Created by Dory on 02/11/2021.
+//  Created by Dory on 11/01/2022.
 //
 
-import Foundation
 import Combine
-import SwiftUI
-
-typealias AudioRecordingInfo = (recording: AudioRecording, isPlaying: Bool)
+import Foundation
 
 final class StoryDetailViewModel {
-	enum RecordingState: String {
-		case initial
-		case inProgress
-		case done
-		case permissionDenied
-	}
-	
-	enum RecordingsUpdate {
-		case delete(Int)
-		case update([AudioRecordingInfo])
-	}
 	
 	// MARK: - Public properties
 	
-	var story: Story
-	private lazy var storyPoint = story.collection.first
+	@Published var storyPointViewModels: [StoryPointDetailViewModel] = []
 	
-	@Published var state: RecordingState = .initial
-	@Published var tagContent: [TagButton.Content] = []
+	lazy var title: String = story.title
 	
-	let recordingsSubject = PassthroughSubject<RecordingsUpdate, Never>()
 	let closeSubject = PassthroughSubject<Void, Never>()
+	let showAlertSubject = PassthroughSubject<AlertConfig, Never>()
+	let addStoryPointSubject = PassthroughSubject<PhotoInputManager.SourceType, Never>()
+	let storyPointAddedSubject = PassthroughSubject<Void, Never>()
 	
 	// MARK: - Private properties
 	
+	private var story: Story
+	
 	private let storyDataProvider = StoryDataProvider.shared
+		
+	private var subscriptions = Set<AnyCancellable>()
 	
-	@ObservedObject private var audioRecorder = AudioRecorder()
-	
-	private var recordings: [AudioRecordingInfo]
-	
-	private lazy var selectedTags: [Tag] = storyPoint?.tagArray ?? [] {
-		didSet {
-			makeTagContent()
-		}
-	}
-	
-	private var subscribers = Set<AnyCancellable>()
+	// MARK: - Initializer
 	
 	init(story: Story) {
 		self.story = story
-		self.recordings = []
 		
-		if let records = storyPoint?.audioRecordings {
-			self.recordings = Array(records).compactMap { rec in
-				AudioRecordingInfo(recording: rec, isPlaying: false)
+		setupStoryPointViewModels()
+		
+		NotificationCenter.default.publisher(for: .storyPointCreated, object: nil)
+			.sink { [weak self] _ in
+				self?.setupStoryPointViewModels()
+				self?.storyPointAddedSubject.send()
 			}
-		}
-		
-		setupSubscribers()
-		makeTagContent()
-	}
-	
-	deinit {
-		subscribers.forEach { $0.cancel() }
-		subscribers.removeAll()
+			.store(in: &subscriptions)
 	}
 	
 	// MARK: - Public methods
 	
-	func load() {
-		recordingsSubject.send(.update(recordings))
+	func addStoryPoint() {
+		showPhotoAlert()
 	}
 	
-	func delete() {
-		logger.info("DetailVM: deleteStory: \(self.story)")
-		
-		storyDataProvider.delete(story: story)
-		closeSubject.send()
-	}
-	
-	func deleteRecording(at index: Int) {
-		logger.info("DetailVM: deleteRecording at \(index)")
-		
-		guard let storyPoint = storyPoint else { return }
-		
-		recordings.remove(at: index)
-		recordingsSubject.send(.delete(index))
-		
-		storyDataProvider.delete(
-			recording: storyPoint.audioRecordings[index],
-			from: storyPoint
-		)
-	}
-	
-	func startRecording() {
-		logger.info("DetailVM: startRecording")
-		
-		audioRecorder.startRecording()
-		print("ALLOWED: \(audioRecorder.recordingAllowed)")
-	}
-	
-	func stopRecording() {
-		logger.info("DetailVM: stopRecording")
-		
-		audioRecorder.stopRecording()
-	}
-	
-	func play(recording: AudioRecording) {
-		audioRecorder.play(recording: recording)
-	}
-	
-	func playAll() {
-		guard !recordings.isEmpty else {
-			logger.info("DetailVM: playAllRecordings failed: recordings are empty")
-			return
-		}
-		audioRecorder.play(recordings: recordings.map { $0.recording })
-		logger.info("DetailVM: playAllRecordings")
-	}
-	
-	func stopPlaying() {
-		audioRecorder.stopPlaying()
-	}
-	
-	func saveTags() {
-		guard let storyPoint = storyPoint, storyPoint.tagArray != selectedTags else {
-			return
-		}
-		
-		storyDataProvider.add(tags: selectedTags, to: storyPoint)
+	func deleteStory() {
+		showAreYouSureAlert()
 	}
 	
 	// MARK: - Private methods
 	
-	private func setupSubscribers() {
-		audioRecorder.$state
-			.sink { [weak self] recState in
-				logger.info("DetailVM: recorderStateObserver: \(String(describing: recState))")
-				self?.updateState(with: recState)
-			}
-			.store(in: &subscribers)
-		
-		audioRecorder.$currentlyPlaying
-			.sink { [weak self] recording in
-				logger.info("DetailVM: currentlyPlayingObserver: \(recording?.createdAt ?? "nil")")
-				
-				self?.updateRecordings(with: recording)
-			}
-			.store(in: &subscribers)
-	}
-	
-	private func updateState(with recState: AudioRecorder.State) {
-		switch recState {
-			
-		case .initial:
-			state = .initial
-		case .recording:
-			state = .inProgress
-		case .recorded(let recording):
-			saveRecording(recording)
-			state = .done
-		case .playing:
-			break
-		case .error(let error):
-			if case .permissionDenied = error {
-				state = .permissionDenied
-			}
+	private func setupStoryPointViewModels() {
+		storyPointViewModels = story.collection.map { point in
+			StoryPointDetailViewModel(storyPoint: point)
 		}
 	}
 	
-	private func updateRecordings(with currentlyPlaying: AudioRecording?) {
-		recordings = recordings.map { rec in
-			AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording == currentlyPlaying)
-		}
-		
-		recordingsSubject.send(.update(recordings))
-	}
-	
-	private func saveRecording(_ recording: AudioRecording) {
-		guard let storyPoint = storyPoint else { return }
-		
-		recordings.append(AudioRecordingInfo(recording: recording, isPlaying: false))
-		recordingsSubject.send(.update(recordings))
-		
-		storyDataProvider.add(recording: recording, to: storyPoint)
-	}
-	
-	private func makeTagContent() {
-		let allTags = Tag.allCases
-		let content = allTags.map { tag in
-			TagButton.Content(
-				title: tag.localizedTitle,
-				isSelected: selectedTags.contains(tag),
-				action: { [weak self] in
-					guard let self = self else {
-						return
+	private func showAreYouSureAlert() {
+		let alert = AlertConfig(
+			title: LocalizationKit.storyDetail.deleteAlertTitle,
+			message: nil,
+			style: .actionSheet,
+			actions: [
+				AlertAction(
+					title: LocalizationKit.storyDetail.deleteAlertAction,
+					style: .destructive,
+					handler: { [weak self] in
+						guard let self = self else { return }
+						
+						self.storyDataProvider.delete(story: self.story)
+						self.closeSubject.send()
 					}
-					
-					if self.selectedTags.contains(tag) {
-						self.selectedTags.removeAll { $0 == tag }
-					} else {
-						self.selectedTags.append(tag)
+				),
+				AlertAction(
+					title: LocalizationKit.general.cancel,
+					style: .cancel,
+					handler: nil
+				)
+			]
+		)
+		
+		showAlertSubject.send(alert)
+	}
+	
+	func showPhotoAlert() {
+		let alert = AlertConfig(
+			title: LocalizationKit.addStory.addPhotoDialogueTitle,
+			message: nil,
+			style: .actionSheet,
+			actions: [
+				AlertAction(
+					title: LocalizationKit.addStory.addPhotoCaptureAction,
+					style: .default,
+					handler: { [weak self] in
+						self?.addStoryPointSubject.send(.camera)
 					}
-					
-					self.makeTagContent()
-				}
-			)
-		}
-		tagContent = content.sorted { $0.isSelected && !$1.isSelected }
+				),
+				AlertAction(
+					title: LocalizationKit.addStory.addPhotoChooseAction,
+					style: .default,
+					handler: { [weak self] in
+						self?.addStoryPointSubject.send(.photoLibrary)
+					}
+				),
+				AlertAction(
+					title: LocalizationKit.general.cancel,
+					style: .cancel,
+					handler: nil
+				)
+			]
+		)
+		
+		showAlertSubject.send(alert)
 	}
 }

@@ -8,12 +8,9 @@
 import Foundation
 import UIKit
 import SnapKit
-import PhotosUI
 import Combine
 
-protocol AddStoryViewControllerType: UIViewController, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {}
-
-final class AddStoryViewController: UIViewController, AddStoryViewControllerType {
+final class AddStoryViewController: UIViewController {
     
     // MARK: - Constants
     
@@ -21,16 +18,11 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
     
     private let titleStackView = UIStackView()
     private let titleTextFieldErrorLabel = UILabel()
-    private let photoStackView = UIStackView()
-    private let pickedImageView = UIImageView()
-    private let addPhotoButton = UIButton(type: .system)
     private let confirmButton = UIButton(type: .system)
     private let closeButton = UIButton(type: .system)
     
     private var titleTextField = UITextField()
     private var confirmButtonBottomConstraint: NSLayoutConstraint?
-	
-	private var subscribers = Set<AnyCancellable>()
     
     init(viewModel: AddStoryViewModel) {
         self.viewModel = viewModel
@@ -50,36 +42,15 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-		setupSubscribers()
+		subscribeToKeyboardNotifications()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        removeSubscribers()
+		unsubscribeFromKeyboardNotifications()
     }
     
     // MARK: - Private methods
-	
-	private func setupSubscribers() {
-		subscribeToKeyboardNotifications()
-		
-		viewModel.$image
-			.receive(on: DispatchQueue.main)
-			.sink { [weak self] imageData in
-				guard let data = imageData else {
-					return
-				}
-				self?.updateUI()
-				self?.updatePickedImageView(with: UIImage(data: data))
-			}
-			.store(in: &subscribers)
-	}
-	
-	private func removeSubscribers() {
-		unsubscribeFromKeyboardNotifications()
-		subscribers.forEach { $0.cancel() }
-		subscribers.removeAll()
-	}
     
     private func setupUI() {
         view.backgroundColor = .white
@@ -87,7 +58,6 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
         
         setupCloseButton()
         setupTitleTextField()
-        setupAddPhotoButton()
         setupConfirmButton()
         
         updateUI()
@@ -96,7 +66,6 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
     private func updateUI() {
         titleTextField.attributedPlaceholder = NSAttributedString(string: viewModel.titlePlaceholder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
         titleTextFieldErrorLabel.text = viewModel.titleError
-        addPhotoButton.setTitle(viewModel.addPhotoTitle, for: .normal)
         confirmButton.setTitle(viewModel.confirmTitle, for: .normal)
         confirmButton.isEnabled = viewModel.confirmButtonEnabled
     }
@@ -162,33 +131,6 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
         textField.delegate = self
     }
     
-    private func setupAddPhotoButton() {
-        photoStackView.axis = .vertical
-        photoStackView.distribution = .equalSpacing
-        photoStackView.spacing = StyleKit.metrics.padding.common
-        
-        photoStackView.addArrangedSubview(pickedImageView)
-        photoStackView.addArrangedSubview(addPhotoButton)
-        
-        view.addSubview(photoStackView)
-        
-        addPhotoButton.addTarget(self, action: #selector(addPhotoTapped), for: .touchUpInside)
-        
-        photoStackView.snp.makeConstraints { make in
-            make.top.equalTo(titleStackView.snp.bottom).offset(StyleKit.metrics.padding.common)
-            make.width.equalTo(titleTextField)
-            make.centerX.equalToSuperview()
-        }
-    }
-    
-    private func updatePickedImageView(with image: UIImage?) {
-        pickedImageView.image = image
-        pickedImageView.contentMode = .scaleAspectFit
-        pickedImageView.snp.makeConstraints { make in
-            make.width.height.lessThanOrEqualTo(StyleKit.metrics.imageWidth)
-        }
-    }
-    
     private func setupConfirmButton() {
         confirmButton.backgroundColor = .white
         
@@ -215,11 +157,6 @@ final class AddStoryViewController: UIViewController, AddStoryViewControllerType
     }
     
     // MARK: - Actions
-    
-    @objc func addPhotoTapped() {
-        hideKeyboard()
-        viewModel.showPhotoAlert()
-    }
     
     @objc func confirmTapped() {
         hideKeyboard()
@@ -305,39 +242,5 @@ extension AddStoryViewController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         titleTextFieldErrorLabel.alpha = 0
-    }
-}
-
-// MARK: - UIImagePickerControllerDelegate
-
-extension AddStoryViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
-    func imagePickerController (_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        guard let image = info[.originalImage] as? UIImage else {
-            return
-        }
-        
-        dismiss(animated: true)
-		viewModel.image = image.jpegData(compressionQuality: 0.0)
-        updateUI()
-        updatePickedImageView(with: image)
-    }
-}
-
-// MARK: PHPickerViewControllerDelegate
-
-extension AddStoryViewController: PHPickerViewControllerDelegate {
-    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        guard let result = results.first else { return }
-        let provider = result.itemProvider
-        provider.loadObject(ofClass: UIImage.self) { image, error in
-            if let image = image as? UIImage {
-                DispatchQueue.main.async { [weak self] in
-                    self?.dismiss(animated: true)
-					self?.viewModel.image = image.jpegData(compressionQuality: 0.0)
-                    self?.updateUI()
-                    self?.updatePickedImageView(with: image)
-                }
-            }
-        }
     }
 }

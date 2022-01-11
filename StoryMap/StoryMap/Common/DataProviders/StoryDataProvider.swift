@@ -29,6 +29,8 @@ final class StoryDataProvider {
 	private let realm = RealmDataProvider.shared
 	private var notificationToken: NotificationToken?
 	
+	private let locationManager = LocationManager()
+	
 	// MARK: - Initializer
 	
 	private init() {
@@ -41,27 +43,26 @@ final class StoryDataProvider {
 		realm?.write(object: story)
 	}
 	
-	func createStory(from image: UIImage, and location: Location) {
-		guard let data = image.jpegData(compressionQuality: 0.0) else {
-			logger.warning("StoryDP: createStory failed, couldn't convert image to data")
-			return
+	func createStoryPoint(from result: PhotoInputManager.Result) -> StoryPoint? {
+		guard let data = result.image.jpegData(compressionQuality: 0.0) else {
+			logger.warning("StoryDP: createStoryPoint failed, couldn't convert image to data")
+			return nil
 		}
 		
-		let item = StoryPoint(
+		guard let userLocation = result.location ?? locationManager.userLocation else {
+			logger.warning("StoryDP: createStoryPoint failed, location is missing.")
+			return nil
+		}
+		
+		return StoryPoint(
 			image: data,
 			location: Configuration.isSimulator
-				? location.randomize()
+				? userLocation.randomize()
 				: Location(
-					latitude: location.latitude,
-					longitude: location.longitude
+					latitude: userLocation.latitude,
+					longitude: userLocation.longitude
 			)
 		)
-		
-		let story = Story(
-			title: "Story \(stories.count)",
-			collection: [item]
-		)
-		realm?.write(object: story)
 	}
 	
 	func delete(story: Story) {
@@ -73,6 +74,26 @@ final class StoryDataProvider {
 		}
 		
 		realm?.deleteCascading(object: story, associatedObjects: [Array(story.collection)])
+	}
+	
+	// MARK: - StoryPoints
+	
+	func add(storyPoint: StoryPoint, to story: Story) {
+		realm?.update(with: {
+			story.collection.append(storyPoint)
+		})
+		
+		NotificationCenter.default.post(name: .storyPointCreated, object: nil)
+	}
+	
+	func delete(storyPoint: StoryPoint, from story: Story) {
+		guard let index = story.collection.firstIndex(of: storyPoint) else {
+			return
+		}
+		
+		realm?.update(with: {
+			story.collection.remove(at: index)
+		})
 	}
 	
 	// MARK: - Recordings

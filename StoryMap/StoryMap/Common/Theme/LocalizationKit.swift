@@ -39,6 +39,9 @@ extension LocalizationKit {
 	
 	struct StoryDetail {
 		let playAllButtonTitle = "storyDetail_playAll_buttonTitle".localized
+		let deleteAlertTitle = "storyDetail_deleteStory_alertTitle".localized
+		let deleteAlertAction = "storyDetail_deleteStory_alertAction".localized
+		let emptyPlaceholder = "storyDetail_emptyStory_placeholder".localized
 	}
 	
 	struct Tags {

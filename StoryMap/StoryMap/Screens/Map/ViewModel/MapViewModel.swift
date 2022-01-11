@@ -14,7 +14,7 @@ class MapViewModel: ObservableObject {
 	@Published var collectionData: [MapCollectionData] = []
 	@Published var filterContent: [TagButton.Content] = []
 	
-	let addStorySubject = PassthroughSubject<Location, Never>()
+	let addStoryPointSubject = PassthroughSubject<Story, Never>()
 	let openStorySubject = PassthroughSubject<Story, Never>()
 	let openStoryListSubject = PassthroughSubject<Void, Never>()
 	
@@ -59,8 +59,8 @@ class MapViewModel: ObservableObject {
 		openStorySubject.send(stories[index])
 	}
 	
-	func addStory(with location: Location) {
-		Configuration.isSimulator ? addTestStory() : addStorySubject.send(location)
+	func addStoryPoint(with index: Int) {
+		Configuration.isSimulator ? addTestStory() : addStoryPointSubject.send(stories[index])
 		audioRecorder.stopPlaying()
 	}
 	
@@ -162,16 +162,21 @@ class MapViewModel: ObservableObject {
 			return
 		}
 		
-		let item = StoryPoint(
+		let item1 = StoryPoint(
 			image: imageData,
 			location: location!.randomize()
 		)
 		
-		item.tags.append(objectsIn: [Tag.food.rawValue, Tag.museum.rawValue, Tag.hikes.rawValue, Tag.nature.rawValue])
+		let item2 = StoryPoint(
+			image: imageData,
+			location: location!.randomize()
+		)
+		
+		item1.tags.append(objectsIn: [Tag.food.rawValue, Tag.museum.rawValue, Tag.hikes.rawValue, Tag.nature.rawValue])
 		
 		let story = Story(
 			title: "Story \(storyDataProvider.stories.count)",
-			collection: [item]
+			collection: [item1, item2]
 		)
 		
 		storyDataProvider.save(story: story)

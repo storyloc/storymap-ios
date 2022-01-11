@@ -47,7 +47,7 @@ class StoryListCoordinator: CoordinatorType {
     }
 
     private func showAddStory(with location: Location) {
-		addStoryCoordinator = AddStoryCoordinator(presenter: presenter, location: location)
+		addStoryCoordinator = AddStoryCoordinator(presenter: presenter)
 		addStoryCoordinator?.showStorySubject
 			.sink { [weak self] story in
 				self?.showStoryDetail(with: story)

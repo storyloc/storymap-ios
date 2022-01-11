@@ -340,7 +340,7 @@ class MapViewController: UIViewController {
             // TODO: Add a warning if we don't have location permissions
             return
         }
-        viewModel.addStory(with: location)
+        viewModel.addStoryPoint(with: selectedStoryIndex)
     }
 }
 

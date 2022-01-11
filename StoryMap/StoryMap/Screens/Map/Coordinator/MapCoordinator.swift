@@ -31,9 +31,9 @@ class MapCoordinator: CoordinatorType {
             locationManager: LocationManager()
         )
         viewController.modalPresentationStyle = .fullScreen
-        viewModel.addStorySubject
-			.sink { [weak self] location in
-				self?.showAddStory(with: location)
+        viewModel.addStoryPointSubject
+			.sink { [weak self] story in
+				self?.showAddStoryPoint(to: story)
 			}
 			.store(in: &subscribers)
         viewModel.openStorySubject
@@ -50,14 +50,14 @@ class MapCoordinator: CoordinatorType {
         presenter.pushViewController(viewController, animated: true)
     }
     
-    private func showAddStory(with location: Location) {
+    private func showAddStoryPoint(to story: Story) {
 		photoManagerSubscriber = photoManager.resultSubject
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] result in
-				StoryDataProvider.shared.createStory(
-					from: result.image,
-					and: location
-				)
+				if let storyPoint = StoryDataProvider.shared.createStoryPoint(from: result) {
+					StoryDataProvider.shared.add(storyPoint: storyPoint, to: story)
+				}
+				
 				self?.presenter.dismiss(animated: true)
 				
 				self?.photoManagerSubscriber?.cancel()

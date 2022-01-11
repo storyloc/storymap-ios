@@ -49,7 +49,7 @@ final class StoryListViewModel {
     }
 
     func addStory(with location: Location) {
-        logger.info("StoryListVM: addStory")
+        logger.info("StoryListVM: addStoryPoint")
 		addStorySubject.send(location)
     }
 

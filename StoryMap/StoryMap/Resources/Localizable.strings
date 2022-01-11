@@ -31,6 +31,9 @@
 // MARK: - Story detail
 
 "storyDetail_playAll_buttonTitle" = "Play all";
+"storyDetail_emptyStory_placeholder" = "This story doesn't have any Points yet. Please add one using the button below.";
+"storyDetail_deleteStory_alertTitle" = "Are you sure to delete this story?";
+"storyDetail_deleteStory_alertAction" = "Delete";
 
 // MARK: - Tags
 
