@@ -36,7 +36,8 @@ class MapViewController: UIViewController {
     private var collectionViewHeightConstraint: Constraint?
     private var collectionViewLayoutPadding: CGFloat = 0
     private var autoScrolling = false
-	
+    private var centerButtonSelected = true
+
 	private var selectedStoryIndex: Int = 0
     
 	private var subscribers = Set<AnyCancellable>()
@@ -82,8 +83,6 @@ class MapViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        locationManager.centerMap()
     }
     
     // MARK: - Private methods
@@ -100,7 +99,7 @@ class MapViewController: UIViewController {
         setupMap()
 
         updateAddButton(false)
-        updateCenterButton(false)
+        updateCenterButton()
     }
     
     private func setupSubscribers() {
@@ -117,6 +116,7 @@ class MapViewController: UIViewController {
 			.sink { [weak self] available in
 				self?.updateAddButton(available)
 				self?.viewModel.location = self?.locationManager.userLocation
+                self?.locationManager.centerMap()
             
 				logger.info("MapVC: Observer userLocationAvailable changed: \(available)")
 			}
@@ -130,7 +130,8 @@ class MapViewController: UIViewController {
         locationManager.$isMapCentered
 			.receive(on: DispatchQueue.main)
 			.sink { [weak self] centered in
-				self?.updateCenterButton(centered)
+                self?.centerButtonSelected = centered
+				self?.updateCenterButton()
 				logger.info("MapVC: Observer isMapCentered changed: \(centered)")
 			}
 			.store(in: &subscribers)
@@ -180,7 +181,6 @@ class MapViewController: UIViewController {
         addButton.layer.cornerRadius = StyleKit.metrics.buttonHeight / 2
 
         addButton.snp.makeConstraints { make in
-            make.bottom.equalTo(addButton.snp.top).offset(-StyleKit.metrics.padding.small)
             make.bottom.equalTo(collectionView.snp.top).offset(-StyleKit.metrics.padding.small)
             make.trailing.equalToSuperview().inset(StyleKit.metrics.padding.small)
             make.width.height.equalTo(StyleKit.metrics.buttonHeight)
@@ -285,13 +285,12 @@ class MapViewController: UIViewController {
         addButton.isEnabled = enabled
     }
     
-    private func updateCenterButton(_ centered: Bool) {
-        let iconName = centered ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
+    private func updateCenterButton() {
+        let iconName = centerButtonSelected ? StyleKit.image.icons.centerOn : StyleKit.image.icons.centerOff
         centerButton.setImage(StyleKit.image.make(from: iconName), for: .normal)
     }
 
     func addStoriesToMap() {
-		guard !viewModel.collectionData.isEmpty else { return }
         let locations = viewModel.collectionData.map { $0.location }
 		locationManager.addMarkers(to: locations)
         
@@ -305,9 +304,14 @@ class MapViewController: UIViewController {
     }
 
     @objc private func centerButtonTapped() {
-        locationManager.centerMap()
-        
-        logger.info("MapVC centerMap")
+        centerButtonSelected.toggle()
+        if centerButtonSelected {
+            locationManager.centerMap()
+        } else {
+            locationManager.isMapCentered = false
+        }
+        updateCenterButton()
+        logger.info("MapVC centerMap Button: \(self.centerButtonSelected)")
     }
     
     @objc private func addButtonTapped() {
