@@ -26,9 +26,13 @@ final class AudioRecorder: NSObject, ObservableObject {
     
     // MARK: - Public properties
     
+    static var shared = AudioRecorder()
+
     @Published var recordingAllowed = false
     @Published var state: State = .initial
     @Published var currentlyPlaying: AudioRecording? = nil
+
+    var playQueue: [AudioRecording] = []
     
     // MARK: - Private properties
     
@@ -36,39 +40,40 @@ final class AudioRecorder: NSObject, ObservableObject {
     private var audioRecorder: AVAudioRecorder?
     private var audioPlayer: AVAudioPlayer?
     private var audioURL: URL?
-	private var playQueue: [AudioRecording]?
     
     override init() {
         super.init()
         
         do {
             try recordingSession.setCategory(.playAndRecord,
-                                             mode: .default,
+                                             mode: .videoRecording,
                                              options: [
                                                 .defaultToSpeaker,
                                                 .allowBluetooth,
                                                 .allowAirPlay,
-                                                .mixWithOthers
+                                                .mixWithOthers,
+                                                .duckOthers,
+                                                //.interruptSpokenAudioAndMixWithOthers
                                              ]
             )
-            try recordingSession.setActive(true)
         } catch {
 			state = .error(.unknown(error))
             logger.error("AudioRecorder: setup failed: \(error.localizedDescription)")
         }
-		
-		askForMicrophonePermissions()
+        askForMicrophonePermissions()
     }
     
     // MARK: - Public methods
     
     public func startRecording() {
-        stopPlaying()
-        
         guard recordingAllowed else {
             logger.warning("AudioRecorder: startRecording failed: missing permissions.")
             return
         }
+        if audioPlayer != nil {
+            stopPlaying()
+        }
+        setPreferedRecordingInput()
         
         let audioFileURL = getDocumentsDirectory().appendingPathComponent("storymap-\(Date().timeIntervalSince1970).m4a")
         audioURL = audioFileURL
@@ -83,6 +88,7 @@ final class AudioRecorder: NSObject, ObservableObject {
         do {
             audioRecorder = try AVAudioRecorder(url: audioFileURL, settings: settings)
             audioRecorder?.delegate = self
+            try recordingSession.setActive(true)
             audioRecorder?.record()
             state = .recording
             logger.error("AudioRecorder: startRecording success")
@@ -93,47 +99,70 @@ final class AudioRecorder: NSObject, ObservableObject {
     }
     
     public func stopRecording() {
-        audioRecorder?.stop()
-        audioRecorder = nil
+        do {
+            audioRecorder?.stop()
+            audioRecorder = nil
+            try recordingSession.setActive(false)
+        } catch {
+            state = .error(.unknown(error))
+            logger.error("AudioRecorder deactivate session failed: \(error.localizedDescription)")
+        }
     }
     
+    public func play() {
+        guard let recording = playQueue.first, !playQueue.isEmpty else { return }
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: getDocumentsDirectory().appendingPathComponent(recording.fileName))
+            audioPlayer?.volume = 20.0 // higher value ducks background music more
+            audioPlayer?.delegate = self
+            try recordingSession.setCategory(.ambient, options: [.duckOthers, .mixWithOthers])
+            try recordingSession.setActive(true)
+            audioPlayer?.play()
+            currentlyPlaying = recording
+            state = .playing
+            logger.info("AudioRecorder: playRecording: \(recording.createdAt)")
+        } catch {
+            logger.warning("AudioRecorder: playRecording failed: \(error.localizedDescription)")
+        }
+    }
     public func play(recording: AudioRecording) {
-		do {
-			audioPlayer = try AVAudioPlayer(contentsOf: getDocumentsDirectory().appendingPathComponent(recording.fileName))
-			audioPlayer?.delegate = self
-			audioPlayer?.play()
-			
-			currentlyPlaying = recording
-			state = .playing
-			logger.info("AudioRecorder: playRecording: \(recording.createdAt)")
-		} catch {
-			logger.warning("AudioRecorder: playRecording failed: \(error.localizedDescription)")
-		}
+        stopPlaying()
+        playQueue = [recording]
+        play()
     }
 	
 	public func play(recordings: [AudioRecording]) {
+        stopPlaying()
 		playQueue = recordings
-		
-		if let first = recordings.first {
-			play(recording: first)
-		}
+        play()
 	}
     
     public func stopPlaying() {
         if let audioPlayer = audioPlayer {
             audioPlayer.stop()
             self.audioPlayer = nil
-            currentlyPlaying = nil
-			
+            do {
+                try recordingSession.setActive(false)
+                try recordingSession.setCategory(
+                    .playAndRecord,
+                    mode: .videoRecording,
+                    options: [
+                        .defaultToSpeaker,
+                        .allowBluetooth,
+                        .allowAirPlay,
+                        .mixWithOthers,
+                        .duckOthers,
+                        //.interruptSpokenAudioAndMixWithOthers
+                     ]
+                )
+            }
+            catch {
+                logger.warning("AudioRecorder: stopPlaying failed: \(error.localizedDescription)")
+            }
             logger.info("AudioRecorder: stopPlaying")
-			
-			guard let playQueue = playQueue, !playQueue.isEmpty else {
-				return
-			}
-			
+            self.playQueue = []
+            currentlyPlaying = nil
 			state = .initial
-        } else {
-            logger.warning("AudioRecorder: stopPlaying failed: audioPlayer is nil")
         }
     }
     
@@ -154,6 +183,19 @@ final class AudioRecorder: NSObject, ObservableObject {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return paths[0]
     }
+
+    private func setPreferedRecordingInput() {
+        do {
+            let availableInputs = recordingSession.availableInputs
+            let input = availableInputs!.count > 1
+                ? availableInputs![1]
+                : availableInputs![0]
+            try recordingSession.setPreferredInput(input)
+        }
+        catch {
+            logger.warning("AudioRecorder: preferedInput failed: \(error.localizedDescription)")
+        }
+    }
 }
                          
 // MARK: - AVAudioRecorderDelegate
@@ -172,7 +214,7 @@ extension AudioRecorder: AVAudioRecorderDelegate {
                 length: player?.duration ?? 0
             )
             state = .recorded(recording)
-            logger.info("AudioRecorder: finishRecording success")
+            logger.info("AudioRecorder: finishRecording success, length \(recording.length)s")
         } else {
 			state = .error(.unknown(nil))
             logger.error("AudioRecorder: finishRecording failed.")
@@ -185,15 +227,16 @@ extension AudioRecorder: AVAudioRecorderDelegate {
 extension AudioRecorder: AVAudioPlayerDelegate {
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         logger.info("AudioRecorder: didFinishPlaying")
-		
-        stopPlaying()
-		
-		if let queue = playQueue, !queue.isEmpty {
-			playQueue?.removeFirst()
-			
-			if let next = playQueue?.first {
-				play(recording: next)
-			}
-		}
+
+        if !playQueue.isEmpty {
+            playQueue.removeFirst()
+        }
+		if !playQueue.isEmpty {
+            logger.info("AudioRecorder: play next in queue")
+            state = .initial    // reset to update in play() for each new played recording
+			play()
+		} else {
+            stopPlaying()
+        }
     }
 }

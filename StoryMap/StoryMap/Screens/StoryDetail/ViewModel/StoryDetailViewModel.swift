@@ -37,7 +37,7 @@ final class StoryDetailViewModel {
     
     private let storyDataProvider = StoryDataProvider.shared
     
-    @ObservedObject private var audioRecorder = AudioRecorder()
+    @ObservedObject private var audioRecorder = AudioRecorder.shared
 	
 	private var recordings: [AudioRecordingInfo]
     
@@ -121,7 +121,7 @@ final class StoryDetailViewModel {
 			.sink { [weak self] recording in
 				logger.info("DetailVM: currentlyPlayingObserver: \(recording?.createdAt ?? "nil")")
             
-				self?.updateRecordings(with: recording)
+				self?.updateRecordings()
 			}
 			.store(in: &subscribers)
     }
@@ -131,12 +131,14 @@ final class StoryDetailViewModel {
 			
 		case .initial:
 			state = .initial
+            updateRecordings()
 		case .recording:
 			state = .inProgress
 		case .recorded(let recording):
 			saveRecording(recording)
 			state = .done
 		case .playing:
+            updateRecordings()
 			break
 		case .error(let error):
 			if case .permissionDenied = error {
@@ -145,7 +147,8 @@ final class StoryDetailViewModel {
 		}
 	}
 	
-	private func updateRecordings(with currentlyPlaying: AudioRecording?) {
+	private func updateRecordings() {
+        let currentlyPlaying = audioRecorder.currentlyPlaying
 		recordings = recordings.map { rec in
 			AudioRecordingInfo(recording: rec.recording, isPlaying: rec.recording == currentlyPlaying)
 		}

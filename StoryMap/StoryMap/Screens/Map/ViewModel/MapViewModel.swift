@@ -21,7 +21,7 @@ class MapViewModel: ObservableObject {
 	
 	@Published private var stories: [Story] = []
 	
-	private let audioRecorder = AudioRecorder()
+	private let audioRecorder = AudioRecorder.shared
 	private var subscribers = Set<AnyCancellable>()
 	
 	private var currentlyPlaying: Story? {
@@ -51,17 +51,14 @@ class MapViewModel: ObservableObject {
 	}
 	
 	func openStory(with index: Int) {
-		audioRecorder.stopPlaying()
 		openStorySubject.send(stories[index])
 	}
 	
 	func addStory(with location: Location) {
 		Configuration.isSimulator ? addTestStory() : addStorySubject.send(location)
-		audioRecorder.stopPlaying()
 	}
 	
 	func openStoryList() {
-		audioRecorder.stopPlaying()
 		openStoryListSubject.send()
 	}
 	
